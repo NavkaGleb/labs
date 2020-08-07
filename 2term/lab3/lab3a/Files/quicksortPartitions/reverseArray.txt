@@ -1,0 +1,7 @@
+							2^12	2^13	2^14	
+1. quicksort llpartition	0.010	0.038	0.138	
+2. quicksort lrpartition	0.013	0.055	0.229	
+3. quicksort hlpartition	0.011	0.068	0.192	
+4. quicksort hrpartition	0.012	0.046	0.196	
+5. quicksort lmof3partition	0.002	0.007	0.033	
+6. quicksort hmof3partition	0.001	0.005	0.018	

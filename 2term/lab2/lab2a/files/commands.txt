@@ -1,0 +1,9 @@
+0 - get deque size
+1 - get front element
+2 - get back element
+3 - push randomly generated circle to front
+4 - push randomly generated circle to back
+5 - pop front element
+6 - pop back element
+7 - check for deque emptiness
+8 - clear deque

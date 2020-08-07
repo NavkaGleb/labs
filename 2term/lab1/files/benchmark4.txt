@@ -1,0 +1,241 @@
+------------------- search by area range, by attackType and by specialAttack -------------------
+monsters amount = 10
+clearing memory: 0
+clearing memory and file: 0.003
+creating: 0.003
+iteration time: 0.007
+loading: 0
+saving: 0.001
+searching: 0
+found records: 0
+free locations: 1
+file size: 694 bytes
+
+monsters amount = 20
+clearing memory: 0
+clearing memory and file: 0.002
+creating: 0.002
+iteration time: 0.006
+loading: 0
+saving: 0.001
+searching: 0.001
+found records: 0
+free locations: 1
+file size: 1419 bytes
+
+monsters amount = 40
+clearing memory: 0
+clearing memory and file: 0.003
+creating: 0.003
+iteration time: 0.009
+loading: 0.001
+saving: 0.001
+searching: 0.001
+found records: 0
+free locations: 1
+file size: 2821 bytes
+
+monsters amount = 80
+clearing memory: 0
+clearing memory and file: 0.003
+creating: 0.003
+iteration time: 0.011
+loading: 0.001
+saving: 0.002
+searching: 0.002
+found records: 0
+free locations: 1
+file size: 5683 bytes
+
+monsters amount = 160
+clearing memory: 0
+clearing memory and file: 0.005
+creating: 0.003
+iteration time: 0.021
+loading: 0.005
+saving: 0.004
+searching: 0.004
+found records: 0
+free locations: 1
+file size: 11334 bytes
+
+monsters amount = 320
+clearing memory: 0
+clearing memory and file: 0.005
+creating: 0.006
+iteration time: 0.04
+loading: 0.01
+saving: 0.01
+searching: 0.009
+found records: 0
+free locations: 1
+file size: 22748 bytes
+
+monsters amount = 640
+clearing memory: 0
+clearing memory and file: 0.005
+creating: 0.007
+iteration time: 0.07
+loading: 0.021
+saving: 0.018
+searching: 0.019
+found records: 1
+free locations: 1
+file size: 45515 bytes
+
+monsters amount = 1280
+clearing memory: 0.001
+clearing memory and file: 0.006
+creating: 0.009
+iteration time: 0.132
+loading: 0.041
+saving: 0.035
+searching: 0.04
+found records: 1
+free locations: 1
+file size: 90963 bytes
+
+monsters amount = 2560
+clearing memory: 0.001
+clearing memory and file: 0.002
+creating: 0.013
+iteration time: 0.148
+loading: 0.037
+saving: 0.062
+searching: 0.033
+found records: 3
+free locations: 1
+file size: 181978 bytes
+
+monsters amount = 5120
+clearing memory: 0
+clearing memory and file: 0.003
+creating: 0.01
+iteration time: 0.209
+loading: 0.068
+saving: 0.061
+searching: 0.067
+found records: 8
+free locations: 1
+file size: 363489 bytes
+
+monsters amount = 10240
+clearing memory: 0.002
+clearing memory and file: 0.004
+creating: 0.019
+iteration time: 0.625
+loading: 0.242
+saving: 0.185
+searching: 0.173
+found records: 16
+free locations: 1
+file size: 727070 bytes
+
+monsters amount = 20480
+clearing memory: 0.005
+clearing memory and file: 0.007
+creating: 0.039
+iteration time: 1.081
+loading: 0.351
+saving: 0.376
+searching: 0.303
+found records: 23
+free locations: 1
+file size: 1454816 bytes
+
+monsters amount = 40960
+clearing memory: 0.005
+clearing memory and file: 0.009
+creating: 0.102
+iteration time: 2.052
+loading: 0.745
+saving: 0.596
+searching: 0.595
+found records: 79
+free locations: 1
+file size: 2908764 bytes
+
+monsters amount = 61440
+clearing memory: 0.012
+clearing memory and file: 0.012
+creating: 0.128
+iteration time: 3.167
+loading: 1.019
+saving: 1.031
+searching: 0.964
+found records: 85
+free locations: 1
+file size: 4364036 bytes
+
+monsters amount = 81920
+clearing memory: 0.023
+clearing memory and file: 0.015
+creating: 0.191
+iteration time: 4.428
+loading: 1.304
+saving: 1.385
+searching: 1.51
+found records: 122
+free locations: 1
+file size: 5817940 bytes
+
+monsters amount = 102400
+clearing memory: 0.027
+clearing memory and file: 0.023
+creating: 0.241
+iteration time: 5.52
+loading: 2.01
+saving: 1.371
+searching: 1.848
+found records: 186
+free locations: 1
+file size: 7272340 bytes
+
+monsters amount = 122880
+clearing memory: 0.018
+clearing memory and file: 0.021
+creating: 0.278
+iteration time: 6.357
+loading: 2.177
+saving: 1.576
+searching: 2.287
+found records: 185
+free locations: 1
+file size: 8726331 bytes
+
+monsters amount = 143360
+clearing memory: 0.024
+clearing memory and file: 0.024
+creating: 0.335
+iteration time: 7.634
+loading: 2.709
+saving: 2.239
+searching: 2.303
+found records: 261
+free locations: 1
+file size: 10182279 bytes
+
+monsters amount = 163840
+clearing memory: 0.023
+clearing memory and file: 0.028
+creating: 0.401
+iteration time: 9.179
+loading: 3.006
+saving: 2.897
+searching: 2.824
+found records: 256
+free locations: 1
+file size: 11635617 bytes
+
+monsters amount = 184320
+clearing memory: 0.033
+clearing memory and file: 0.034
+creating: 0.449
+iteration time: 12.593
+loading: 4.535
+saving: 3.839
+searching: 3.703
+found records: 287
+free locations: 1
+file size: 13091016 bytes
+

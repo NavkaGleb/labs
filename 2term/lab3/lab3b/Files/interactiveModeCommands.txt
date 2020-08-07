@@ -1,0 +1,4 @@
+0 - print all data from memory
+1 - generate 'n' random monsters
+2 - sort data in memory by field
+3 - exit

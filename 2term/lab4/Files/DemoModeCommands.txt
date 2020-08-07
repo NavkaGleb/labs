@@ -1,0 +1,1 @@
+0 generalTree 0 2 generalTree 3 10 0 2 6 5 2 228 0.7 4 5 6 1 1 n 7 43 8 0 binaryTree 1 2 binaryTree 1 8 0 228 4 5 2 4 3 4 6 3 0 expressionTree 2 2 expressionTree 0 sin(ln(x^2))+log2(y) 1 2 2 x 1 y 2.5 4 5 x 1 4 1 7 8 3

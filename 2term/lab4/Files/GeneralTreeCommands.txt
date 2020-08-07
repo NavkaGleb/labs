@@ -1,0 +1,9 @@
+0 - get node by path                                      (requires: path)
+1 - add new node to tree by path to parent                (requires: int value, path)
+2 - add new node to tree by probability                   (requires: int value, probability)
+3 - add 'n' new random nodes to the tree in random order  (requires: int amount)
+4 - print tree using tabs                                 (no params)
+5 - print tree using tabs and path to node                (no params)
+6 - delete sub tree and get this sub tree                 (requires: path to node of sub tree)
+7 - delete all sub threes and get amount of deleted nodes (requires: int value)
+8 - exit
