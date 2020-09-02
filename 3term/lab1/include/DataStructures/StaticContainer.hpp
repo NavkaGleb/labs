@@ -18,12 +18,8 @@ namespace ng {
 			virtual ~Iterator() = default;
 
 			// accessors
-			virtual T& operator * () = 0;
-			virtual T* operator -> () = 0;
-
-			// public methods
-			virtual bool operator != (const Iterator& other) = 0;
-			virtual bool operator == (const Iterator& other) = 0;
+			virtual T& operator*() = 0;
+			virtual T* operator->() = 0;
 
 		}; // class Iterator
 
@@ -34,12 +30,8 @@ namespace ng {
 			virtual ~ConstIterator() = default;
 
 			// accessors
-			virtual const T& operator * () const = 0;
-			virtual const T* operator -> () const = 0;
-
-			// public methods
-			virtual bool operator != (const ConstIterator& other) = 0;
-			virtual bool operator == (const ConstIterator& other) = 0;
+			virtual const T& operator*() const = 0;
+			virtual const T* operator->() const = 0;
 
 		}; // class ConstIterator
 
@@ -54,10 +46,12 @@ namespace ng {
 		virtual T& front() = 0;
 		virtual T& back() = 0;
 		virtual T& at(std::size_t index) = 0;
+		virtual T& operator[](std::size_t index) = 0;
 
 		virtual const T& front() const = 0;
 		virtual const T& back() const = 0;
 		virtual const T& at(std::size_t index) const = 0;
+		virtual const T& operator[](std::size_t index) const = 0;
 
 	}; // class StaticContainer
 
