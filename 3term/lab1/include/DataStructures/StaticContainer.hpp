@@ -22,12 +22,8 @@ namespace ng {
 			virtual T* operator -> () = 0;
 
 			// public methods
-			virtual Iterator& operator ++ () = 0;
-			virtual Iterator& operator -- () = 0;
-			virtual Iterator& operator += (int n) = 0;
-			virtual Iterator& operator -= (int n) = 0;
-
 			virtual bool operator != (const Iterator& other) = 0;
+			virtual bool operator == (const Iterator& other) = 0;
 
 		}; // class Iterator
 
@@ -42,12 +38,8 @@ namespace ng {
 			virtual const T* operator -> () const = 0;
 
 			// public methods
-			virtual ConstIterator& operator ++ () = 0;
-			virtual ConstIterator& operator -- () = 0;
-			virtual ConstIterator& operator += (int n) = 0;
-			virtual ConstIterator& operator -= (int n) = 0;
-
 			virtual bool operator != (const ConstIterator& other) = 0;
+			virtual bool operator == (const ConstIterator& other) = 0;
 
 		}; // class ConstIterator
 
@@ -57,7 +49,7 @@ namespace ng {
 
 		// accessors
 		[[nodiscard]] virtual bool empty() const = 0;
-		[[nodiscard]] virtual std::size_t size() const = 0;
+		[[nodiscard]] virtual const std::size_t& size() const = 0;
 
 		virtual T& front() = 0;
 		virtual T& back() = 0;

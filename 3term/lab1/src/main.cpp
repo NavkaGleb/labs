@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <array>
+#include <Array.hpp>
 
 int main() {
 
-	std::array<int, 3> array{};
+	ng::Array<int, 3> array;
 
 }
