@@ -1,6 +1,14 @@
 #include <iostream>
 
 #include <Array.hpp>
+#include <MatrixGraph.hpp>
+
+struct Vertex {
+
+	int x;
+	int y;
+
+};
 
 int main() {
 
@@ -10,6 +18,16 @@ int main() {
 		std::cout << e << " ";
 	std::cout << std::endl;
 
-	std::cout << array[1] << std::endl;
+	ng::MatrixGraph<Vertex> graph(false, true);
+
+	graph.pushNode(0);
+	graph.pushNode(1);
+	graph.pushNode(2);
+
+	graph.pushEdge(0, 1, 12);
+	graph.pushEdge(1, 2, 43);
+
+	graph.print();
+
 
 }
