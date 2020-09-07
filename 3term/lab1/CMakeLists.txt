@@ -9,7 +9,7 @@ set(SOURCE_FILES
     include/DataStructures/StaticContainer.hpp
     include/DataStructures/DynamicContainer.hpp
     include/DataStructures/SortedContainer.hpp
-    include/DataStructures/Array.hpp include/DataStructures/MatrixGraph.hpp include/DataStructures/Graph.hpp)
+    include/DataStructures/Array.hpp include/DataStructures/MatrixGraph.hpp include/DataStructures/Graph.hpp include/DataStructures/ListGraph.hpp)
 
 # include directories
 include_directories(
