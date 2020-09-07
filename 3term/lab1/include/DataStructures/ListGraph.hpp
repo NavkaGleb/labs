@@ -252,7 +252,7 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::popNode(const N& value) {
 
-
+        // https://www.includehelp.com/ds/insertion-and-deletion-of-nodes-and-edges-in-a-graph-using-adjacency-list.aspx
 
     }
 
