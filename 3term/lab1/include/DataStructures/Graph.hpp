@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 namespace ng {
 
@@ -36,13 +37,9 @@ namespace ng {
 		virtual void clear() = 0;
 		virtual void print() const = 0;
 
-//		virtual void bfs(int snode, bool* visited) const = 0;
-//		virtual void bfs(int snode, std::vector<int>& distance) const = 0;
-//		[[nodiscard]] virtual std::vector<int> bfs(int snode) const = 0;
-//
-		virtual void dfs(const N& node, bool* visited) const = 0;
-		virtual void dfs(const N& node, std::vector<N>& path) const = 0;
-		[[nodiscard]] virtual std::vector<N> dfs(const N& node) const = 0;
+        virtual void dfs(const N& node, bool* visited) const = 0;
+        virtual void dfs(const N& node, std::vector<N>& path) const = 0;
+        [[nodiscard]] virtual std::vector<N> dfs(const N& node) const = 0;
 //
 //		[[nodiscard]] virtual std::vector<int> dijkstra(int snode) const = 0;
 //		[[nodiscard]] virtual std::vector<std::vector<int>> floyd() const = 0;

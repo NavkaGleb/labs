@@ -6,6 +6,8 @@
 #include <functional>
 #include <stack>
 #include <iostream>
+#include <queue>
+#include <functional>
 
 #include "Graph.hpp"
 
@@ -42,13 +44,14 @@ namespace ng {
 		void clear() override;
 		void print() const override;
 
-//		void bfs(int snode, bool* visited) const override;
-//		void bfs(int snode, std::vector<int>& distance) const override;
-//		[[nodiscard]] std::vector<int> bfs(int snode) const override;
-//
-		void dfs(const N& node, bool* visited) const override;
-		void dfs(const N& node, std::vector<N>& path) const override;
-		[[nodiscard]] std::vector<N> dfs(const N& node) const override;
+        void dfs(const N& node, bool* visited) const override;
+        void dfs(const N& node, std::vector<N>& path) const override;
+        [[nodiscard]] std::vector<N> dfs(const N& node) const override;
+
+		template <typename T> void bfs(const N& node, std::map<N, T>& distance) const;
+		template <typename T> void bfs(const N& node, std::map<N, T>& distance, std::function<T(const E&)> f) const;
+		template <typename T> [[nodiscard]] std::map<N, T> bfs(const N& node) const;
+		template <typename T> [[nodiscard]] std::map<N, T> bfs(const N& node, std::function<T(const E&)> f) const;
 //
 //		[[nodiscard]] std::vector<int> dijkstra(int snode) const override;
 //		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
@@ -70,7 +73,6 @@ namespace ng {
 		bool _weighed;
 
 		// private methods
-//		void _addEdge(const int& fnode, const int& tnode, const int& weight, const bool& increment = true);
 		void _dfs(const N& node, bool* visited, std::vector<N>* path) const;
 		void _dfs(const int& nodeIndex, bool* visited) const;
 
@@ -81,7 +83,7 @@ namespace ng {
 	MatrixGraph<N, E>::MatrixGraph()
 		: _edges(0), _directed(false), _weighed(false) {
 
-    
+
 
 	}
 
@@ -350,6 +352,146 @@ namespace ng {
 	    return path;
 
 	}
+
+    template <typename N, typename E>
+    template <typename T>
+    void MatrixGraph<N, E>::bfs(const N& node, std::map<N, T>& distance) const {
+
+        bool* visited = new bool[this->_nodes.size()]();
+        std::queue<N> queue;
+        N cnode = node;
+
+        visited[this->_nodes.at(node)] = true;
+        queue.emplace(node);
+
+        while (!queue.empty()) {
+
+            cnode = queue.front();
+            queue.pop();
+
+            for (const auto& p : this->_nodes) {
+
+                if (this->_matrix[this->_nodes.at(cnode)][p.second] && !visited[p.second]) {
+
+                    visited[p.second] = true;
+                    queue.emplace(p.first);
+                    distance[p.first] = distance[cnode] + *this->_matrix[this->_nodes.at(cnode)][p.second];
+
+                }
+
+            }
+
+        }
+
+        delete [] visited;
+
+    }
+
+    template <typename N, typename E>
+    template <typename T>
+    void MatrixGraph<N, E>::bfs(const N& node, std::map<N, T>& distance, std::function<T(const E&)> f) const {
+
+        bool* visited = new bool[this->_nodes.size()]();
+        std::queue<N> queue;
+        N cnode = node;
+
+        visited[this->_nodes.at(node)] = true;
+        queue.emplace(node);
+
+        while (!queue.empty()) {
+
+            cnode = queue.front();
+            queue.pop();
+
+            for (const auto& p : this->_nodes) {
+
+                if (this->_matrix[this->_nodes.at(cnode)][p.second] && !visited[p.second]) {
+
+                    visited[p.second] = true;
+                    queue.emplace(p.first);
+                    distance[p.first] = distance[cnode] + f(*this->_matrix[this->_nodes.at(cnode)][p.second]);
+
+                }
+
+            }
+
+        }
+
+        delete [] visited;
+
+    }
+
+    template <typename N, typename E>
+    template <typename T>
+    std::map<N, T> MatrixGraph<N, E>::bfs(const N& node) const {
+
+        bool* visited = new bool[this->_nodes.size()]();
+        std::map<N, T> distance;
+        std::queue<N> queue;
+        N cnode = node;
+
+        visited[this->_nodes.at(node)] = true;
+        queue.emplace(node);
+
+        while (!queue.empty()) {
+
+            cnode = queue.front();
+            queue.pop();
+
+            for (const auto& p : this->_nodes) {
+
+                if (this->_matrix[this->_nodes.at(cnode)][p.second] && !visited[p.second]) {
+
+                    visited[p.second] = true;
+                    queue.emplace(p.first);
+                    distance[p.first] = distance[cnode] + *this->_matrix[this->_nodes.at(cnode)][p.second];
+
+                }
+
+            }
+
+        }
+
+        delete [] visited;
+        return distance;
+
+    }
+
+    template <typename N, typename E>
+    template <typename T>
+    std::map<N, T> MatrixGraph<N, E>::bfs(const N& node, std::function<T(const E&)> f) const {
+
+        bool* visited = new bool[this->_nodes.size()]();
+        std::map<N, T> distance;
+        std::queue<N> queue;
+        N cnode = node;
+
+        visited[this->_nodes.at(node)] = true;
+        queue.emplace(node);
+
+        while (!queue.empty()) {
+
+            cnode = queue.front();
+            queue.pop();
+
+            for (const auto& p : this->_nodes) {
+
+                if (this->_matrix[this->_nodes.at(cnode)][p.second] && !visited[p.second]) {
+
+                    visited[p.second] = true;
+                    queue.emplace(p.first);
+                    distance[p.first] = distance[cnode] + f(*this->_matrix[this->_nodes.at(cnode)][p.second]);
+
+                }
+
+            }
+
+        }
+
+        delete [] visited;
+        return distance;
+
+    }
 
 	// private methods
 	template <typename N, typename E>

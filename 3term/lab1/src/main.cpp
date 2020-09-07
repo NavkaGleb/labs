@@ -15,15 +15,18 @@ struct Vertex {
 
 };
 
+struct Edge {
+    float value;
+    std::string name;
+
+    friend std::ostream& operator<<(std::ostream& ostream, const Edge& edge) {
+        return ostream << edge.name << " -> " << edge.value;
+    }
+};
+
 int main() {
 
-	ng::Array<int> array = { 1, 5, 36, 94 };
-
-	for (const auto& e : array)
-		std::cout << e << " ";
-	std::cout << std::endl;
-
-	ng::MatrixGraph<Vertex> graph(false, true);
+	ng::MatrixGraph<Vertex, float> graph(false, true);
 
 	Vertex a = { 0, 1 };
 	Vertex b = { 2, 3 };
@@ -35,17 +38,22 @@ int main() {
 	graph.pushNode(c);
 	graph.pushNode(d);
 
-	graph.pushEdge(a, b, 3);
-	graph.pushEdge(a, c, 7);
-	graph.pushEdge(b, d, 8);
+	graph.pushEdge(a, b, 3.541f);
+	graph.pushEdge(a, c, 7.542f);
+	graph.pushEdge(b, d, 8.5f);
 
 	graph.print();
 
-//	graph.popEdge(a, b);
-//
-//	std::cout << "---" << std::endl;
-//	graph.print();
+	std::function<float(const Edge&)> func = [](const Edge& edge) { return edge.value; };
 
+    std::map<Vertex, float> distance = graph.bfs<float>(a);
+
+	std::cout << "distance\n";
+	for (const auto& p : distance)
+        std::cout << "{ " << p.first.x << ", " << p.first.y << " } -> " << p.second << std::endl;
+
+
+    std::cout << "-----" << std::endl;
 	std::vector<Vertex> path;
 	graph.dfs(a, path);
 
