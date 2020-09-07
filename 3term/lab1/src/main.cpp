@@ -2,7 +2,8 @@
 #include <algorithm>
 
 #include <Array.hpp>
-#include <MatrixGraph.hpp>
+//#include <MatrixGraph.hpp>
+#include <ListGraph.hpp>
 
 struct Vertex {
 
@@ -11,6 +12,10 @@ struct Vertex {
 
 	bool operator<(const Vertex& other) const {
 	    return x * y < other.x * other.y;
+	}
+
+	bool operator==(const Vertex& other) const {
+	    return this->x == other.x && this->y == other.y;
 	}
 
 };
@@ -26,7 +31,7 @@ struct Edge {
 
 int main() {
 
-	ng::MatrixGraph<Vertex, float> graph(false, true);
+	ng::ListGraph<Vertex> graph(false, true);
 
 	Vertex a = { 0, 1 };
 	Vertex b = { 2, 3 };
@@ -38,26 +43,17 @@ int main() {
 	graph.pushNode(c);
 	graph.pushNode(d);
 
-	graph.pushEdge(a, b, 3.541f);
-	graph.pushEdge(a, c, 7.542f);
-	graph.pushEdge(b, d, 8.5f);
+	graph.pushEdge(a, b, 3);
+	graph.pushEdge(a, c, 7);
+	graph.pushEdge(b, d, 8);
 
-	graph.print();
+	std::function<int(const int&)> f = [](const int& e) { return e; };
 
-	std::function<float(const Edge&)> func = [](const Edge& edge) { return edge.value; };
+	auto distance = graph.bfs(a, f);
 
-    std::map<Vertex, float> distance = graph.bfs<float>(a);
-
-	std::cout << "distance\n";
 	for (const auto& p : distance)
-        std::cout << "{ " << p.first.x << ", " << p.first.y << " } -> " << p.second << std::endl;
+	    std::cout << "{ " << p.first.x << ", " << p.first.y << "} -> " << p.second << std::endl;
 
-
-    std::cout << "-----" << std::endl;
-	std::vector<Vertex> path;
-	graph.dfs(a, path);
-
-	for (const auto& v : path)
-	    std::cout << "{ " << v.x << ", " << v.y << " }" << " ";
+	distance.begin()->first.x;
 
 }

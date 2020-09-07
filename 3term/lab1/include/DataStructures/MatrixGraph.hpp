@@ -18,7 +18,7 @@ namespace ng {
 	public:
 		// constructor / destructor
 		MatrixGraph();
-		explicit MatrixGraph(bool directed, bool weighed);
+		MatrixGraph(bool directed, bool weighed);
 		~MatrixGraph() override;
 
 		// accessors
@@ -67,7 +67,6 @@ namespace ng {
 		// variables
 		std::vector<std::vector<E*>> _matrix;
 		std::map<N, int> _nodes;
-		std::vector<int> _emptyNodes;
 		int _edges;
 		bool _directed;
 		bool _weighed;
@@ -80,18 +79,10 @@ namespace ng {
 
 	// constructor / destructor
 	template <typename N, typename E>
-	MatrixGraph<N, E>::MatrixGraph()
-		: _edges(0), _directed(false), _weighed(false) {
-
-
-
-	}
+	MatrixGraph<N, E>::MatrixGraph() : _edges(0), _directed(false), _weighed(false) {}
 
 	template <typename N, typename E>
-	MatrixGraph<N, E>::MatrixGraph(bool directed, bool weighed)
-		: _edges(0), _directed(directed), _weighed(weighed) {
-
-	}
+	MatrixGraph<N, E>::MatrixGraph(bool directed, bool weighed) : _edges(0), _directed(directed), _weighed(weighed) {}
 
 	template <typename N, typename E>
 	MatrixGraph<N, E>::~MatrixGraph() {
@@ -121,7 +112,7 @@ namespace ng {
 	template <typename N, typename E>
 	bool MatrixGraph<N, E>::connected() const {
 
-		auto* visited = new bool[this->_nodes.size()];
+		auto* visited = new bool[this->_nodes.size()]();
 
 		this->_dfs(0, visited);
 
@@ -146,83 +137,83 @@ namespace ng {
 
 		std::vector<std::vector<N>> components;
 
-//		if (!this->_directed) {
-//
-//			std::vector<int> component;
-//			bool* visited = new bool[this->_nodes.size()];
-//			std::fill_n(visited, this->_nodes.size(), false);
-//
-//			for (int i = 0; i < this->_nodes.size(); i++) {
-//
-//				if (!visited[i]) {
-//
-//					component.clear();
-//					this->_dfs(i, visited, &component);
-//					components.emplace_back(component);
-//
-//				}
-//
-//			}
-//
-//			delete [] visited;
-//
-//		} else {
-//
-//			// Tarjan's Strongly Connected Component Algorithm
-//			int id = 0;
-//			bool* onStack = new bool[this->_nodes.size()]();
-//			int* ids = new int[this->_nodes.size()]();
-//			int* low = new int[this->_nodes.size()]();
-//			std::stack<int> stack;
-//
-//			std::fill_n(ids, this->_nodes.size(), -1);
-//
-//			std::function<void(int)> _dfs = [&](int snode) {
-//
-//				stack.emplace(snode);
-//				onStack[snode] = true;
-//				ids[snode] = id;
-//				low[snode] = id++;
-//
-//				for (int i = 0; i < this->_nodes; i++) {
-//
-//					if (this->_matrix[snode][i] && ids[i] == -1)
-//						_dfs(i);
-//
-//					if (this->_matrix[snode][i] && onStack[i])
-//						low[snode] = std::min(low[snode], low[i]);
-//
-//				}
-//
-//				if (ids[snode] == low[snode]) {
-//
-//					components.emplace_back(std::vector<int>(0));
-//
-//					for (int node = stack.top(); ; node = stack.top()) {
-//
-//						stack.pop();
-//						onStack[node] = false;
-//						components.back().emplace_back(node);
-//
-//						if (node == snode) break;
-//
-//					}
-//
-//					std::reverse(components.back().begin(), components.back().end());
-//
-//				}
-//
-//			};
-//
-//			for (int i = 0; i < this->_nodes.size(); i++)
-//				if (ids[i] == -1)
-//					_dfs(i);
-//
-//			delete [] onStack;
-//			delete [] ids;
-//			delete [] low;
-//
-//		}
+		if (!this->_directed) {
+
+			std::vector<N> component;
+			bool* visited = new bool[this->_nodes.size()]();
+
+			for (const auto& p : this->_nodes) {
+
+				if (!visited[p.second]) {
+
+					component.clear();
+					this->_dfs(p.first, visited, &component);
+					components.emplace_back(component);
+
+				}
+
+			}
+
+			delete [] visited;
+
+		} else {
+
+			// Tarjan's Strongly Connected Component Algorithm
+			int id = 0;
+			bool* onStack = new bool[this->_nodes.size()]();
+			int* ids = new int[this->_nodes.size()]();
+			int* low = new int[this->_nodes.size()]();
+			std::stack<N> stack;
+
+			std::fill_n(ids, this->_nodes.size(), -1);
+
+			std::function<void(const N&)> _dfs = [&](const N& node) {
+
+				stack.emplace(node);
+				onStack[this->_nodes.at(node)] = true;
+				ids[this->_nodes.at(node)] = id;
+				low[this->_nodes.at(node)] = id++;
+
+				for (const auto& p : this->_nodes) {
+
+					if (this->_matrix[this->_nodes.at(node)][p.second] && ids[p.second] == -1)
+						_dfs(p.first);
+
+					if (this->_matrix[this->_nodes.at(node)][p.second] && onStack[p.second])
+						low[this->_nodes.at(node)] = std::min(low[this->_nodes.at(node)], low[p.second]);
+
+				}
+
+				if (ids[this->_nodes.at(node)] == low[this->_nodes.at(node)]) {
+
+					components.emplace_back(std::vector<N>(0));
+
+					for (N n = stack.top(); ; n = stack.top()) {
+
+						stack.pop();
+						onStack[this->_nodes.at(n)] = false;
+						components.back().emplace_back(n);
+
+						if (n == node)
+						    break;
+
+					}
+
+					std::reverse(components.back().begin(), components.back().end());
+
+				}
+
+			};
+
+			for (const auto p : this->_nodes)
+				if (ids[p.second] == -1)
+					_dfs(p.first);
+
+			delete [] onStack;
+			delete [] ids;
+			delete [] low;
+
+		}
 
 		return components;
 
