@@ -1,6 +1,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <iterator>
 
 #include "StaticContainer.hpp"
 
@@ -10,7 +11,7 @@ namespace ng {
 	class Array : public StaticContainer<T> {
 	public:
 		// inner classes
-		class Iterator : public StaticContainer<T>::Iterator {
+	    class Iterator : public StaticContainer<T>::Iterator {
 		public:
 			// constructor / destructor
 			Iterator(T* data, std::size_t index);
@@ -35,7 +36,7 @@ namespace ng {
 
 		}; // class Iterator
 
-		class ConstIterator : public StaticContainer<T>::ConstIterator {
+	    class ConstIterator : public StaticContainer<T>::ConstIterator {
 		public:
 			// constructor / destructor
 			ConstIterator(T* data, std::size_t index);

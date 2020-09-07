@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <initializer_list>
 #include <functional>
 #include <stack>
@@ -46,9 +46,9 @@ namespace ng {
 //		void bfs(int snode, std::vector<int>& distance) const override;
 //		[[nodiscard]] std::vector<int> bfs(int snode) const override;
 //
-//		void dfs(int snode, bool* visited) const override;
-//		void dfs(int snode, std::vector<int>& path) const override;
-//		[[nodiscard]] std::vector<int> dfs(int snode) const override;
+		void dfs(const N& node, bool* visited) const override;
+		void dfs(const N& node, std::vector<N>& path) const override;
+		[[nodiscard]] std::vector<N> dfs(const N& node) const override;
 //
 //		[[nodiscard]] std::vector<int> dijkstra(int snode) const override;
 //		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
@@ -63,15 +63,16 @@ namespace ng {
 	private:
 		// variables
 		std::vector<std::vector<E*>> _matrix;
-		std::unordered_map<N, int> _nodes;
+		std::map<N, int> _nodes;
+		std::vector<int> _emptyNodes;
 		int _edges;
 		bool _directed;
 		bool _weighed;
 
 		// private methods
-//		void _rfill();
 //		void _addEdge(const int& fnode, const int& tnode, const int& weight, const bool& increment = true);
-//		void _dfs(int snode, bool* visited, std::vector<int>* path = nullptr) const;
+		void _dfs(const N& node, bool* visited, std::vector<N>* path) const;
+		void _dfs(const int& nodeIndex, bool* visited) const;
 
 	}; // class MatrixGraph
 
@@ -80,7 +81,7 @@ namespace ng {
 	MatrixGraph<N, E>::MatrixGraph()
 		: _edges(0), _directed(false), _weighed(false) {
 
-
+    
 
 	}
 
@@ -118,15 +119,22 @@ namespace ng {
 	template <typename N, typename E>
 	bool MatrixGraph<N, E>::connected() const {
 
-//		auto* visited = new bool[this->_nodes.size()];
-//
-//		this->dfs(0, visited);
-//
-//		for (int i = 0; i < this->_nodes.size(); i++)
-//			if (!visited[i])
-//				return false;
-//
-//		delete [] visited;
+		auto* visited = new bool[this->_nodes.size()];
+
+		this->_dfs(0, visited);
+
+		for (int i = 0; i < this->_nodes.size(); ++i) {
+
+            if (!visited[i]) {
+
+                delete [] visited;
+                return false;
+
+            }
+
+        }
+
+		delete [] visited;
 		return true;
 
 	}
@@ -229,7 +237,7 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::pushNode(const N& value) {
 
-		this->_nodes[this->_nodes.size()] = value;
+		this->_nodes[value] = this->_nodes.size();
 
 		for (auto& a : this->_matrix)
 			a.emplace_back(nullptr);
@@ -291,12 +299,20 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::print() const {
 
+	    std::cout << "  ";
+	    for (int i = 0; i < this->_nodes.size(); ++i)
+	        std::cout << i << " ";
+	    std::cout << std::endl;
+
 		for (int i = 0; i < this->_nodes.size(); ++i) {
 
 			for (int j = 0; j < this->_nodes.size(); ++j) {
 
+			    if (j == 0)
+			        std::cout << i << " ";
+
 				if (this->_matrix[i][j])
-					std::cout << "1" << " ";
+					std::cout << *this->_matrix[i][j] << " ";
 				else
 					std::cout << "n" << " ";
 
@@ -305,6 +321,59 @@ namespace ng {
 			std::cout << std::endl;
 
 		}
+
+	}
+
+	template <typename N, typename E>
+	void MatrixGraph<N, E>::dfs(const N& node, bool* visited) const {
+
+        this->_dfs(node, visited, nullptr);
+
+	}
+
+	template <typename N, typename E>
+	void MatrixGraph<N, E>::dfs(const N& node, std::vector<N>& path) const {
+
+	    bool* visited = new bool[this->_nodes.size()];
+
+	    this->_dfs(node, visited, &path);
+	    delete [] visited;
+
+	}
+
+	template <typename N, typename E>
+	std::vector<N> MatrixGraph<N, E>::dfs(const N& node) const {
+
+	    std::vector<N> path;
+
+	    this->dfs(node, path);
+	    return path;
+
+	}
+
+	// private methods
+	template <typename N, typename E>
+	void MatrixGraph<N, E>::_dfs(const N& node, bool* visited, std::vector<N>* path) const {
+
+	    visited[this->_nodes.at(node)] = true;
+
+	    if (path)
+	        path->emplace_back(node);
+
+	    for (const auto& p : this->_nodes)
+	        if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second])
+	            this->_dfs(p.first, visited, path);
+
+	}
+
+	template <typename N, typename E>
+	void MatrixGraph<N, E>::_dfs(const int& nodeIndex, bool* visited) const {
+
+	    visited[nodeIndex] = true;
+
+	    for (int i = 0; i < this->_nodes.size(); ++i)
+	        if (this->_matrix[nodeIndex][i] && !visited[i])
+	            this->_dfs(i, visited);
 
 	}
 
