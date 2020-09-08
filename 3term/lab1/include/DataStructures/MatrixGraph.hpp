@@ -48,12 +48,13 @@ namespace ng {
         void dfs(const N& node, std::vector<N>& path) const override;
         [[nodiscard]] std::vector<N> dfs(const N& node) const override;
 
-		template <typename T> void bfs(N node, std::map<N, T>& distance) const;
-		template <typename T> void bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f) const;
-		template <typename T> std::map<N, T> bfs(N node) const;
-		template <typename T> std::map<N, T> bfs(N node, std::function<T(const E&)> f) const;
+		template <typename T = E>
+		void bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
+		template <typename T = E>
+		std::map<N, T> bfs(N node, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
 
-		template <typename T> std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f) const;
+		template <typename T = E>
+		std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
 //		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
 //
 //		[[nodiscard]] std::vector<int> kahn() const override;
@@ -346,39 +347,6 @@ namespace ng {
 
     template <typename N, typename E>
     template <typename T>
-    void MatrixGraph<N, E>::bfs(N node, std::map<N, T>& distance) const {
-
-        bool* visited = new bool[this->_nodes.size()]();
-        std::queue<N> queue;
-
-        visited[this->_nodes.at(node)] = true;
-        queue.emplace(node);
-
-        while (!queue.empty()) {
-
-            node = queue.front();
-            queue.pop();
-
-            for (const auto& p : this->_nodes) {
-
-                if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second]) {
-
-                    visited[p.second] = true;
-                    queue.emplace(p.first);
-                    distance[p.first] = distance[node] + *this->_matrix[this->_nodes.at(node)][p.second];
-
-                }
-
-            }
-
-        }
-
-        delete [] visited;
-
-    }
-
-    template <typename N, typename E>
-    template <typename T>
     void MatrixGraph<N, E>::bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f) const {
 
         bool* visited = new bool[this->_nodes.size()]();
@@ -407,41 +375,6 @@ namespace ng {
         }
 
         delete [] visited;
-
-    }
-
-    template <typename N, typename E>
-    template <typename T>
-    std::map<N, T> MatrixGraph<N, E>::bfs(N node) const {
-
-        bool* visited = new bool[this->_nodes.size()]();
-        std::map<N, T> distance;
-        std::queue<N> queue;
-
-        visited[this->_nodes.at(node)] = true;
-        queue.emplace(node);
-
-        while (!queue.empty()) {
-
-            node = queue.front();
-            queue.pop();
-
-            for (const auto& p : this->_nodes) {
-
-                if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second]) {
-
-                    visited[p.second] = true;
-                    queue.emplace(p.first);
-                    distance[p.first] = distance[node] + *this->_matrix[this->_nodes.at(node)][p.second];
-
-                }
-
-            }
-
-        }
-
-        delete [] visited;
-        return distance;
 
     }
 

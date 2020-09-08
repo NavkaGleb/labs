@@ -31,7 +31,7 @@ struct Edge {
 
 int main() {
 
-	ng::ListGraph<Vertex> graph(false, true);
+	ng::MatrixGraph<Vertex> graph(false, true);
 
 	Vertex a = { 0, 1 };
 	Vertex b = { 2, 3 };
@@ -47,9 +47,9 @@ int main() {
 	graph.pushEdge(a, c, 7);
 	graph.pushEdge(b, d, 8);
 
-	std::function<int(const int&)> f = [](const int& e) { return e; };
+	std::function<float(const int&)> f = [](const int& e) { return e; };
 
-	auto distance = graph.dijkstra(a, f);
+	auto distance = graph.dijkstra(a);
 
 	for (const auto& p : distance)
 	    std::cout << "{ " << p.first.x << ", " << p.first.y << " } -> " << *p.second << std::endl;
