@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #include <Array.hpp>
-//#include <MatrixGraph.hpp>
+#include <MatrixGraph.hpp>
 #include <ListGraph.hpp>
 
 struct Vertex {
@@ -31,7 +31,7 @@ struct Edge {
 
 int main() {
 
-	ng::ListGraph<Vertex> graph(false, true);
+	ng::MatrixGraph<Vertex> graph(false, true);
 
 	Vertex a = { 0, 1 };
 	Vertex b = { 2, 3 };
@@ -49,11 +49,9 @@ int main() {
 
 	std::function<int(const int&)> f = [](const int& e) { return e; };
 
-	auto distance = graph.bfs(a, f);
+	auto distance = graph.dijkstra(a, f);
 
 	for (const auto& p : distance)
-	    std::cout << "{ " << p.first.x << ", " << p.first.y << "} -> " << p.second << std::endl;
-
-	distance.begin()->first.x;
+	    std::cout << "{ " << p.first.x << ", " << p.first.y << " } -> " << *p.second << std::endl;
 
 }

@@ -40,8 +40,7 @@ namespace ng {
         virtual void dfs(const N& node, bool* visited) const = 0;
         virtual void dfs(const N& node, std::vector<N>& path) const = 0;
         [[nodiscard]] virtual std::vector<N> dfs(const N& node) const = 0;
-//
-//		[[nodiscard]] virtual std::vector<int> dijkstra(int snode) const = 0;
+
 //		[[nodiscard]] virtual std::vector<std::vector<int>> floyd() const = 0;
 //
 //		[[nodiscard]] virtual std::vector<int> kahn() const = 0;
