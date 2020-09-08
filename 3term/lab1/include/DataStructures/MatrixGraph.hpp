@@ -500,8 +500,9 @@ namespace ng {
 
             for (const auto& p : this->_nodes) {
 
-                if (this->_matrix[this->_nodes.at(node)][p.second] &&
-                    (!distance[p.first] || *distance[p.first] > *distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]))) {
+                if (this->_matrix[this->_nodes.at(node)][p.second] && (
+                    !distance[p.first] ||
+                    *distance[p.first] > *distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]))) {
 
                     if (!distance[p.first])
                         distance[p.first] = new T();

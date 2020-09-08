@@ -25,22 +25,22 @@ namespace ng {
         // accessors
         [[nodiscard]] bool empty() const override;
         [[nodiscard]] std::size_t nodes() const override;
-        [[nodiscard]] const int &edges() const override;
-        [[nodiscard]] const bool &directed() const override;
-        [[nodiscard]] const bool &weighed() const override;
+        [[nodiscard]] const int& edges() const override;
+        [[nodiscard]] const bool& directed() const override;
+        [[nodiscard]] const bool& weighed() const override;
 
         [[nodiscard]] bool connected() const override;
         [[nodiscard]] std::vector<std::vector<N>> components() const override;
 
         // modifiers
-        void directed(const bool &directed) override;
-        void weighed(const bool &weighed) override;
+        void directed(const bool& directed) override;
+        void weighed(const bool& weighed) override;
 
         // public methods
         void pushNode(const N &value) override;
-        void popNode(const N &value) override;
-        void pushEdge(const N &from, const N &to, const E &weight) override;
-        void popEdge(const N &from, const N &to) override;
+        void popNode(const N& value) override;
+        void pushEdge(const N& from, const N& to, const E& weight) override;
+        void popEdge(const N& from, const N& to) override;
         void popEdges() override;
         void clear() override;
         void print() const override;
@@ -49,10 +49,12 @@ namespace ng {
         void dfs(const N &node, std::vector<N> &path) const override;
         [[nodiscard]] std::vector<N> dfs(const N &node) const override;
 
-        template <typename T> void bfs(const N &node, std::map<N, T> &distance) const;
-        template <typename T> void bfs(const N &node, std::map<N, T> &distance, std::function<T(const E &)> f) const;
-        template <typename T> [[nodiscard]] std::map<N, T> bfs(const N &node) const;
-        template <typename T> [[nodiscard]] std::map<N, T> bfs(const N &node, std::function<T(const E &)> f) const;
+        template <typename T> void bfs(N node, std::map<N, T>& distance) const;
+        template <typename T> void bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f) const;
+        template <typename T> [[nodiscard]] std::map<N, T> bfs(N node) const;
+        template <typename T> [[nodiscard]] std::map<N, T> bfs(N node, std::function<T(const E&)> f) const;
+
+        template <typename T> std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f);
 //
 //		[[nodiscard]] std::vector<int> dijkstra(int snode) const override;
 //		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
@@ -328,27 +330,26 @@ namespace ng {
 
     template <typename N, typename E>
     template <typename T>
-    void ListGraph<N, E>::bfs(const N& node, std::map<N, T>& distance) const {
+    void ListGraph<N, E>::bfs(N node, std::map<N, T>& distance) const {
 
         bool* visited = new bool[this->_nodes.size()]();
         std::queue<N> queue;
-        N cnode = node;
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);
 
         while (!queue.empty()) {
 
-            cnode = queue.front();
+            node = queue.front();
             queue.pop();
 
-            for (const auto& edge : this->_list.at(cnode))
+            for (const auto& edge : this->_list.at(node))
 
                 if (!visited[this->_nodes.at(edge.toNode)]) {
 
                     visited[this->_nodes.at(edge.toNode)] = true;
                     queue.emplace(edge.toNode);
-                    distance[edge.toNode] = distance[cnode] + edge.value;
+                    distance[edge.toNode] = distance[node] + edge.value;
 
                 }
 
@@ -360,27 +361,26 @@ namespace ng {
 
     template <typename N, typename E>
     template <typename T>
-    void ListGraph<N, E>::bfs(const N& node, std::map<N, T>& distance, std::function<T(const E&)> f) const {
+    void ListGraph<N, E>::bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f) const {
 
         bool* visited = new bool[this->_nodes.size()]();
         std::queue<N> queue;
-        N cnode = node;
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);
 
         while (!queue.empty()) {
 
-            cnode = queue.front();
+            node = queue.front();
             queue.pop();
 
-            for (const auto& edge : this->_list.at(cnode))
+            for (const auto& edge : this->_list.at(node))
 
                 if (!visited[this->_nodes.at(edge.toNode)]) {
 
                     visited[this->_nodes.at(edge.toNode)] = true;
                     queue.emplace(edge.toNode);
-                    distance[edge.toNode] = distance[cnode] + f(edge.value);
+                    distance[edge.toNode] = distance[node] + f(edge.value);
 
                 }
 
@@ -392,28 +392,27 @@ namespace ng {
 
     template <typename N, typename E>
     template <typename T>
-    std::map<N, T> ListGraph<N, E>::bfs(const N& node) const {
+    std::map<N, T> ListGraph<N, E>::bfs(N node) const {
 
         bool* visited = new bool[this->_nodes.size()]();
         std::map<N, T> distance;
         std::queue<N> queue;
-        N cnode = node;
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);
 
         while (!queue.empty()) {
 
-            cnode = queue.front();
+            node = queue.front();
             queue.pop();
 
-            for (const auto& edge : this->_list.at(cnode))
+            for (const auto& edge : this->_list.at(node))
 
                 if (!visited[this->_nodes.at(edge.toNode)]) {
 
                     visited[this->_nodes.at(edge.toNode)] = true;
                     queue.emplace(edge.toNode);
-                    distance[edge.toNode] = distance[cnode] + edge.value;
+                    distance[edge.toNode] = distance[node] + edge.value;
 
                 }
 
@@ -426,34 +425,71 @@ namespace ng {
 
     template <typename N, typename E>
     template <typename T>
-    std::map<N, T> ListGraph<N, E>::bfs(const N& node, std::function<T(const E&)> f) const {
+    std::map<N, T> ListGraph<N, E>::bfs(N node, std::function<T(const E&)> f) const {
 
         bool* visited = new bool[this->_nodes.size()]();
         std::map<N, T> distance;
         std::queue<N> queue;
-        N cnode = node;
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);
 
         while (!queue.empty()) {
 
-            cnode = queue.front();
+            node = queue.front();
             queue.pop();
 
-            for (const auto& edge : this->_list.at(cnode))
+            for (const auto& edge : this->_list.at(node))
 
                 if (!visited[this->_nodes.at(edge.toNode)]) {
 
                     visited[this->_nodes.at(edge.toNode)] = true;
                     queue.emplace(edge.toNode);
-                    distance[edge.toNode] = distance[cnode] + f(edge.value);
+                    distance[edge.toNode] = distance[node] + f(edge.value);
 
                 }
 
         }
 
         delete [] visited;
+        return distance;
+
+    }
+
+    template <typename N, typename E>
+    template <typename T>
+    std::map<N, T*> ListGraph<N, E>::dijkstra(N node, std::function<T(const E&)> f) {
+
+        std::map<N, T*> distance;
+        std::priority_queue<std::pair<T, N>> pqueue;
+
+        for (const auto& p : this->_nodes)
+            distance[p.first] = nullptr;
+
+        distance[node] = new T();
+        pqueue.emplace(*distance[node], node);
+
+        while (!pqueue.empty()) {
+
+            node = pqueue.top().second;
+            pqueue.pop();
+
+            for (const auto& edge : this->_list[node]) {
+
+                if (!distance[edge.toNode] || *distance[edge.toNode] > *distance[node] + f(edge.value)) {
+
+                    if (!distance[edge.toNode])
+                        distance[edge.toNode] = new T();
+
+                    *distance[edge.toNode] = *distance[node] + f(edge.value);
+                    pqueue.emplace(*distance[edge.toNode] * -1, edge.toNode);
+
+                }
+
+            }
+
+        }
+
         return distance;
 
     }

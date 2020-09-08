@@ -31,7 +31,7 @@ struct Edge {
 
 int main() {
 
-	ng::MatrixGraph<Vertex> graph(false, true);
+	ng::ListGraph<Vertex> graph(false, true);
 
 	Vertex a = { 0, 1 };
 	Vertex b = { 2, 3 };
