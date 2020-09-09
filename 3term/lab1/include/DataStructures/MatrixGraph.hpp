@@ -46,7 +46,7 @@ namespace ng {
 
         void dfs(const N& node, bool* visited) const override;
         void dfs(const N& node, std::vector<N>& path) const override;
-        [[nodiscard]] std::vector<N> dfs(const N& node) const override;
+        std::vector<N> dfs(const N& node) const override;
 
 		template <typename T = E>
 		void bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f = [](const E& e) { return e; }) const;

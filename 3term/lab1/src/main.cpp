@@ -38,6 +38,9 @@ int main() {
 	Vertex c = { 4, 5 };
 	Vertex d = { 6, 7 };
 
+    int x[] = {3,5,8};
+    std::cout << (*x)["my string" + 3];
+
 	graph.pushNode(a);
 	graph.pushNode(b);
 	graph.pushNode(c);
