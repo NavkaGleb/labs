@@ -2,7 +2,7 @@
 
 int main() {
 
-    ng::PolyphaseMergeSort mergeSort("../Files/data.txt", 6, 2);
+    ng::PolyphaseMergeSort mergeSort("../Files/data.txt", 4, 2);
     mergeSort.run();
 
     return 0;

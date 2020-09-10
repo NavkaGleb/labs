@@ -1,8 +1,37 @@
 #include "PolyphaseMergeSort.hpp"
 
 #include <algorithm>
+#include <map>
 
 namespace ng {
+
+    int f(int i, int p) {
+
+        if (0 <= i && i < p - 1)
+            return 0;
+
+        if (i == p - 1)
+            return 1;
+
+        int sum = 0;
+
+        for (int j = i - 1; j >= i - p; --j)
+            sum += f(j, p);
+
+        return sum;
+
+    }
+
+    int a(int level, int i, int n) {
+
+        int sum = 0;
+
+        for (int o = level + n - 3; o >= level + i - 2; --o)
+            sum += f(o, n - 1);
+
+        return sum;
+
+    }
 
     // constructor / destructor
     PolyphaseMergeSort::PolyphaseMergeSort(std::string dataPath, int filesCount, int chunkSize)
@@ -25,6 +54,15 @@ namespace ng {
 
         }
 
+        std::cout << "---" << std::endl;
+        for (int level = 1; level <= 4; ++level) {
+
+            for (int i = 0; i < this->_tapes.size(); ++i)
+                std::cout << a(level, i + 1, this->_tapes.size()) << " ";
+            std::cout << std::endl;
+
+        }
+
     }
 
     // public methods
@@ -43,8 +81,6 @@ namespace ng {
 
             infile >> number;
             this->_chunk.emplace_back(number);
-
-            std::cout << "number = " << number << std::endl;
 
             if (i + 1 == this->_chunk.capacity()) {
 
@@ -77,43 +113,17 @@ namespace ng {
 
         }
 
+        this->_merge();
+
     }
 
     // private methods
     void PolyphaseMergeSort::_initTapes() {
 
         for (int i = 0; i < this->_tapes.size(); ++i)
-            this->_tapes[i] = new Tape("../Files/" + std::to_string(i + 1) + ".txt", std::ios_base::out);
+            this->_tapes[i] = new Tape("../Files/" + std::to_string(i + 1) + ".txt", std::ios_base::in | std::ios_base::out);
 
         this->_currentTape = this->_tapes.front();
-
-    }
-
-    int f(int i, int p) {
-
-        if (0 <= i && i < p - 1)
-            return 0;
-
-        if (i == p - 1)
-            return 1;
-
-        int sum = 0;
-
-        for (int j = i - 1; j >= i - p; --j)
-            sum += f(j, p);
-
-        return sum;
-
-    }
-
-    int a(int level, int i, int n) {
-
-        int sum = 0;
-
-        for (int o = level + n - 3; o >= level + i - 2; --o)
-            sum += f(o, n - 1);
-
-        return sum;
 
     }
 
@@ -141,6 +151,37 @@ namespace ng {
 
         if (this->_currentTapeIndex == this->_tapes.size() - 1)
             this->_nullifyTape();
+
+    }
+
+    void PolyphaseMergeSort::_merge() {
+
+        this->_currentTape = this->_tapes.back();
+
+        std::sort(this->_tapes.begin(), this->_tapes.end(), [](const Tape* t1, const Tape* t2) {
+
+            return t1->size() < t2->size();
+
+        });
+
+        std::cout << "filenames" << std::endl;
+        for (const auto& tape : this->_tapes) {
+
+            std::cout << tape->filename() << " -> " << tape->size() << std::endl;
+
+        }
+
+//        std::vector<std::pair<int, int>> heads;
+//
+//        for (int i = 0; i < this->_tapes.size(); ++i) {
+//
+//            if (this->_tapes[i] != this->_currentTape) {
+//
+//
+//
+//            }
+//
+//        }
 
     }
 

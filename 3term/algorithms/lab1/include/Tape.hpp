@@ -9,14 +9,16 @@ namespace ng {
     public:
         // constructor / destructor
         Tape() = default;
-        Tape(const std::string& filename, std::ios_base::openmode mode);
+        Tape(std::string filename, std::ios_base::openmode mode);
         virtual ~Tape();
 
         // accessors
+        [[nodiscard]] const std::string& filename() const;
         [[nodiscard]] bool eof() const;
         [[nodiscard]] const int& capacity() const;
         [[nodiscard]] const int& size() const;
         [[nodiscard]] bool full() const;
+        [[nodiscard]] int dummy() const;
 
         // modifiers
         void capacity(const int& capacity);
@@ -28,13 +30,18 @@ namespace ng {
         void write(const std::vector<int>& data);
         void write(const int* data, const int& size);
         void write(const std::string& str);
+        void write(const int& data);
+        void read(int& data);
+        int read();
         void close();
 
     private:
         // variables
         std::fstream _file;
+        std::string _filename;
         int _capacity;
         int _size;
+        int _position;
 
         // private methods
 

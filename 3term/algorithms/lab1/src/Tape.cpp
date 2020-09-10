@@ -3,9 +3,10 @@
 namespace ng {
 
     // constructor / destructor
-    Tape::Tape(const std::string& filename, std::ios_base::openmode mode) : _capacity(0), _size(0) {
+    Tape::Tape(std::string filename, std::ios_base::openmode mode)
+        : _filename(std::move(filename)), _capacity(0), _size(0), _position(0) {
 
-        this->open(filename, mode);
+        this->_file.open(this->_filename, mode);
 
     }
 
@@ -16,6 +17,8 @@ namespace ng {
     }
 
     // accessors
+    const std::string& Tape::filename() const { return this->_filename; }
+
     bool Tape::eof() const { return this->_file.eof(); }
 
     const int& Tape::capacity() const { return this->_capacity; }
@@ -23,6 +26,8 @@ namespace ng {
     const int& Tape::size() const { return this->_size; }
 
     bool Tape::full() const { return this->_size == this->_capacity; }
+
+    int Tape::dummy() const { return this->_capacity - this->_size; }
 
     // modifiers
     void Tape::capacity(const int& capacity) { this->_capacity = capacity; }
@@ -32,7 +37,8 @@ namespace ng {
 
     void Tape::open(const std::string& filename, std::ios_base::openmode mode) {
 
-        this->_file.open(filename, mode);
+        this->_filename = filename;
+        this->_file.open(this->_filename, mode);
 
     }
 
@@ -53,6 +59,28 @@ namespace ng {
     void Tape::write(const std::string& str) {
 
         this->_file << str;
+
+    }
+
+    void Tape::write(const int& data) {
+
+        this->_file << data;
+        ++this->_position;
+
+    }
+
+    void Tape::read(int& data) {
+
+        this->_file >> data;
+
+    }
+
+    int Tape::read() {
+
+        int data;
+        this->_file >> data;
+
+        return data;
 
     }
 

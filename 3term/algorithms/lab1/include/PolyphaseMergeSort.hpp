@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <map>
 
 #include <Tape.hpp>
 
@@ -32,6 +33,8 @@ namespace ng {
         void _updateTapesCapacity();
         void _nullifyTape();
         void _nextTape();
+
+        void _merge();
 
     }; // class PolyphaseMergeSort
 
