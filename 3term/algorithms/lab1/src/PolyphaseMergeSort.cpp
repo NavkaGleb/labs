@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <map>
+#include <functional>
 
 namespace ng {
 
@@ -35,7 +36,7 @@ namespace ng {
 
     // constructor / destructor
     PolyphaseMergeSort::PolyphaseMergeSort(std::string dataPath, int filesCount, int chunkSize)
-        : _dataPath(std::move(dataPath)), _currentTape(nullptr), _currentTapeIndex(0), _level(1) {
+        : _dataPath(std::move(dataPath)), _ctape(0), _level(1) {
 
         this->_tapes.resize(filesCount, nullptr);
         this->_chunk.reserve(chunkSize);
@@ -49,7 +50,7 @@ namespace ng {
 
         for (int i = 0; i < this->_tapes.size(); ++i) {
 
-            std::cout << i << " | size = " << this->_tapes[i]->size() << ", capacity = " << this->_tapes[i]->capacity() << std::endl;
+            std::cout << i << " | chunks = " << this->_tapes[i]->chunks() << ", capacity = " << this->_tapes[i]->capacity() << std::endl;
             delete this->_tapes[i];
 
         }
@@ -68,48 +69,62 @@ namespace ng {
     // public methods
     void PolyphaseMergeSort::run() {
 
-        std::ifstream infile(this->_dataPath);
+        std::ifstream infile(this->_dataPath, std::ios_base::binary);
 
         if (!infile.is_open())
             throw std::invalid_argument("failed to open the file | PolyphaseMergeSort::run");
 
+        int number;
+        int eof;
+
+        // init eof
+        infile.seekg(0, std::ios_base::end);
+        eof = infile.tellg();
+        infile.seekg(0, std::ios_base::beg);
+
         this->_initTapes();
 
-        int number;
+        for (int i = 0; infile.tellg() != eof; ++i) {
 
-        for (int i = 0; !infile.eof(); ++i) {
-
-            infile >> number;
+            infile.read(reinterpret_cast<char*>(&number), sizeof(number));
             this->_chunk.emplace_back(number);
 
             if (i + 1 == this->_chunk.capacity()) {
 
                 // update capacity of tapes
-                if (this->_currentTape->full()) {
+                if (this->_tapes[this->_ctape]->full()) {
 
                     this->_updateTapesCapacity();
                     this->_nullifyTape();
 
                 }
 
+                // sort data in memory
                 std::sort(this->_chunk.begin(), this->_chunk.end());
 
                 // write data to tape
-                this->_currentTape->write(this->_chunk);
-                this->_currentTape->write("\n");
-                this->_currentTape->incrementSize();
+                this->_tapes[this->_ctape]->write(this->_chunk);
+                this->_tapes[this->_ctape]->incrementChunks();
 
                 // clear chunk
                 this->_chunk.clear();
 
                 // change tape if currentTape is full
-                if (this->_currentTape->full())
+                if (this->_tapes[this->_ctape]->full())
                     this->_nextTape();
 
                 // update i
                 i = -1;
 
             }
+
+        }
+
+        for (auto& tape : this->_tapes) {
+
+            tape->close();
+            tape->open(std::ios_base::in | std::ios_base::binary);
+            tape->initDummy();
 
         }
 
@@ -121,15 +136,16 @@ namespace ng {
     void PolyphaseMergeSort::_initTapes() {
 
         for (int i = 0; i < this->_tapes.size(); ++i)
-            this->_tapes[i] = new Tape("../Files/" + std::to_string(i + 1) + ".txt", std::ios_base::in | std::ios_base::out);
-
-        this->_currentTape = this->_tapes.front();
+            this->_tapes[i] = new Tape(
+                "../files/" + std::to_string(i) + ".bin",
+                std::ios_base::out | std::ios_base::binary,
+                this->_chunk.capacity()
+            );
 
     }
 
     void PolyphaseMergeSort::_updateTapesCapacity() {
 
-        std::cout << "---update tape capacity" << std::endl;
         for (int i = 0; i < this->_tapes.size(); ++i)
             this->_tapes[i]->capacity(a(this->_level, i + 1, this->_tapes.size()));
 
@@ -139,49 +155,187 @@ namespace ng {
 
     void PolyphaseMergeSort::_nullifyTape() {
 
-        this->_currentTapeIndex = 0;
-        this->_currentTape = this->_tapes[this->_currentTapeIndex];
+        this->_ctape = 0;
 
     }
 
     void PolyphaseMergeSort::_nextTape() {
 
-        ++this->_currentTapeIndex;
-        this->_currentTape = this->_tapes[this->_currentTapeIndex];
+        ++this->_ctape;
 
-        if (this->_currentTapeIndex == this->_tapes.size() - 1)
+        if (this->_ctape == this->_tapes.size() - 1)
             this->_nullifyTape();
+
+    }
+
+    void PolyphaseMergeSort::_merge(const int& empty) {
+
+        std::cout << "--merge chunks " << empty << std::endl;
+
+        struct Peak {
+
+            int value;
+            int tape;
+
+            explicit Peak(int tape = -1) : value(0), tape(tape) {}
+            virtual ~Peak() = default;
+
+        };
+
+        static std::function<bool(const Peak&, const Peak&)> sortFunction = [](const Peak& peak1, const Peak& peak2) {
+            return peak1.value > peak2.value;
+        };
+
+        std::vector<Peak> peaks;
+        std::vector<int> infile;
+
+        std::cout << "INIT peaks !" << std::endl;
+
+        for (int i = 0; i < this->_tapes.size(); ++i) {
+
+            if (empty != i && this->_tapes[i]->dummy() == 0) {
+
+                peaks.emplace_back(Peak(i));
+                this->_tapes[i]->read(peaks.back().value);
+                std::cout << "\ttape " << i << " -> " << peaks.back().value << "(pos: " << this->_tapes[i]->pos() << ")" << std::endl;
+
+            }
+
+        }
+
+        std::cout << std::endl;
+
+        while (!peaks.empty()) {
+
+            // sort peaks
+            std::sort(peaks.begin(), peaks.end(), sortFunction);
+
+            std::cout << "peaks AFTER SORTING !!!!" << std::endl;
+            for (const auto& peak : peaks)
+                std::cout << "\ttape " << peak.tape << " -> " << peak.value << "(pos: " << this->_tapes[peak.tape]->pos() << ")" << std::endl;
+            std::cout << std::endl;
+
+            // write to file
+            std::cout << "write to file << " << peaks.back().value << "(" << peaks.back().tape << ")" << std::endl;
+            this->_tapes[empty]->write(peaks.back().value);
+            infile.emplace_back(peaks.back().value);
+
+            // get new number
+            if (!peaks.empty() && this->_tapes[peaks.back().tape]->dummy() == 0 && !this->_tapes[peaks.back().tape]->eoc()) {
+
+                this->_tapes[peaks.back().tape]->read(peaks.back().value);
+                std::cout << "\tpush new tape " << peaks.back().tape << " -> " << peaks.back().value << "(pos: " << this->_tapes[peaks.back().tape]->pos() << ")" << std::endl;
+
+            } else {
+
+                std::cout << "\t peak " << peaks.back().tape << " = -1" << std::endl;
+                peaks.back().tape = -1;
+
+            }
+
+            for (int i = static_cast<int>(peaks.size()) - 1; i >= 0; --i) {
+
+                if (peaks[i].tape == -1)
+                    peaks.pop_back();
+                else
+                    break;
+
+            }
+
+        }
+
+        std::cout << "-- number in empty file\t\t";
+        for (int i : infile)
+            std::cout << i << " ";
+        std::cout << std::endl;
 
     }
 
     void PolyphaseMergeSort::_merge() {
 
-        this->_currentTape = this->_tapes.back();
+        std::cout << "--merge" << std::endl;
 
-        std::sort(this->_tapes.begin(), this->_tapes.end(), [](const Tape* t1, const Tape* t2) {
+        bool sorted = false;
+        int empty = -1;
+        int min = -1;
+        int level = 1;
 
-            return t1->size() < t2->size();
+        while (!sorted) {
 
-        });
+            ++level;
 
-        std::cout << "filenames" << std::endl;
-        for (const auto& tape : this->_tapes) {
+            std::cout << "MERGE LEVEL = " << level << std::endl;
 
-            std::cout << tape->filename() << " -> " << tape->size() << std::endl;
+            std::cout << "\ttapes in begin of loop" << std::endl;
+            for (int i = 0; i < this->_tapes.size(); ++i)
+                std::cout << i << " | chunks = " << this->_tapes[i]->chunks() << ", capacity = " << this->_tapes[i]->capacity() << std::endl;
+
+            // search min chunks and empty file
+            for (int i = 0; i < this->_tapes.size(); ++i) {
+
+                if (this->_tapes[i]->empty()) {
+
+                    if (empty == -1)
+                        empty = i;
+                    else
+                        sorted = true;
+
+                } else if (min == -1 || this->_tapes[min]->capacity() > this->_tapes[i]->capacity()) {
+
+                    min = i;
+
+                }
+
+                if (sorted)
+                    std::cout << "full file -> " << min << "!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+            }
+
+            if (!sorted) {
+
+                this->_tapes[empty]->close();
+                this->_tapes[empty]->open(std::ios_base::out | std::ios_base::trunc);
+                this->_tapes[empty]->close();
+
+                this->_tapes[empty]->open(std::ios_base::out | std::ios_base::binary);
+                this->_tapes[empty]->capacity(this->_tapes[min]->capacity());
+                this->_tapes[empty]->chunks(this->_tapes[min]->capacity());
+                this->_tapes[empty]->chunkSize(static_cast<int>(this->_chunk.capacity()) * level);
+
+                std::cout << "empty file = " << empty << std::endl;
+                std::cout << "min capacity = " << this->_tapes[min]->capacity() << std::endl;
+
+                int minCapacity = this->_tapes[min]->capacity();
+
+                for (int i = 0; i < minCapacity; ++i) {
+
+                    this->_merge(empty);
+
+                    for (int j = 0; j < this->_tapes.size(); ++j)
+                        if (j != empty)
+                            this->_tapes[j]->decrementCapacity();
+
+                    std::cout << "-- chunks after MERGE ! " << std::endl;
+                    for (int j = 0; j < this->_tapes.size(); ++j)
+                        std::cout << j << " | chunks = " << this->_tapes[j]->chunks() << ", capacity = " << this->_tapes[j]->capacity() << std::endl;
+                    std::cout << std::endl;
+
+                }
+
+                // open input file and init chunkCapacity and size and capacity of tape
+                this->_tapes[empty]->close();
+                this->_tapes[empty]->open(std::ios_base::in | std::ios_base::binary);
+
+                std::cout << "-- chunks after ALL" << std::endl;
+                for (int i = 0; i < this->_tapes.size(); ++i)
+                    std::cout << i << " | chunks = " << this->_tapes[i]->chunks() << ", capacity = " << this->_tapes[i]->capacity() << std::endl;
+
+            }
+
+            empty = -1;
+            min = -1;
 
         }
-
-//        std::vector<std::pair<int, int>> heads;
-//
-//        for (int i = 0; i < this->_tapes.size(); ++i) {
-//
-//            if (this->_tapes[i] != this->_currentTape) {
-//
-//
-//
-//            }
-//
-//        }
 
     }
 

@@ -23,8 +23,7 @@ namespace ng {
         // variables
         std::string _dataPath;
         std::vector<Tape*> _tapes;
-        Tape* _currentTape;
-        int _currentTapeIndex;
+        int _ctape;
         std::vector<int> _chunk;
         int _level;
 
@@ -34,6 +33,7 @@ namespace ng {
         void _nullifyTape();
         void _nextTape();
 
+        void _merge(const int& empty);
         void _merge();
 
     }; // class PolyphaseMergeSort
