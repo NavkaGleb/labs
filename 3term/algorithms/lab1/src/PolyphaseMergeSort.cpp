@@ -120,6 +120,27 @@ namespace ng {
 
         }
 
+        if (!this->_chunk.empty()) {
+
+            if (this->_tapes[this->_ctape]->full())
+                this->_nextTape();
+
+            if (this->_tapes[this->_ctape]->full()) {
+
+                this->_updateTapesCapacity();
+                this->_nullifyTape();
+
+            }
+
+            // sort data in memory
+            std::sort(this->_chunk.begin(), this->_chunk.end());
+
+            // write data to tape
+            this->_tapes[this->_ctape]->write(this->_chunk);
+            this->_tapes[this->_ctape]->incrementChunks();
+
+        }
+
         for (auto& tape : this->_tapes) {
 
             tape->close();
@@ -168,7 +189,7 @@ namespace ng {
 
     }
 
-    void PolyphaseMergeSort::_merge(const int& empty) {
+    void PolyphaseMergeSort::_merge(const int& empty, const bool& initChunkSize) {
 
         std::cout << "--merge chunks " << empty << std::endl;
 
@@ -193,7 +214,9 @@ namespace ng {
 
         for (int i = 0; i < this->_tapes.size(); ++i) {
 
-            if (empty != i && this->_tapes[i]->dummy() == 0) {
+//            std::cout << this->_tapes[i]->filename() << " -> " this->_tapes[i]->eoc() <<
+
+            if (empty != i && !this->_tapes[i]->eof()) {
 
                 peaks.emplace_back(Peak(i));
                 this->_tapes[i]->read(peaks.back().value);
@@ -221,7 +244,7 @@ namespace ng {
             infile.emplace_back(peaks.back().value);
 
             // get new number
-            if (!peaks.empty() && this->_tapes[peaks.back().tape]->dummy() == 0 && !this->_tapes[peaks.back().tape]->eoc()) {
+            if (!peaks.empty() && !this->_tapes[peaks.back().tape]->eoc(peaks.back().value)) {
 
                 this->_tapes[peaks.back().tape]->read(peaks.back().value);
                 std::cout << "\tpush new tape " << peaks.back().tape << " -> " << peaks.back().value << "(pos: " << this->_tapes[peaks.back().tape]->pos() << ")" << std::endl;
@@ -248,6 +271,9 @@ namespace ng {
         for (int i : infile)
             std::cout << i << " ";
         std::cout << std::endl;
+
+        if (initChunkSize)
+            this->_tapes[empty]->chunkSize(infile.size());
 
     }
 
@@ -300,7 +326,15 @@ namespace ng {
                 this->_tapes[empty]->open(std::ios_base::out | std::ios_base::binary);
                 this->_tapes[empty]->capacity(this->_tapes[min]->capacity());
                 this->_tapes[empty]->chunks(this->_tapes[min]->capacity());
-                this->_tapes[empty]->chunkSize(static_cast<int>(this->_chunk.capacity()) * level);
+
+//                int sum = 0;
+//                for (int i = 0; i < this->_tapes.size(); ++i)
+//                    if (i != empty)
+//                        sum += this->_tapes[i]->chunkSize();
+//
+//                std::cout << "\t\t\t\t\t\tSUM == " << sum << std::endl;
+//
+//                this->_tapes[empty]->chunkSize(sum / 4);
 
                 std::cout << "empty file = " << empty << std::endl;
                 std::cout << "min capacity = " << this->_tapes[min]->capacity() << std::endl;
@@ -309,7 +343,7 @@ namespace ng {
 
                 for (int i = 0; i < minCapacity; ++i) {
 
-                    this->_merge(empty);
+                    this->_merge(empty, i == 0);
 
                     for (int j = 0; j < this->_tapes.size(); ++j)
                         if (j != empty)

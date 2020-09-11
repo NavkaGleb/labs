@@ -33,7 +33,7 @@ namespace ng {
         void _nullifyTape();
         void _nextTape();
 
-        void _merge(const int& empty);
+        void _merge(const int& empty, const bool& initChunkSize);
         void _merge();
 
     }; // class PolyphaseMergeSort

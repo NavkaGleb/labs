@@ -27,13 +27,22 @@ namespace ng {
     // accessors
     const std::string& Tape::filename() const { return this->_filename; }
 
-    bool Tape::eof() const { return this->_file.eof(); }
+    bool Tape::eof() { return this->_file.tellg() == this->_end || this->_file.tellg() == -1; }
 
-    bool Tape::eoc() {
+    bool Tape::eoc(const int& current) {
 
         std::cout << "\t-- eoc in " << this->_filename << std::endl;
         std::cout << "\tpos = " << this->_file.tellg() << ", chunkSize = " << this->_chunkSize << std::endl;
-        return this->_file.tellg() == -1 || this->_file.tellg() == this->_end || this->_file.tellg() % (this->_chunkSize) == 0;
+        
+        std::fstream::pos_type cur = this->_file.tellg();
+        int next;
+        this->_file.read(reinterpret_cast<char*>(&next), sizeof(next));
+
+        if (this->_file.tellg() == -1)
+            return true;
+
+        this->_file.seekg(cur);
+        return this->_file.tellg() == this->_end || current > next;
 
     }
 
@@ -42,6 +51,8 @@ namespace ng {
     const int& Tape::capacity() const { return this->_capacity; }
 
     const int& Tape::chunks() const { return this->_chunks; }
+
+    const int& Tape::chunkSize() const { return this->_chunkSize; }
 
     const int& Tape::dummy() const { return this->_dummy; }
 

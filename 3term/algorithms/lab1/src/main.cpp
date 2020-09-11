@@ -4,7 +4,8 @@ int main() {
 
     std::fstream outfile("../files/numbers.bin", std::ios_base::out | std::ios_base::binary);
 
-    for (int i = 10; i >= 1; --i)
+    // huembers
+    for (int i = 63; i >= 1; --i)
         outfile.write(reinterpret_cast<char*>(&i), sizeof(i));
 
     outfile.close();

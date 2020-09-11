@@ -14,11 +14,12 @@ namespace ng {
 
         // accessors
         [[nodiscard]] const std::string& filename() const;
-        [[nodiscard]] bool eof() const;
-        [[nodiscard]] bool eoc();
+        [[nodiscard]] bool eof();
+        [[nodiscard]] bool eoc(const int& current);
         [[nodiscard]] bool empty() const;
         [[nodiscard]] const int& capacity() const;
         [[nodiscard]] const int& chunks() const;
+        [[nodiscard]] const int& chunkSize() const;
         [[nodiscard]] const int& dummy() const;
         [[nodiscard]] bool full() const;
         int pos();
