@@ -11,6 +11,7 @@
 
 namespace ng {
 
+    // header
     template <typename T>
     class PolyphaseMergeSort {
     public:
@@ -30,6 +31,8 @@ namespace ng {
         std::vector<T> _chunk;
         int _level;
         int _result;
+        std::function<int(int, int)> _fibonacci;
+        std::function<int(int)> _tapeCapacity;
 
         // private methods
         void _updateTapesCapacity();
@@ -44,65 +47,47 @@ namespace ng {
 
     }; // class PolyphaseMergeSort
 
-    int f(int i, int p) {
-
-        if (0 <= i && i < p - 1)
-            return 0;
-
-        if (i == p - 1)
-            return 1;
-
-        int sum = 0;
-
-        for (int j = i - 1; j >= i - p; --j)
-            sum += f(j, p);
-
-        return sum;
-
-    }
-
-    int a(int level, int i, int n) {
-
-        int sum = 0;
-
-        for (int o = level + n - 3; o >= level + i - 2; --o)
-            sum += f(o, n - 1);
-
-        return sum;
-
-    }
-
+    // source
     // constructor / destructor
     template <typename T>
     PolyphaseMergeSort<T>::PolyphaseMergeSort(std::string inpath, std::string outpath, int filesCount, int chunkSize)
-            : _inpath(std::move(inpath)), _outpath(std::move(outpath)), _ctape(0), _level(1), _result(-1) {
+        : _inpath(std::move(inpath)), _outpath(std::move(outpath)), _ctape(0), _level(1), _result(-1) {
 
         this->_tapes.resize(filesCount, nullptr);
         this->_chunk.reserve(chunkSize);
+
+        this->_fibonacci = [&](int n, int order) {
+
+            if (0 <= n && n < order - 1) return 0;
+            if (n == order - 1) return 1;
+
+            int sum = 0;
+
+            for (int i = n - 1; i >= n - order; --i)
+                sum += this->_fibonacci(i, order);
+
+            return sum;
+
+        };
+
+        this->_tapeCapacity = [&](int n) {
+
+            int sum = 0;
+
+            for (int i = this->_level + this->_tapes.size() - 3; i >= this->_level + n - 2; --i)
+                sum += this->_fibonacci(i, this->_tapes.size() - 1);
+
+            return sum;
+
+        };
 
     }
 
     template <typename T>
     PolyphaseMergeSort<T>::~PolyphaseMergeSort() {
 
-//        for (auto& tape : this->_tapes)
-//            delete tape;
-
-        for (int i = 0; i < this->_tapes.size(); ++i) {
-
-            std::cout << i << " | chunks = " << this->_tapes[i]->chunks() << ", capacity = " << this->_tapes[i]->capacity() << std::endl;
-            delete this->_tapes[i];
-
-        }
-
-        std::cout << "---" << std::endl;
-        for (int level = 1; level <= 4; ++level) {
-
-            for (int i = 0; i < this->_tapes.size(); ++i)
-                std::cout << a(level, i + 1, this->_tapes.size()) << " ";
-            std::cout << std::endl;
-
-        }
+        for (auto& tape : this->_tapes)
+            delete tape;
 
     }
 
@@ -122,7 +107,7 @@ namespace ng {
     void PolyphaseMergeSort<T>::_updateTapesCapacity() {
 
         for (int i = 0; i < this->_tapes.size(); ++i)
-            this->_tapes[i]->capacity(a(this->_level, i + 1, this->_tapes.size()));
+            this->_tapes[i]->capacity(this->_tapeCapacity(i + 1));
 
         ++this->_level;
 
@@ -169,8 +154,8 @@ namespace ng {
 
         for (int i = 0; i < this->_tapes.size(); ++i)
             this->_tapes[i] = new Tape<T>(
-                    "../files/" + std::to_string(i) + ".bin",
-                    std::ios_base::out | std::ios_base::binary
+                "../files/" + std::to_string(i) + ".bin",
+                std::ios_base::out | std::ios_base::binary
             );
 
         std::ifstream infile(this->_inpath, std::ios_base::binary);

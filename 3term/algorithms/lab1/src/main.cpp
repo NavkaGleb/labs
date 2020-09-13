@@ -8,9 +8,10 @@ int main() {
     // huembers
     for (int i = 23; i >= 1; --i) {
 
-        auto num = ng::random::irand<int>(0, 20);
-        std::cout << num << " ";
-        outfile.write(reinterpret_cast<char*>(&num), sizeof(num));
+//        auto num = ng::random::irand<int>(0, 20);
+//        std::cout << num << " ";
+        std::cout << i << " ";
+        outfile.write(reinterpret_cast<char*>(&i), sizeof(i));
 
     }
     std::cout << std::endl;

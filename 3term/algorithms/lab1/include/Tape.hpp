@@ -5,6 +5,7 @@
 
 namespace ng {
 
+    // header
     template <typename T>
     class Tape {
     public:
@@ -49,10 +50,11 @@ namespace ng {
 
     }; // class Tape
 
+    // source
     // constructor / destructor
     template <typename T>
     Tape<T>::Tape(std::string filename, std::ios_base::openmode mode)
-            : _filename(std::move(filename)), _mode(mode), _capacity(0), _chunks(0), _end(-1) {
+        : _filename(std::move(filename)), _mode(mode), _capacity(0), _chunks(0), _end(-1) {
 
         this->_file.open(this->_filename, this->_mode);
         this->_file.seekp(0, std::ios_base::end);
