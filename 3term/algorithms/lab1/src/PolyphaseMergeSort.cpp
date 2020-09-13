@@ -209,6 +209,7 @@ namespace ng {
 
         std::vector<Peak> peaks;
         std::vector<int> infile;
+        int lastChunk = -1;
 
         std::cout << "INIT peaks !" << std::endl;
 
@@ -229,6 +230,9 @@ namespace ng {
         std::cout << std::endl;
 
         while (!peaks.empty()) {
+//
+//            if (peaks.size() == 1)
+//                lastChunk = peaks.back().tape;
 
             // sort peaks
             std::sort(peaks.begin(), peaks.end(), sortFunction);
@@ -243,8 +247,12 @@ namespace ng {
             this->_tapes[empty]->write(peaks.back().value);
             infile.emplace_back(peaks.back().value);
 
+//            if (lastChunk != -1)
+//                for (!this->_tapes[lastChunk]->eoc())
+
+
             // get new number
-            if (!peaks.empty() && !this->_tapes[peaks.back().tape]->eoc(peaks.back().value)) {
+            if (!this->_tapes[peaks.back().tape]->eoc(peaks.back().value)) {
 
                 this->_tapes[peaks.back().tape]->read(peaks.back().value);
                 std::cout << "\tpush new tape " << peaks.back().tape << " -> " << peaks.back().value << "(pos: " << this->_tapes[peaks.back().tape]->pos() << ")" << std::endl;
@@ -253,15 +261,7 @@ namespace ng {
 
                 std::cout << "\t peak " << peaks.back().tape << " = -1" << std::endl;
                 peaks.back().tape = -1;
-
-            }
-
-            for (int i = static_cast<int>(peaks.size()) - 1; i >= 0; --i) {
-
-                if (peaks[i].tape == -1)
-                    peaks.pop_back();
-                else
-                    break;
+                peaks.pop_back();
 
             }
 
@@ -312,8 +312,12 @@ namespace ng {
 
                 }
 
-                if (sorted)
+                if (sorted) {
+
+//                    std::rename(this->_tapes[min]->filename().c_str(), "result.bin");
                     std::cout << "full file -> " << min << "!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+                }
 
             }
 
