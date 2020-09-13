@@ -178,7 +178,7 @@ namespace ng {
         if (!infile.is_open())
             throw std::invalid_argument("failed to open the file | template <typename T>PolyphaseMergeSort<T>::run");
 
-        int number;
+        T number;
         int eof;
 
         infile.seekg(0, std::ios_base::end);

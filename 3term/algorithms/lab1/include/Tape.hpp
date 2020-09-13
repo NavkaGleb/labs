@@ -17,7 +17,7 @@ namespace ng {
         [[nodiscard]] bool empty() const;
         [[nodiscard]] bool full() const;
         [[nodiscard]] bool eof();
-        [[nodiscard]] bool eoc(const int& current);
+        [[nodiscard]] bool eoc(const T& current);
         [[nodiscard]] const int& capacity() const;
         [[nodiscard]] const int& chunks() const;
 
@@ -75,7 +75,7 @@ namespace ng {
     bool Tape<T>::eof() { return this->_file.tellg() == this->_end || this->_file.tellg() == -1; }
 
     template <typename T>
-    bool Tape<T>::eoc(const int& current) {
+    bool Tape<T>::eoc(const T& current) {
 
         std::fstream::pos_type cur = this->_file.tellg();
         T next;

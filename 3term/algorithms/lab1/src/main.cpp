@@ -8,7 +8,7 @@ int main() {
     // huembers
     for (int i = 23; i >= 1; --i) {
 
-        auto num = ng::random::frand<float>(0.f, 10.f);
+        auto num = ng::random::irand<int>(0, 20);
         std::cout << num << " ";
         outfile.write(reinterpret_cast<char*>(&num), sizeof(num));
 
