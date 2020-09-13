@@ -41,7 +41,7 @@ namespace ng {
         void _writeChunk();
         void _initTapes();
         void _merge(const int& empty);
-        void _merge();
+        void _sort();
         void _renameTape();
         void _deleteTapes();
 
@@ -96,7 +96,7 @@ namespace ng {
     void PolyphaseMergeSort<T>::run() {
 
         this->_initTapes();
-        this->_merge();
+        this->_sort();
         this->_renameTape();
         this->_deleteTapes();
 
@@ -263,7 +263,7 @@ namespace ng {
     }
 
     template <typename T>
-    void PolyphaseMergeSort<T>::_merge() {
+    void PolyphaseMergeSort<T>::_sort() {
 
         bool sorted = false;
         int empty = -1;
