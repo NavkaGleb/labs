@@ -16,18 +16,15 @@ namespace ng {
         // accessors
         [[nodiscard]] const std::string& filename() const;
         [[nodiscard]] bool empty() const;
-        [[nodiscard]] bool full() const;
         [[nodiscard]] bool eof();
         [[nodiscard]] bool eoc(const T& current);
         [[nodiscard]] const int& capacity() const;
-        [[nodiscard]] const int& chunks() const;
 
         // modifiers
         void capacity(const int& capacity);
-        void chunks(const int& chunks);
 
         // public methods
-        void incrementChunks(const int& count = 1);
+        void incrementCapacity(const int& count = 1);
         void decrementCapacity(const int& count = 1);
 
         void open(std::ios_base::openmode mode);
@@ -45,21 +42,15 @@ namespace ng {
         int _chunks;
         int _end;
 
-        // private methods
-        void _updateEnd();
-
     }; // class Tape
 
     // source
     // constructor / destructor
     template <typename T>
     Tape<T>::Tape(std::string filename, std::ios_base::openmode mode)
-        : _filename(std::move(filename)), _mode(mode), _capacity(0), _chunks(0), _end(-1) {
+        : _filename(std::move(filename)), _mode(mode), _capacity(0), _chunks(0), _end(0) {
 
         this->_file.open(this->_filename, this->_mode);
-        this->_file.seekp(0, std::ios_base::end);
-        this->_end = this->_file.tellp();
-        this->_file.seekp(0, std::ios_base::beg);
 
     }
 
@@ -68,10 +59,7 @@ namespace ng {
     const std::string& Tape<T>::filename() const { return this->_filename; }
 
     template <typename T>
-    bool Tape<T>::empty() const { return this->_chunks == 0; }
-
-    template <typename T>
-    bool Tape<T>::full() const { return this->_chunks == this->_capacity; }
+    bool Tape<T>::empty() const { return this->_capacity == 0; }
 
     template <typename T>
     bool Tape<T>::eof() { return this->_file.tellg() == this->_end || this->_file.tellg() == -1; }
@@ -94,19 +82,13 @@ namespace ng {
     template <typename T>
     const int& Tape<T>::capacity() const { return this->_capacity; }
 
-    template <typename T>
-    const int& Tape<T>::chunks() const { return this->_chunks; }
-
     // modifiers
     template <typename T>
     void Tape<T>::capacity(const int& capacity) { this->_capacity = capacity; }
 
-    template <typename T>
-    void Tape<T>::chunks(const int& chunks) { this->_chunks = chunks; }
-
     // public methods
     template <typename T>
-    void Tape<T>::incrementChunks(const int& count) { this->_chunks += count; }
+    void Tape<T>::incrementCapacity(const int& count) { this->_capacity += count; }
 
     template <typename T>
     void Tape<T>::decrementCapacity(const int& count) {
@@ -124,7 +106,8 @@ namespace ng {
         this->_mode = mode;
         this->_file.open(this->_filename, this->_mode);
 
-        this->_updateEnd();
+        if (this->_mode == (std::ios_base::out | std::ios_base::binary))
+            this->_end = 0;
 
     }
 
@@ -135,7 +118,12 @@ namespace ng {
     void Tape<T>::read(T& data) { this->_file.read(reinterpret_cast<char*>(&data), sizeof(data)); }
 
     template <typename T>
-    void Tape<T>::write(const T& data) { this->_file.write(reinterpret_cast<const char*>(&data), sizeof(data)); }
+    void Tape<T>::write(const T& data) {
+
+        this->_file.write(reinterpret_cast<const char*>(&data), sizeof(data));
+        this->_end += sizeof(data);
+
+    }
 
     template <typename T>
     void Tape<T>::write(const std::vector<T>& data) {
@@ -143,15 +131,7 @@ namespace ng {
         for (const auto& e : data)
             this->_file.write(reinterpret_cast<const char*>(&e), sizeof(e));
 
-    }
-
-    // private methods
-    template <typename T>
-    void Tape<T>::_updateEnd() {
-
-        this->_file.seekp(0, std::ios_base::end);
-        this->_end = this->_file.tellp();
-        this->_file.seekp(0, std::ios_base::beg);
+        this->_end += sizeof(T) * data.size();
 
     }
 
