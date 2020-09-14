@@ -3,14 +3,31 @@
 
 int main() {
 
-    std::fstream outfile("../files/data.bin", std::ios_base::out | std::ios_base::binary);
+    std::string inpath;
+    std::string outpath;
+    int filesCount;
+    int chunkSize;
+
+    std::cout << "enter path to data:" << std::endl;
+    std::cin >> inpath;
+
+    std::cout << "enter path for result:" << std::endl;
+    std::cin >> outpath;
+
+    std::cout << "enter files count" << std::endl;
+    std::cin >> filesCount;
+
+    std::cout << "enter chunk size" << std::endl;
+    std::cin >> chunkSize;
+
+    std::fstream outfile(inpath, std::ios_base::out | std::ios_base::binary);
 
     // huembers
-    for (int i = 23; i >= 1; --i) {
+    for (int i = 200000; i >= 1; --i) {
 
 //        auto num = ng::random::irand<int>(0, 20);
 //        std::cout << num << " ";
-        std::cout << i << " ";
+//        std::cout << i << " ";
         outfile.write(reinterpret_cast<char*>(&i), sizeof(i));
 
     }
@@ -18,10 +35,10 @@ int main() {
 
     outfile.close();
 
-    ng::PolyphaseMergeSort<int> mergeSort("../files/data.bin", "../files/result.bin", 5, 5);
+    ng::PolyphaseMergeSort<int> mergeSort(inpath, outpath, filesCount, chunkSize);
     mergeSort.run();
 
-    std::fstream infile("../files/result.bin", std::ios_base::in | std::ios_base::binary);
+    std::fstream infile(outpath, std::ios_base::in | std::ios_base::binary);
 
     if (!infile.is_open())
         std::cerr << "failed to open the file" << std::endl;
