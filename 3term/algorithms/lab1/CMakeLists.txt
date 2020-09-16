@@ -9,4 +9,4 @@ include_directories(
     ${SFML_INCLUDE_DIR}
 )
 
-add_executable(lab1 src/main.cpp include/Tape.hpp include/PolyphaseMergeSort.hpp include/Random.hpp)
+add_executable(lab1 src/main.cpp include/Tape.hpp include/PolyphaseMergeSort.hpp include/Random.hpp src/functional.cpp include/functional.hpp)

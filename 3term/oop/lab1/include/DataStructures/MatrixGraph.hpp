@@ -27,6 +27,7 @@ namespace ng {
 		[[nodiscard]] const int& edges() const override;
 		[[nodiscard]] const bool& directed() const override;
 		[[nodiscard]] const bool& weighed() const override;
+        [[nodiscard]] const std::vector<std::vector<E*>>& matrix();
 
 		[[nodiscard]] bool connected() const override;
 		[[nodiscard]] std::vector<std::vector<N>> components() const override;
@@ -110,6 +111,9 @@ namespace ng {
 
 	template <typename N, typename E>
 	const bool& MatrixGraph<N, E>::weighed() const { return this->_weighed; }
+
+	template <typename N, typename E>
+	const std::vector<std::vector<E*>>& MatrixGraph<N, E>::matrix() { return this->_matrix; }
 
 	template <typename N, typename E>
 	bool MatrixGraph<N, E>::connected() const {

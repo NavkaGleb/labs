@@ -7,6 +7,13 @@ namespace ng {
 
 	class SpanningTree;
 
+	template <typename T>
+	class Bfs {
+	public:
+	    virtual void operator()() = 0;
+
+	}; // class bfs
+
 	template <typename N, typename E>
 	class Graph {
 	public:
@@ -38,6 +45,14 @@ namespace ng {
 		virtual void clear() = 0;
 		virtual void print() const = 0;
 
+        template <typename T = E>
+        void bfs(N node, std::map<N, T>& distance, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
+
+        template <typename T>
+        void bfs(N node, Bfs<T> b) {
+            b();
+        };
+
         virtual void dfs(const N& node, bool* visited) const = 0;
         virtual void dfs(const N& node, std::vector<N>& path) const = 0;
         [[nodiscard]] virtual std::vector<N> dfs(const N& node) const = 0;
@@ -50,6 +65,9 @@ namespace ng {
 //		[[nodiscard]] virtual SpanningTree* spanningTree(int snode) const = 0;
 //		[[nodiscard]] virtual std::vector<SpanningTree*> spanningForest() const = 0;
 //		[[nodiscard]] virtual std::vector<SpanningTree*> kruskal() const = 0;
+
+	protected:
+
 
 	}; // class Graph
 

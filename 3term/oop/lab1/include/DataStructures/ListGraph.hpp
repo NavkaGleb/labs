@@ -16,6 +16,9 @@ namespace ng {
 
     template <typename N, typename E = int>
     class ListGraph : public Graph<N, E> {
+    private:
+        struct Edge;
+
     public:
         // constructor / destructor
         ListGraph();
@@ -28,6 +31,7 @@ namespace ng {
         [[nodiscard]] const int& edges() const override;
         [[nodiscard]] const bool& directed() const override;
         [[nodiscard]] const bool& weighed() const override;
+        [[nodiscard]] const std::map<N, std::vector<Edge>>& list() const;
 
         [[nodiscard]] bool connected() const override;
         [[nodiscard]] std::vector<std::vector<N>> components() const override;
@@ -122,6 +126,9 @@ namespace ng {
 
     template <typename N, typename E>
     const bool& ListGraph<N, E>::weighed() const { return this->_weighed; }
+
+    template <typename N, typename E>
+    const std::map<N, std::vector<typename ListGraph<N, E>::Edge>>& ListGraph<N, E>::list() const { return this->_list; }
 
     template <typename N, typename E>
     bool ListGraph<N, E>::connected() const {
@@ -332,12 +339,12 @@ namespace ng {
             return;
 
         }
-        
-        for (int i = 0; i < this->_list[from]; ++i) {
 
-            if (this->_list[i].toNode == to) {
+        for (int i = 0; i < this->_list[from].size(); ++i) {
 
-                this->_list[i].erase(this->_list.begin() + i);
+            if (this->_list[from][i].toNode == to) {
+
+                this->_list[from].erase(this->_list[from].begin() + i);
                 break;
 
             }
@@ -346,11 +353,11 @@ namespace ng {
 
         if (!this->_directed) {
 
-            for (int i = 0; i < this->_list[to]; ++i) {
+            for (int i = 0; i < this->_list[to].size(); ++i) {
 
-                if (this->_list[i].toNode == from) {
+                if (this->_list[to][i].toNode == from) {
 
-                    this->_list[i].erase(this->_list.begin() + i);
+                    this->_list[to].erase(this->_list[to].begin() + i);
                     break;
 
                 }
