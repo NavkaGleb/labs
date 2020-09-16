@@ -6,21 +6,6 @@
 
 namespace functional {
 
-    bool end_of_chunk(Tape& tape, const int& current) {
-
-        int next;
-        std::fstream::pos_type current_position = tape.file.tellg();
-
-        tape.file.read(reinterpret_cast<char*>(&next), sizeof(next));
-
-        if (tape.file.tellg() == -1)
-            return true;
-
-        tape.file.seekg(current_position);
-        return tape.file.tellg() == tape.end || current > next;
-
-    }
-
     void generate_source(const std::string& filepath, const int& n) {
 
         std::ofstream outfile(filepath, std::ios_base::binary);
@@ -59,9 +44,6 @@ namespace functional {
             maxIndex = 0;
 
         }
-
-        for (int i = 0; i < tapes.size(); ++i)
-            std::cout << i << " -> " << tapes[i].size << std::endl;
 
     }
 
@@ -109,9 +91,6 @@ namespace functional {
         tape.end += static_cast<int>(chunk.size() * sizeof(int));
         tape.chunks_position.emplace_back(tape.end);
 
-//        int cur = -1;
-//        tape.file.write(reinterpret_cast<char*>(&cur), sizeof(cur));
-
     }
 
     void init_tapes(std::vector<Tape>& tapes, const std::string& filepath, const int& files_count, const int& chunk_size) {
@@ -139,11 +118,7 @@ namespace functional {
         new_chunk_size = numbers / chunks;
         oversize_chunks = numbers % chunks;
 
-        std::cout << "tapes size = " << tapes.size() << std::endl;
-
         for (int i = 0; i < tapes.size(); ++i) {
-
-            std::cout << "i = " << i << std::endl;
 
             tapes[i].filename = "../files/" + std::to_string(i) + ".bin";
             tapes[i].file.open(tapes[i].filename, std::ios_base::out | std::ios_base::binary);
@@ -187,7 +162,6 @@ namespace functional {
 
                 read_num(tapes[i], peaks[i].value);
                 peaks[i].tape = i;
-
 
             }
 
@@ -237,7 +211,7 @@ namespace functional {
 
     void sort(std::vector<Tape>& tapes, int& full_file) {
 
-        std::cout << "sort" << std::endl;
+        std::cout << "sort..." << std::endl;
 
         bool sorted = false;
         int empty = -1;
@@ -259,9 +233,9 @@ namespace functional {
                 tapes[empty].file.close();
                 tapes[empty].file.open(tapes[empty].filename, std::ios_base::out | std::fstream::binary);
                 tapes[empty].end = 0;
-                tapes[empty].chunks_position.clear();
                 tapes[empty].current_chunk = 0;
                 tapes[empty].current_position = 0;
+                tapes[empty].chunks_position.clear();
 
                 for (int i = 0; i < tapes[min].size; ++i)
                     merge(tapes, empty);
@@ -321,7 +295,6 @@ namespace functional {
 
         init_tapes(tapes, inpath, files_count, chunk_size);
         sort(tapes, full_file);
-
 
         auto end = std::chrono::steady_clock::now();
         std::cout << "TIME = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;

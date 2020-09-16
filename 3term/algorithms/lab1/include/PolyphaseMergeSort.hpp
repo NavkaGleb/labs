@@ -93,17 +93,10 @@ namespace ng {
         this->_sort();
         endTimePoint = high_resolution_clock::now();
         end = time_point_cast<milliseconds>(endTimePoint).time_since_epoch().count();
-        std::cout << "end sort " << static_cast<double>(end - start) * 0.001 << std::endl;
+        std::cout << "-- end sort " << static_cast<double>(end - start) * 0.001 << std::endl;
 
         this->_renameTape();
-        endTimePoint = high_resolution_clock::now();
-        end = time_point_cast<milliseconds>(endTimePoint).time_since_epoch().count();
-        std::cout << "rename tape " << static_cast<double>(end - start) * 0.001 << std::endl;
-
         this->_deleteTapes();
-        endTimePoint = high_resolution_clock::now();
-        end = time_point_cast<milliseconds>(endTimePoint).time_since_epoch().count();
-        std::cout << "delete tapes " << static_cast<double>(end - start) * 0.001 << std::endl;
 
     }
 
@@ -143,10 +136,6 @@ namespace ng {
             maxIndex = 0;
 
         }
-
-        for (int i = 0; i < this->_tapes.size(); ++i)
-            std::cout << i << " -> " << this->_tapes[i]->capacity() << std::endl;
-        std::cout << std::endl;
 
     }
 
@@ -212,23 +201,14 @@ namespace ng {
     template <typename T>
     void PolyphaseMergeSort<T>::_merge(const int& empty) {
 
-        std::cout << "merge " << empty << std::endl;
-
         std::vector<Peak> peaks(this->_tapes.size());
 
         for (int i = 0; i < peaks.size(); ++i) {
 
             if (i != empty) {
 
-                if (this->_tapes[i]->eof()) {
-
-                    std::cout << "end of file " << i << std::endl;
-                    peaks[i] = Peak();
-
-                } else {
-                    peaks[i] = Peak(i);
-                    this->_tapes[i]->read(peaks[i].value);
-                }
+                peaks[i] = Peak(i);
+                this->_tapes[i]->read(peaks[i].value);
 
             }
 
@@ -257,21 +237,29 @@ namespace ng {
 
                 this->_tapes[empty]->write(peaks[min].value);
 
-                if (!this->_tapes[min]->eoc(peaks[min].value))
+                if (!this->_tapes[min]->eoc()) {
+
                     this->_tapes[min]->read(peaks[min].value);
-                else
+
+                } else {
+
                     peaks[min].tape = -1;
+                    this->_tapes[min]->nextChunk();
+
+                }
 
             }
 
         }
+
+        this->_tapes[empty]->addChunkPosition();
 
     }
 
     template <typename T>
     void PolyphaseMergeSort<T>::_sort() {
 
-        std::cout << "sort" << std::endl;
+        std::cout << "sort..." << std::endl;
 
         bool sorted = false;
         int empty = -1;

@@ -28,7 +28,6 @@ namespace functional {
 
     };
 
-    bool end_of_chunk(Tape& tape, const int& current);
     void generate_source(const std::string& filepath, const int& n);
     void init_tapes_capacity(std::vector<Tape>& tapes, int files_count, int min_chunks);
     int get_chunks_count(const std::vector<Tape>& tapes);
