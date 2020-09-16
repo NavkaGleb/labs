@@ -298,6 +298,31 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::popEdge(const N& from, const N& to) {
 
+        for (int i = 0; i < this->_list[from]; ++i) {
+
+            if (this->_list[i].toNode == to) {
+
+                this->_list[i].erase(this->_list.begin() + i);
+                break;
+
+            }
+
+        }
+
+        if (!this->_directed) {
+
+            for (int i = 0; i < this->_list[to]; ++i) {
+
+                if (this->_list[i].toNode == from) {
+
+                    this->_list[i].erase(this->_list.begin() + i);
+                    break;
+
+                }
+
+            }
+
+        }
 
 
     }

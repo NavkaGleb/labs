@@ -308,7 +308,9 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::popEdges() {
 
-
+        for (const auto& row : this->_matrix)
+            for (const auto& e : row)
+                delete e;
 
 	}
 
