@@ -39,6 +39,7 @@ namespace ng {
 		void pushNode(const N& value) override;
 		void popNode(const N& value) override;
 		void pushEdge(const N& from, const N& to, const E& weight) override;
+		void pushEdge(const N& from, const N& to) override;
 		void popEdge(const N& from, const N& to) override;
 		void popEdges() override;
 		void clear() override;
@@ -113,6 +114,9 @@ namespace ng {
 	template <typename N, typename E>
 	bool MatrixGraph<N, E>::connected() const {
 
+	    if (this->_nodes.empty())
+	        return false;
+
 		auto* visited = new bool[this->_nodes.size()]();
 
 		this->_dfs(0, visited);
@@ -137,6 +141,9 @@ namespace ng {
 	std::vector<std::vector<N>> MatrixGraph<N, E>::components() const {
 
 		std::vector<std::vector<N>> components;
+
+		if (this->_nodes.empty())
+		    return components;
 
 		if (!this->_directed) {
 
@@ -175,13 +182,13 @@ namespace ng {
 				ids[this->_nodes.at(node)] = id;
 				low[this->_nodes.at(node)] = id++;
 
-				for (const auto& p : this->_nodes) {
+				for (const auto& [key, value] : this->_nodes) {
 
-					if (this->_matrix[this->_nodes.at(node)][p.second] && ids[p.second] == -1)
-						_dfs(p.first);
+					if (this->_matrix[this->_nodes.at(node)][value] && ids[value] == -1)
+						_dfs(key);
 
-					if (this->_matrix[this->_nodes.at(node)][p.second] && onStack[p.second])
-						low[this->_nodes.at(node)] = std::min(low[this->_nodes.at(node)], low[p.second]);
+					if (this->_matrix[this->_nodes.at(node)][value] && onStack[value])
+						low[this->_nodes.at(node)] = std::min(low[this->_nodes.at(node)], low[value]);
 
 				}
 
@@ -243,7 +250,17 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::popNode(const N& value) {
 
+        int index = this->_nodes[value];
 
+        for (int i = 0; i < this->_nodes.size(); ++i)
+            this->_matrix[i].erase(this->_matrix[i].begin() + index);
+
+        this->_matrix.erase(this->_matrix.begin() + index);
+        this->_nodes.erase(value);
+
+        for (const auto& [key, value] : this->_nodes)
+            if (value > index)
+                --this->_nodes[key];
 
 	}
 
@@ -256,6 +273,18 @@ namespace ng {
 			this->_matrix[this->_nodes[to]][this->_nodes[from]] = new E(weight);
 
 		++this->_edges;
+
+	}
+
+	template <typename N, typename E>
+	void MatrixGraph<N, E>::pushEdge(const N& from, const N& to) {
+
+        this->_matrix[this->_nodes[from]][this->_nodes[to]] = new E();
+
+        if (!this->_directed)
+            this->_matrix[this->_nodes[to]][this->_nodes[from]] = new E();
+
+        ++this->_edges;
 
 	}
 
@@ -286,7 +315,11 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::clear() {
 
+        for (const auto& row : this->_matrix)
+            for (const auto& e : row)
+                delete e;
 
+        this->_nodes.clear();
 
 	}
 
@@ -360,13 +393,13 @@ namespace ng {
             node = queue.front();
             queue.pop();
 
-            for (const auto& p : this->_nodes) {
+            for (const auto& [key, value] : this->_nodes) {
 
-                if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second]) {
+                if (this->_matrix[this->_nodes.at(node)][value] && !visited[value]) {
 
-                    visited[p.second] = true;
-                    queue.emplace(p.first);
-                    distance[p.first] = distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]);
+                    visited[value] = true;
+                    queue.emplace(key);
+                    distance[key] = distance[node] + f(*this->_matrix[this->_nodes.at(node)][value]);
 
                 }
 
@@ -394,13 +427,13 @@ namespace ng {
             node = queue.front();
             queue.pop();
 
-            for (const auto& p : this->_nodes) {
+            for (const auto& [key, value] : this->_nodes) {
 
-                if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second]) {
+                if (this->_matrix[this->_nodes.at(node)][value] && !visited[value]) {
 
-                    visited[p.second] = true;
-                    queue.emplace(p.first);
-                    distance[p.first] = distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]);
+                    visited[value] = true;
+                    queue.emplace(key);
+                    distance[key] = distance[node] + f(*this->_matrix[this->_nodes.at(node)][value]);
 
                 }
 
@@ -431,17 +464,17 @@ namespace ng {
             node = pqueue.top().second;
             pqueue.pop();
 
-            for (const auto& p : this->_nodes) {
+            for (const auto& [key, value] : this->_nodes) {
 
-                if (this->_matrix[this->_nodes.at(node)][p.second] && (
-                    !distance[p.first] ||
-                    *distance[p.first] > *distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]))) {
+                if (this->_matrix[this->_nodes.at(node)][value] && (
+                    !distance[value] ||
+                    *distance[key] > *distance[node] + f(*this->_matrix[this->_nodes.at(node)][value]))) {
 
-                    if (!distance[p.first])
-                        distance[p.first] = new T();
+                    if (!distance[key])
+                        distance[key] = new T();
 
-                    *distance[p.first] = *distance[node] + f(*this->_matrix[this->_nodes.at(node)][p.second]);
-                    pqueue.emplace(*distance[p.first] * -1, p.first);
+                    *distance[key] = *distance[node] + f(*this->_matrix[this->_nodes.at(node)][value]);
+                    pqueue.emplace(*distance[key] * -1, key);
 
                 }
 
@@ -462,9 +495,9 @@ namespace ng {
 	    if (path)
 	        path->emplace_back(node);
 
-	    for (const auto& p : this->_nodes)
-	        if (this->_matrix[this->_nodes.at(node)][p.second] && !visited[p.second])
-	            this->_dfs(p.first, visited, path);
+	    for (const auto& [key, value] : this->_nodes)
+	        if (this->_matrix[this->_nodes.at(node)][value] && !visited[value])
+	            this->_dfs(key, visited, path);
 
 	}
 

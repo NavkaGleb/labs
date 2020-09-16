@@ -10,4 +10,3 @@ include_directories(
 )
 
 add_executable(lab1 src/main.cpp include/Tape.hpp include/PolyphaseMergeSort.hpp include/Random.hpp)
-

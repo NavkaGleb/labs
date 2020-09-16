@@ -32,6 +32,7 @@ namespace ng {
 		virtual void pushNode(const N& value) = 0;
 		virtual void popNode(const N& value) = 0;
 		virtual void pushEdge(const N& from, const N& to, const E& weight) = 0;
+		virtual void pushEdge(const N& from, const N& to) = 0;
 		virtual void popEdge(const N& from, const N& to) = 0;
 		virtual void popEdges() = 0;
 		virtual void clear() = 0;

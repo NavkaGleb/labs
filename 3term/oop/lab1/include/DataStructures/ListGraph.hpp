@@ -40,6 +40,7 @@ namespace ng {
         void pushNode(const N &value) override;
         void popNode(const N& value) override;
         void pushEdge(const N& from, const N& to, const E& weight) override;
+        void pushEdge(const N& from, const N& to) override;
         void popEdge(const N& from, const N& to) override;
         void popEdges() override;
         void clear() override;
@@ -156,12 +157,12 @@ namespace ng {
             std::vector<N> component;
             bool* visited = new bool[this->_nodes.size()]();
 
-            for (const auto p : this->_nodes) {
+            for (const auto& [key, value] : this->_nodes) {
 
-                if (!visited[p.second]) {
+                if (!visited[value]) {
 
                     component.clear();
-                    this->_dfs(p.first, visited, &component);
+                    this->_dfs(key, visited, &component);
                     components.emplace_back(component);
 
                 }
@@ -222,9 +223,9 @@ namespace ng {
 
             };
 
-            for (const auto& p : this->_nodes)
-                if (ids[p.second] == -1)
-                    _dfs(p.first);
+            for (const auto& [key, value] : this->_nodes)
+                if (ids[value] == -1)
+                    _dfs(key);
 
             delete [] onStack;
             delete [] ids;
@@ -255,7 +256,18 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::popNode(const N& value) {
 
-        // https://www.includehelp.com/ds/insertion-and-deletion-of-nodes-and-edges-in-a-graph-using-adjacency-list.aspx
+        int index = this->_nodes[value];
+
+        this->_list.erase(value);
+
+        for (auto& [key, edges] : this->_list)
+            for (int i = 0; i < edges.size(); ++i)
+                if (edges[i].toNode == value)
+                    edges.erase(edges.begin() + i--);
+
+        for (const auto& [key, value] : this->_nodes)
+            if (value > index)
+                --this->_nodes[key];
 
     }
 
@@ -272,7 +284,20 @@ namespace ng {
     }
 
     template <typename N, typename E>
+    void ListGraph<N, E>::pushEdge(const N& from, const N& to) {
+
+        this->_list[from].emplace_back(to, E());
+
+        if (!this->_directed)
+            this->_list[to].emplace_back(from, E());
+
+        ++this->_edges;
+
+    }
+
+    template <typename N, typename E>
     void ListGraph<N, E>::popEdge(const N& from, const N& to) {
+
 
 
     }
@@ -280,25 +305,38 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::popEdges() {
 
-        for (auto& p : this->_list)
-            p.second.clear();
+        for (auto& [key, edges] : this->_list)
+            edges.clear();
 
     }
 
     template <typename N, typename E>
     void ListGraph<N, E>::clear() {
 
-        for (auto& p : this->_list)
-            p.second.clear();
+        for (auto& [key, edges] : this->_list)
+            edges.clear();
 
         this->_list.clear();
-
+        this->_nodes.clear();
     }
 
     template <typename N, typename E>
     void ListGraph<N, E>::print() const {
 
+        std::cout << "  ";
+        for (const auto& [key, value] : this->_nodes)
+            std::cout << value << " ";
+        std::cout << std::endl;
 
+        for (const auto& [key, edges] : this->_list) {
+
+            std::cout << this->_nodes.at(key) << " ";
+
+            for (const auto& edge : edges)
+                std::cout << "(" << edge.toNode << ", " << edge.value << ") ";
+            std::cout << std::endl;
+
+        }
 
     }
 
@@ -400,8 +438,8 @@ namespace ng {
         std::map<N, T*> distance;
         std::priority_queue<std::pair<T, N>> pqueue;
 
-        for (const auto& p : this->_nodes)
-            distance[p.first] = nullptr;
+        for (const auto& [key, value] : this->_nodes)
+            distance[key] = nullptr;
 
         distance[node] = new T();
         pqueue.emplace(*distance[node], node);
