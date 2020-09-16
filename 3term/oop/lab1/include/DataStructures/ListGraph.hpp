@@ -248,6 +248,13 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::pushNode(const N& value) {
 
+        if (this->_nodes.count(value) == 1) {
+
+            std::cerr << "node already exists" << std::endl;
+            return;
+
+        }
+
         this->_nodes[value] = this->_nodes.size();
         this->_list[value] = std::vector<Edge>(0);
 
@@ -255,6 +262,13 @@ namespace ng {
 
     template <typename N, typename E>
     void ListGraph<N, E>::popNode(const N& value) {
+
+        if (this->_nodes.count(value) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
 
         int index = this->_nodes[value];
 
@@ -274,6 +288,13 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::pushEdge(const N& from, const N& to, const E& weight) {
 
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
+
         this->_list[from].emplace_back(to, weight);
 
         if (!this->_directed)
@@ -285,6 +306,13 @@ namespace ng {
 
     template <typename N, typename E>
     void ListGraph<N, E>::pushEdge(const N& from, const N& to) {
+
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
 
         this->_list[from].emplace_back(to, E());
 
@@ -298,6 +326,13 @@ namespace ng {
     template <typename N, typename E>
     void ListGraph<N, E>::popEdge(const N& from, const N& to) {
 
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
+        
         for (int i = 0; i < this->_list[from]; ++i) {
 
             if (this->_list[i].toNode == to) {

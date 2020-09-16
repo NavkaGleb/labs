@@ -238,6 +238,13 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::pushNode(const N& value) {
 
+	    if (this->_nodes.count(value) == 1) {
+
+	        std::cerr << "node already exists" << std::endl;
+	        return;
+
+	    }
+
 		this->_nodes[value] = this->_nodes.size();
 
 		for (auto& a : this->_matrix)
@@ -249,6 +256,13 @@ namespace ng {
 
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::popNode(const N& value) {
+
+	    if (this->_nodes.count(value) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
 
         int index = this->_nodes[value];
 
@@ -267,6 +281,13 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::pushEdge(const N& from, const N& to, const E& weight) {
 
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
+
 		this->_matrix[this->_nodes[from]][this->_nodes[to]] = new E(weight);
 
 		if (!this->_directed)
@@ -279,6 +300,13 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::pushEdge(const N& from, const N& to) {
 
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
+
         this->_matrix[this->_nodes[from]][this->_nodes[to]] = new E();
 
         if (!this->_directed)
@@ -290,6 +318,13 @@ namespace ng {
 
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::popEdge(const N& from, const N& to) {
+
+        if (this->_nodes.count(from) == 0 || this->_nodes.count(to) == 0) {
+
+            std::cerr << "no such node" << std::endl;
+            return;
+
+        }
 
 		delete this->_matrix[this->_nodes[from]][this->_nodes[to]];
 		this->_matrix[this->_nodes[from]][this->_nodes[to]] = nullptr;
