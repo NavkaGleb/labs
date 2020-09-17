@@ -3,49 +3,111 @@
 
 #include "functional.hpp"
 
-int main() {
+void generateReversedData(const std::string& filepath, const int& n) {
 
-//    functional::main();
+    std::ofstream outfile(filepath, std::ios_base::binary);
 
-    std::string inpath = "../files/data.bin";
-    std::string outpath = "../files/result.bin";
-    int filesCount = 5;
-    int chunkSize = 1000;
-
-    std::fstream outfile(inpath, std::ios_base::out | std::ios_base::binary);
+    if (!outfile.is_open())
+        throw std::invalid_argument("failed to open the file | main::generateReversedData");
 
     // huembers
-    for (int i = 1000000; i >= 1; --i) {
-//        auto num = ng::random::irand<int>(0, 20);
-//        std::cout << num << " ";
-//        std::cout << i << " ";
+    for (int i = n; i >= 1; --i)
         outfile.write(reinterpret_cast<char*>(&i), sizeof(i));
-    }
-    std::cout << std::endl;
+
     outfile.close();
 
-    ng::PolyphaseMergeSort<int> mergeSort(inpath, outpath, filesCount, chunkSize);
-    mergeSort.run();
+}
 
-    std::fstream infile(outpath, std::ios_base::in | std::ios_base::binary);
+void generateRandomData(const std::string& filepath, const int& n, const int& left, const int& right) {
+
+    std::ofstream outfile(filepath, std::ios_base::binary);
+
+    if (!outfile.is_open())
+        throw std::invalid_argument("failed to open the file | main::generateRandomData");
+
+    int num;
+
+    // huembers
+    for (int i = n; i >= 1; --i) {
+
+        num = ng::random::irand<int>(left, right);
+        outfile.write(reinterpret_cast<char*>(&num), sizeof(num));
+
+    }
+
+    outfile.close();
+
+}
+
+void print(const std::string& filepath) {
+
+    std::fstream infile(filepath, std::ios_base::in | std::ios_base::binary);
 
     if (!infile.is_open())
-        std::cerr << "failed to open the file" << std::endl;
+        throw std::invalid_argument("failed to open the file | main::print");
+
+
+    int end = 0;
+    int num = 0;
 
     infile.seekg(0, std::ios_base::end);
-    int end = infile.tellg();
+    end = infile.tellg();
     infile.seekg(0, std::ios_base::beg);
-    int num;
+
     while (infile.tellg() != end) {
 
         infile.read(reinterpret_cast<char*>(&num), sizeof(num));
         std::cout << num << " ";
 
     }
+
     std::cout << std::endl;
-//    infile.close();
+    infile.close();
 
+}
 
-    return 0;
+int main() {
+
+    ng::functional::main();
+
+//    int huembers = 1000;
+//    std::string inpath = "../files/data.bin";
+//    std::string outpath = "../files/result.bin";
+//    int filesCount = 5;
+//    int chunkSize = 30;
+//    bool init = false;
+//
+//    std::cout << "do you want init variables or use default? [1/0]" << std::endl;
+//    std::cin >> init;
+//
+//    if (init) {
+//
+//        std::cout << "enter amount of numbers: ";
+//        std::cin >> huembers;
+//
+//        std::cout << "enter path to data: ";
+//        std::cin >> inpath;
+//
+//        std::cout << "enter path to result: ";
+//        std::cin >> outpath;
+//
+//        std::cout << "enter files count: ";
+//        std::cin >> filesCount;
+//
+//        std::cout << "enter chunk size: ";
+//        std::cin >> chunkSize;
+//
+//    }
+//
+//
+////    generateRandomData(inpath, huembers, -10, 10);
+//    generateReversedData(inpath, huembers);
+//
+//    ng::PolyphaseMergeSort<int> mergeSort(inpath, outpath, filesCount, chunkSize);
+//    mergeSort.run();
+//
+//    print(outpath);
+
+    system("pause");
 
 }

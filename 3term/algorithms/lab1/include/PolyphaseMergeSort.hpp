@@ -83,17 +83,13 @@ namespace ng {
 
         using namespace std::chrono;
 
-        auto start = time_point_cast<milliseconds>(this->_start).time_since_epoch().count();
+        auto start = steady_clock::now();
 
         this->_initTapes();
-        time_point<high_resolution_clock> endTimePoint = high_resolution_clock::now();
-        auto end = time_point_cast<milliseconds>(endTimePoint).time_since_epoch().count();
-        std::cout << "end init tapes " << static_cast<double>(end - start) * 0.001 << std::endl;
-
         this->_sort();
-        endTimePoint = high_resolution_clock::now();
-        end = time_point_cast<milliseconds>(endTimePoint).time_since_epoch().count();
-        std::cout << "-- end sort " << static_cast<double>(end - start) * 0.001 << std::endl;
+
+        auto end = steady_clock::now();
+        std::cout << "end sort " << (duration_cast<milliseconds>(end - start).count()) * 0.001 << " sec" << std::endl;
 
         this->_renameTape();
         this->_deleteTapes();

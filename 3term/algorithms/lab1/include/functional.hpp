@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <chrono>
 
-namespace functional {
+namespace ng::functional {
 
     struct Tape {
 
@@ -40,6 +40,7 @@ namespace functional {
     void sort(std::vector<Tape>& tapes, int& full_file);
     void rename_tape(std::vector<Tape>& tapes, const int& full_file, const std::string& outpath);
     void delete_tapes(std::vector<Tape>& tapes, const int& full_file);
+    void print(const std::string& filepath);
 
     int main();
 

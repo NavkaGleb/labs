@@ -4,7 +4,7 @@
 
 #include <Random.hpp>
 
-namespace functional {
+namespace ng::functional {
 
     void generate_source(const std::string& filepath, const int& n) {
 
@@ -279,17 +279,68 @@ namespace functional {
 
     }
 
+    void print(const std::string& filepath) {
+
+        std::fstream infile(filepath, std::ios_base::in | std::ios_base::binary);
+
+        if (!infile.is_open())
+            throw std::invalid_argument("failed to open the file | main::print");
+
+
+        int end;
+        int num = 0;
+
+        infile.seekg(0, std::ios_base::end);
+        end = infile.tellg();
+        infile.seekg(0, std::ios_base::beg);
+
+        while (infile.tellg() != end) {
+
+            infile.read(reinterpret_cast<char*>(&num), sizeof(num));
+            std::cout << num << " ";
+
+        }
+
+        std::cout << std::endl;
+        infile.close();
+
+    }
+
     int main() {
 
-        std::string inpath = "../files/source.bin";
+        int huembers = 1000;
+        std::string inpath = "../files/data.bin";
         std::string outpath = "../files/result.bin";
         int files_count = 5;
-        int chunk_size = 1000;
+        int chunk_size = 17;
+        bool init = false;
         int full_file = -1;
         std::vector<Tape> tapes;
 
+        std::cout << "do you want init variables or use default? [1/0]" << std::endl;
+        std::cin >> init;
+
+        if (init) {
+
+            std::cout << "enter amount of numbers: ";
+            std::cin >> huembers;
+
+            std::cout << "enter path to data: ";
+            std::cin >> inpath;
+
+            std::cout << "enter path to result: ";
+            std::cin >> outpath;
+
+            std::cout << "enter files count: ";
+            std::cin >> files_count;
+
+            std::cout << "enter chunk size: ";
+            std::cin >> chunk_size;
+
+        }
+
         // main
-        generate_source(inpath, 1000000);
+        generate_source(inpath, huembers);
 
         auto start = std::chrono::steady_clock::now();
 
@@ -297,30 +348,13 @@ namespace functional {
         sort(tapes, full_file);
 
         auto end = std::chrono::steady_clock::now();
-        std::cout << "TIME = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+        std::cout << "TIME = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() * 0.001
+                  << " sec" << std::endl;
 
         rename_tape(tapes, full_file, outpath);
         delete_tapes(tapes, full_file);
 
-        // output
-        std::ifstream iinfile(outpath, std::ios_base::binary);
-
-        if (!iinfile.is_open())
-            std::cerr << "failed to open the file" << std::endl;
-
-        iinfile.seekg(0, std::ios_base::end);
-        int endc = iinfile.tellg();
-        iinfile.seekg(0, std::ios_base::beg);
-        int num;
-
-        while (iinfile.tellg() != endc) {
-
-            iinfile.read(reinterpret_cast<char*>(&num), sizeof(num));
-            std::cout << num << " ";
-
-        }
-        std::cout << std::endl;
-        iinfile.close();
+        print(outpath);
 
         return 0;
 
