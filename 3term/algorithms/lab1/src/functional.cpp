@@ -308,11 +308,11 @@ namespace ng::functional {
 
     int main() {
 
-        int huembers = 1000;
+        int huembers = 200000;
         std::string inpath = "../files/data.bin";
         std::string outpath = "../files/result.bin";
         int files_count = 5;
-        int chunk_size = 17;
+        int chunk_size = 1000;
         bool init = false;
         int full_file = -1;
         std::vector<Tape> tapes;

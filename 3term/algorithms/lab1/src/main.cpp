@@ -18,19 +18,20 @@ void generateReversedData(const std::string& filepath, const int& n) {
 
 }
 
-void generateRandomData(const std::string& filepath, const int& n, const int& left, const int& right) {
+template <typename T>
+void generateRandomData(const std::string& filepath, const int& n, const T& left, const T& right) {
 
     std::ofstream outfile(filepath, std::ios_base::binary);
 
     if (!outfile.is_open())
         throw std::invalid_argument("failed to open the file | main::generateRandomData");
 
-    int num;
+    T num;
 
     // huembers
     for (int i = n; i >= 1; --i) {
 
-        num = ng::random::irand<int>(left, right);
+        num = ng::random::irand<T>(left, right);
         outfile.write(reinterpret_cast<char*>(&num), sizeof(num));
 
     }
@@ -68,44 +69,44 @@ void print(const std::string& filepath) {
 
 int main() {
 
-    ng::functional::main();
+//    ng::functional::main();
 
-//    int huembers = 1000;
-//    std::string inpath = "../files/data.bin";
-//    std::string outpath = "../files/result.bin";
-//    int filesCount = 5;
-//    int chunkSize = 30;
-//    bool init = false;
-//
-//    std::cout << "do you want init variables or use default? [1/0]" << std::endl;
-//    std::cin >> init;
-//
-//    if (init) {
-//
-//        std::cout << "enter amount of numbers: ";
-//        std::cin >> huembers;
-//
-//        std::cout << "enter path to data: ";
-//        std::cin >> inpath;
-//
-//        std::cout << "enter path to result: ";
-//        std::cin >> outpath;
-//
-//        std::cout << "enter files count: ";
-//        std::cin >> filesCount;
-//
-//        std::cout << "enter chunk size: ";
-//        std::cin >> chunkSize;
-//
-//    }
-//
-//
-////    generateRandomData(inpath, huembers, -10, 10);
-//    generateReversedData(inpath, huembers);
-//
-//    ng::PolyphaseMergeSort<int> mergeSort(inpath, outpath, filesCount, chunkSize);
-//    mergeSort.run();
-//
+    int numbers = 1000000;
+    std::string inpath = "../files/data.bin";
+    std::string outpath = "../files/result.bin";
+    int filesCount = 5;
+    int chunkSize = 100;
+    bool init = false;
+
+    std::cout << "do you want init variables or use default? [1/0]" << std::endl;
+    std::cin >> init;
+
+    if (init) {
+
+        std::cout << "enter amount of numbers: ";
+        std::cin >> numbers;
+
+        std::cout << "enter path to data: ";
+        std::cin >> inpath;
+
+        std::cout << "enter path to result: ";
+        std::cin >> outpath;
+
+        std::cout << "enter files count: ";
+        std::cin >> filesCount;
+
+        std::cout << "enter chunk size: ";
+        std::cin >> chunkSize;
+
+    }
+
+
+//    generateRandomData<int>(inpath, numbers, -10, 10);
+    generateReversedData(inpath, numbers);
+
+    ng::PolyphaseMergeSort<int> mergeSort(inpath, outpath, filesCount, chunkSize);
+    mergeSort.run();
+
 //    print(outpath);
 
     system("pause");
