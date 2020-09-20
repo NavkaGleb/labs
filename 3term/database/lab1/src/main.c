@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <string.h>
+#include "functions.h"
 
 int main() {
 
-    printf("Hello, World!\n");
+    insert_master();
+    get_master();
     return 0;
 
 }
