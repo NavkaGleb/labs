@@ -2,6 +2,7 @@
 #define FUNCTIONS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "country.h"
@@ -22,13 +23,13 @@ void print_index_city(const index_city_t index_city);
 
 long long get_eof(FILE* file);
 
-void get_master(long long id);
+country_t get_master(long long id);
 void get_slave(void);
 
 void delete_master(void);
 void delete_slave(void);
 
-void update_master(void);
+void update_master(const country_t country);
 void update_slave(void);
 
 void insert_master(void);

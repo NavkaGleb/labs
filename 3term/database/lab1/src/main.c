@@ -3,8 +3,10 @@
 int main() {
 
 //    insert_master();
-    get_master(2);
+
+    printf("insert slave\n");
     insert_slave();
+
     return 0;
 
 }
