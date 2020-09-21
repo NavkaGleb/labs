@@ -7,6 +7,7 @@ typedef struct country {
     int area;
     int cities_count;
     long long city_pos;
+    bool deleted;
 } country_t;
 
 #endif // COUNTRY_H

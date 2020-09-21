@@ -6,6 +6,7 @@ typedef struct city {
     char name[10];
     int population;
     unsigned long long next;
+    bool deleted;
 } city_t;
 
 #endif // CITY_H
