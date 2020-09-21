@@ -16,6 +16,6 @@ set(HEADER_FILES
 # set SOURCE FILES
 set(SOURCE_FILES
     src/main.c
-    src/functions.c include/structs/person.h)
+    src/functions.c include/structs/country.h include/structs/index_country.h include/structs/city.h include/structs/index_city.h)
 
 add_executable(lab1 ${SOURCE_FILES})

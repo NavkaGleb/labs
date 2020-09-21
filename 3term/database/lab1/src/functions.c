@@ -2,8 +2,13 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
-#include "person.h"
+int rand_int(int left, int right) {
+
+    return rand() % (right - left) + left;
+
+}
 
 void rand_string(char* string, size_t length) {
 
@@ -16,11 +21,32 @@ void rand_string(char* string, size_t length) {
 
 }
 
-void rand_person(person_t* p) {
+void rand_country(country_t* country) {
 
-    p->passport = rand() % 100;
-    rand_string(p->name, rand() % (sizeof(p->name) / sizeof(p->name[0]) - 1 - 1) + 1);
-    p->sex = male;
+    country->id = rand() % 100;
+    rand_string(country->name, rand_int(1, sizeof(country->name) / sizeof(country->name[0]) - 1));
+    country->area = rand_int(10, 1000);
+    country->cities_count = 0;
+    country->city_pos = -1;
+
+}
+
+void print_country(const country_t country) {
+
+    printf("{ id: %lld, name: %s, area: %d, cities_count: %d, city_pos: % lld }\n",
+       country.id, country.name, country.area, country.cities_count, country.city_pos);
+
+}
+
+void print_index_country(const index_country_t index_country) {
+
+    printf("{ id: %lld, pos: %lld }\n", index_country.id, index_country.pos);
+
+}
+
+void print_city(const city_t city) {
+
+    printf("{ id: %lld, name: %s, population: %d, next: %lld }", city.id, city.name, city.population, city.next);
 
 }
 
@@ -36,39 +62,46 @@ long long get_eof(FILE* file) {
 
 }
 
-void get_master(void) {
+void get_master(long long id) {
 
-    FILE* infile = fopen("../files/person.fl", "r");
-    FILE* index_infile = fopen("../files/person.ind", "r");
+    FILE* data_infile = fopen("../files/country.fl", "r");
+    FILE* index_infile = fopen("../files/country.ind", "r");
 
-    if (infile == NULL || index_infile == NULL)
+    if (data_infile == NULL || index_infile == NULL)
         return;
 
     printf("read from file!\n");
 
-    long long passport;
-    int pos;
-    person_t person;
-    long long end = get_eof(infile);
+    index_country_t index_country;
+    country_t country;
+    long long end = get_eof(index_infile);
+    int count = 0;
+    short exists = false;
 
-    while (ftell(infile) != end) {
+    while (ftell(index_infile) != end) {
 
-        fread(&passport, sizeof(passport), 1, index_infile);
-        fread(&pos, sizeof(pos), 1, index_infile);
-        fread(&person, sizeof(person), 1, infile);
+        ++count;
 
-        printf("passport = %lld\n", passport);
-        printf("pos = %d\n", pos);
+        fread(&index_country, sizeof(index_country), 1, index_infile);
+        fread(&country, sizeof(country), 1, data_infile);
 
-        printf("passport = %lld\n", person.passport);
-        printf("name = %s\n", person.name);
-        printf("sex = %d\n", person.sex);
+        print_index_country(index_country);
+        print_country(country);
 
-        printf("current pos == %ld\n\n", ftell(infile));
+        if (country.id == id) {
+            exists = true;
+            break;
+        }
 
     }
 
-    fclose(infile);
+    printf("\n");
+    if (exists)
+        print_country(country);
+    else
+        printf("no record. try to update database!\n");
+
+    fclose(data_infile);
     fclose(index_infile);
 
 }
@@ -78,30 +111,53 @@ void insert_master(void) {
     // init rand
     srand(time(NULL));
 
-    // simple file
-    FILE* outfile = fopen("../files/person.fl", "a");
-    FILE* index_outfile = fopen("../files/person.ind", "a");
+    // open files
+    FILE* data_outfile = fopen("../files/country.fl", "a");
+    FILE* index_outfile = fopen("../files/country.ind", "a");
 
-    if (outfile == NULL || index_outfile == NULL)
+    if (data_outfile == NULL || index_outfile == NULL)
         return;
 
-    int current_pos = -1;
-    person_t person;
+    country_t country;
+    index_country_t index_country;
 
-    rand_person(&person);
-    current_pos = ftell(outfile);
+    rand_country(&country);
+    index_country.id = country.id;
+    index_country.pos = ftell(data_outfile);
 
-    printf("passport = %lld\n", person.passport);
-    printf("name = %s\n", person.name);
-    printf("sex = %d\n", person.sex);
-    printf("sizeof person %d\n", sizeof(person));
-    printf("current_pos = %d\n\n", current_pos);
+    print_country(country);
+    print_index_country(index_country);
 
-    fwrite(&person, sizeof(person), 1, outfile);
-    fwrite(&person.passport, sizeof(person.passport), 1, index_outfile);
-    fwrite(&current_pos, sizeof(current_pos), 1, index_outfile);
+    fwrite(&country, sizeof(country), 1, data_outfile);
+    fwrite(&index_country, sizeof(index_country), 1, index_outfile);
 
-    fclose(outfile);
+    fclose(data_outfile);
+    fclose(index_outfile);
+
+}
+
+void insert_slave(void) {
+
+    printf("\ninsert slave\n");
+
+    FILE* data_outfile = fopen("../files/city.fl", "a");
+    FILE* index_outfile = fopen("../files/city.ind", "a");
+
+    if (data_outfile == NULL || index_outfile == NULL)
+        return;
+
+    city_t city;
+    index_city_t index_city;
+
+    // init city
+    city.id = 1;
+    strcpy(city.name, "city_name");
+    city.population = rand_int(10, 100);
+    city.next = -1;
+
+    print_city(city);
+
+    fclose(data_outfile);
     fclose(index_outfile);
 
 }

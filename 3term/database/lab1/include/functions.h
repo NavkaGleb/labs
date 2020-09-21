@@ -4,14 +4,25 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "person.h"
+#include "country.h"
+#include "index_country.h"
+#include "city.h"
+#include "index_city.h"
 
+enum bool { false = 0, true };
+
+int rand_int(int left, int right);
 void rand_string(char* string, size_t length);
-void rand_person(person_t* p);
+void rand_country(country_t* p);
+
+void print_country(const country_t country);
+void print_index_country(const index_country_t index_country);
+void print_city(const city_t city);
+void print_index_city(const index_city_t index_city);
 
 long long get_eof(FILE* file);
 
-void get_master(void);
+void get_master(long long id);
 void get_slave(void);
 
 void delete_master(void);
