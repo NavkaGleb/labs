@@ -5,7 +5,8 @@ typedef struct city {
     unsigned long long id;
     char name[10];
     int population;
-    unsigned long long next;
+    unsigned long long country_id;
+    long long next;
     bool deleted;
 } city_t;
 
