@@ -12,9 +12,6 @@ void print_commands();
 bool ui_print_country(country_t* country);
 bool ui_print_city(city_t* city);
 
-//void ui_insert_country();
-//void ui_insert_city();
-
 void ui_update_country();
 void ui_update_city();
 

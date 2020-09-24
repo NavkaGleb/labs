@@ -48,30 +48,6 @@ bool ui_print_city(city_t* city) {
     return true;
 }
 
-//void ui_insert_country() {
-//    char name[COUNTRY_NAME_LENGTH];
-//    int area;
-//
-//    printf("enter country name:\n");
-//    scanf("%s", name);
-//    printf("enter country area:\n");
-//    scanf("%d", &area);
-//
-//    insert_master(name, area);
-//}
-//
-//void ui_insert_city() {
-//    char name[CITY_NAME_LENGTH];
-//    int population;
-//
-//    printf("enter city name:\n");
-//    scanf("%s", name);
-//    printf("enter city population:\n");
-//    scanf("%d", &population);
-//
-//    insert_slave(name, population);
-//}
-
 void ui_update_country() {
     if (!print_existing_countries()) {
         printf("[ MESSAGE ] no countries in database. first add one\n");
@@ -227,7 +203,7 @@ void ui_run() {
                 run = false;
                 break;
             default:
-                printf("no such command. try again :(\n");
+                printf("there is no such command. try again :(\n");
                 break;
         }
 

@@ -15,6 +15,9 @@ void scan_city(city_t* city) {
     scanf("%s", city->name);
     printf("enter city population:\n");
     scanf("%d", &city->population);
+    printf("choose id of the country:\n");
+    print_existing_countries();
+    scanf("%lld", &city->country_id);
 }
 
 void print_country(const country_t country, const char* title) {
@@ -407,10 +410,6 @@ bool insert_slave(bool entry, char name[CITY_NAME_LENGTH], int population) {
         scan_city(&city);
     }
 
-    printf("choose id of the country:\n");
-    print_existing_countries();
-    scanf("%lld", &city.country_id);
-
     ++global_data.cities_count;
 
     country_t* country = get_master(city.country_id);
@@ -549,6 +548,11 @@ void get_slaves(unsigned long long id) {
         exit(1);
     }
 
+    if (country->cities_count == 0) {
+        printf("[ MESSAGE ] no cities in this country :(\n");
+        return;
+    }
+
     city_t city;
     long long offset = country->city_pos;
     ft_table_t* table = ft_create_table();
@@ -564,13 +568,9 @@ void get_slaves(unsigned long long id) {
     printf("END = %lld\n", get_eof(data_infile));
 
     for (int i = 0; i < country->cities_count; ++i) {
-        printf("offset = %lld\n", offset);
         fseek(data_infile, offset, SEEK_SET);
-        printf("current pos = %ld", ftell(data_infile));
         fread(&city, sizeof(city), 1, data_infile);
         offset = city.next;
-
-        print_city(city, "FUCKING CURRENT CITY");
 
         itoa(city.id, id_buffer, 10);
         itoa(city.population, population_buffer, 10);
@@ -619,7 +619,7 @@ void update_countries(global_data_t* global_data) {
         } else {
 
             index_country.id = country.id;
-            index_country.pos = ftell(data_infile) - (deleted + sizeof(country));
+            index_country.pos = ftell(data_infile) - ((deleted + 1) + sizeof(country));
 
             fwrite(&country, sizeof(country), 1, temp_data_outfile);
             fwrite(&index_country, sizeof(index_country), 1, index_outfile);
@@ -651,21 +651,14 @@ void update_cities(global_data_t* global_data) {
     long long end = get_eof(data_infile);
     index_city_t index_city;
     city_t city;
-    country_t* countries = (country_t*)malloc(sizeof(country_t) * global_data->countries_count);
-    int* ids = (int*)malloc(sizeof(int) * global_data->countries_count);
+    country_t* countries = (country_t*)malloc(sizeof(country_t) * (global_data->countries_count + global_data->deleted_countries));
+    unsigned long long* pos = (unsigned long long*)malloc(sizeof(unsigned long long) * (end / sizeof(city_t)));
     int deleted = 0;
 
-    get_masters(countries, global_data->countries_count);
-
-    for (int i = 0; i < global_data->countries_count; ++i) {
-        fseek(data_infile, countries[i].city_pos, SEEK_SET);
-        fread(&city, sizeof(city), 1, data_infile);
-        ids[i] = city.id;
-    }
-
-    fseek(data_infile, 0, SEEK_SET);
+    get_masters(countries, global_data->countries_count + global_data->deleted_countries);
 
     while (ftell(data_infile) != end) {
+        pos[ftell(data_infile) / sizeof(city_t)] = ftell(data_infile) - (deleted * sizeof(city));
         fread(&city, sizeof(city), 1, data_infile);
 
         if (city.deleted) {
@@ -674,16 +667,8 @@ void update_cities(global_data_t* global_data) {
             index_city.id = city.id;
             index_city.pos = ftell(data_infile) - ((deleted + 1) * sizeof(city));
 
-            print_city(city, "CURRENT FUCKING CITY");
-
-            printf("NOT DELETED CITY\n");
-            printf("deleted = %d\n", deleted);
-            printf("current pos of city %lld -> %lld\n", index_city.id, index_city.pos);
-
-//            if (city.next != -1)
-//                city.next -= (deleted * sizeof(city));
-
-            print_city(city, "CITY AFTER UPDATE!!!!");
+            if (city.next != -1)
+                city.next = pos[city.next / sizeof(city_t)];
 
             fwrite(&city, sizeof(city), 1, temp_data_outfile);
             fwrite(&index_city, sizeof(index_city), 1, index_outfile);
@@ -694,27 +679,18 @@ void update_cities(global_data_t* global_data) {
     fclose(temp_data_outfile);
     fclose(index_outfile);
 
-    FILE* index_infile = fopen("../files/city.ind", "r");
-    end = get_eof(index_infile);
-
-    for (int i = 0; i < global_data->countries_count; ++i) {
-        while (ftell(index_infile) != end) {
-            fread(&index_city, sizeof(index_city), 1, index_infile);
-
-            if (index_city.id == ids[i]) {
-                countries[i].city_pos = index_city.pos;
-                break;
-            }
-        }
-    }
-
-    fclose(index_infile);
+    for (int i = 0; i < global_data->countries_count + global_data->deleted_countries; ++i)
+        if (countries[i].city_pos != 1 && !countries[i].deleted)
+            countries[i].city_pos = pos[countries[i].city_pos / sizeof(city_t)];
 
     remove("../files/city.fl");
     rename("../files/temp_city.fl", "../files/city.fl");
 
-    update_masters(countries, global_data->countries_count);
+    update_masters(countries, global_data->countries_count + global_data->deleted_countries);
     global_data->deleted_cities = 0;
+
+    free(countries);
+    free(pos);
 }
 
 void update_files(global_data_t* global_data) {
@@ -749,6 +725,8 @@ void update_master(const country_t country) {
     // add error messages!
     remove("../files/country.fl");
     rename("../files/temp_country.fl", "../files/country.fl");
+
+    printf("[ MESSAGE ] country was successfully updated\n");
 }
 
 void update_masters(country_t* countries, size_t size) {
@@ -784,6 +762,8 @@ void update_slave(const city_t city) {
 
     remove("../files/city.fl");
     rename("../files/temp_city.fl", "../files/city.fl");
+
+    printf("[ MESSAGE ] city was successfully updated\n");
 }
 
 void update_slaves(const city_t* cities, size_t size) {
@@ -886,8 +866,6 @@ void delete_slave(unsigned long long id) {
 
         if (i == 0 && current_city.id == city->id) {
             country->city_pos = city->next;
-            printf("FUCK THIS SHIT\n");
-            printf("city id %lld\n", current_city.id);
             break;
         } else if (current_city.id == city->id) {
             prev_city.next = current_city.next;
