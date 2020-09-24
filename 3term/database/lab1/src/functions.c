@@ -251,7 +251,6 @@ bool print_existing_cities(void) {
 }
 
 void print_global_data(const global_data_t global_data) {
-
     printf("{ country_id: %lld, city_id: %lld, countries_count: %lld, cities_count: %lld, deleted_country: %lld, deleted_city: %lld }\n",
        global_data.country_id,
        global_data.city_id,
@@ -260,7 +259,6 @@ void print_global_data(const global_data_t global_data) {
        global_data.deleted_countries,
        global_data.deleted_cities
    );
-
 }
 
 long long get_eof(FILE* file) {
@@ -274,23 +272,25 @@ long long get_eof(FILE* file) {
 }
 
 void init_global_data() {
-
     FILE* global_data_outfile = fopen("../files/global_data.dat", "rb+");
     long long end = get_eof(global_data_outfile);
 
     if (end == 0) {
+        global_data_t global_data;
+        global_data.country_id = 0;
+        global_data.city_id = 0;
+        global_data.countries_count = 0;
+        global_data.cities_count = 0;
+        global_data.deleted_countries = 0;
+        global_data.deleted_cities = 0;
 
-        global_data_t global_data = { 0, 0, 0, 0, 0, 0 };
         fwrite(&global_data, sizeof(global_data), 1, global_data_outfile);
-
     }
 
     fclose(global_data_outfile);
-
 }
 
 global_data_t get_global_data() {
-
     FILE* global_data_infile = fopen("../files/global_data.dat", "r");
 
     if (global_data_infile == NULL) {
@@ -304,8 +304,9 @@ global_data_t get_global_data() {
     fread(&global_data, sizeof(global_data), 1, global_data_infile);
     fclose(global_data_infile);
 
-    return global_data;
+    print_global_data(global_data);
 
+    return global_data;
 }
 
 void put_global_data(global_data_t global_data) {
@@ -591,7 +592,6 @@ void get_slaves(unsigned long long id) {
 }
 
 void update_countries(global_data_t* global_data) {
-
     FILE* data_infile = fopen("../files/country.fl", "r");
     FILE* temp_data_outfile = fopen("../files/temp_country.fl", "w");
     FILE* index_outfile = fopen("../files/country.ind", "w");
@@ -798,7 +798,7 @@ void delete_master(unsigned long long id) {
 
     country->deleted = true;
     --global_data.countries_count;
-    ++global_data.deleted_countries;
+    global_data.deleted_countries++;
 
     FILE* data_infile = fopen("../files/city.fl", "r");
     city_t* cities = (city_t*)malloc(sizeof(city_t) * country->cities_count);
@@ -845,7 +845,7 @@ void delete_slave(unsigned long long id) {
     city->deleted = true;
     --country->cities_count;
     --global_data.cities_count;
-    ++global_data.deleted_cities;
+    global_data.deleted_cities++;
 
     FILE* data_infile = fopen("../files/city.fl", "r");
     int offset = country->city_pos;

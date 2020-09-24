@@ -1,8 +1,6 @@
 #ifndef GLOBAL_DATA_H
 #define GLOBAL_DATA_H
 
-#include <stdlib.h>
-
 typedef struct global_data {
     unsigned long long country_id;
     unsigned long long city_id;
