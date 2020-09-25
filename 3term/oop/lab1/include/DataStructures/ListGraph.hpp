@@ -105,11 +105,7 @@ namespace ng {
     ListGraph<N, E>::ListGraph(bool directed, bool weighed) : _edges(0), _directed(directed), _weighed(weighed) {}
 
     template <typename N, typename E>
-    ListGraph<N, E>::~ListGraph() {
-
-
-
-    }
+    ListGraph<N, E>::~ListGraph() {}
 
     // accessors
     template <typename N, typename E>
