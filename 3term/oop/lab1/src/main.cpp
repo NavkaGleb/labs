@@ -3,46 +3,62 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-int main(int argc, char** argv) {
+//int main(int argc, char** argv) {
+//
+//    testing::InitGoogleTest(&argc, argv);
+//    return RUN_ALL_TESTS();
+//
+//}
 
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+#include <iostream>
+#include <algorithm>
 
-}
+#include "DataStructures/Array.hpp"
+#include "DataStructures/Graphs/MatrixGraph.hpp"
+#include "DataStructures/Graphs/ListGraph.hpp"
+#include "DataStructures/Trees/GeneralTree.hpp"
+#include "FileSystem/FileSystem.hpp"
 
-//#include <iostream>
-//#include <algorithm>
+struct Vertex {
+
+	int x;
+	int y;
+
+	bool operator<(const Vertex& other) const {
+	    return x * y < other.x * other.y;
+	}
+
+	bool operator==(const Vertex& other) const {
+	    return this->x == other.x && this->y == other.y;
+	}
+
+};
+
+struct Edge {
+    float value;
+    std::string name;
+
+    friend std::ostream& operator<<(std::ostream& ostream, const Edge& edge) {
+        return ostream << edge.name << " -> " << edge.value;
+    }
+};
+
+int main() {
+
+//    ng::GeneralTree<int> tree(0);
 //
-//#include <Array.hpp>
-//#include <MatrixGraph.hpp>
-//#include <ListGraph.hpp>
+//    tree.push(32);
+//    tree.push(85);
+//    tree.push(32, { 0 });
 //
-//struct Vertex {
-//
-//	int x;
-//	int y;
-//
-//	bool operator<(const Vertex& other) const {
-//	    return x * y < other.x * other.y;
-//	}
-//
-//	bool operator==(const Vertex& other) const {
-//	    return this->x == other.x && this->y == other.y;
-//	}
-//
-//};
-//
-//struct Edge {
-//    float value;
-//    std::string name;
-//
-//    friend std::ostream& operator<<(std::ostream& ostream, const Edge& edge) {
-//        return ostream << edge.name << " -> " << edge.value;
-//    }
-//};
-//
-//int main() {
-//
+//    tree.tprint();
+
+    ng::FileSystem fileSystem;
+
+    fileSystem.push("fuck.txt");
+
+    fileSystem.print();
+
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //
 //	Vertex a = { 0, 1 };
@@ -65,5 +81,5 @@ int main(int argc, char** argv) {
 //
 //	for (const auto& p : distance)
 //	    std::cout << "{ " << p.first.x << ", " << p.first.y << " } -> " << *p.second << std::endl;
-//
-//}
+
+}

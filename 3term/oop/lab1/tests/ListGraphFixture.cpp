@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "ListGraph.hpp"
+#include "DataStructures/Graphs/ListGraph.hpp"
 
 class ListGraphFixture : public ::testing::Test {
 protected:
