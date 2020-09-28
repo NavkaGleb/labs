@@ -8,11 +8,11 @@ namespace ch = std::chrono;
 namespace ng {
 
     // constructor / destructor
-    FileSystem::FileSystem() : _tree(new GeneralTree<FileSystemObject*>), _currentNode(nullptr) {}
+    FileSystem::FileSystem() : _tree(new GeneralMapTree<std::string, FileSystemObject*>), _currentNode(nullptr) {}
 
     FileSystem::FileSystem(const std::string& root) {
 
-        this->_tree = new GeneralTree<FileSystemObject*>(new Directory(root));
+        this->_tree = new GeneralMapTree<std::string, FileSystemObject*>(new Directory(root));
         this->_currentNode = this->_tree->root();
 
     }
@@ -27,23 +27,13 @@ namespace ng {
     // public methods
     void FileSystem::pushFile(const std::string& name) {
 
-        std::vector<int> path;
-
-        for (const auto& [index, filename] : this->_currentPath)
-            path.emplace_back(index);
-
-        this->_tree->push(new File(name), path);
+        this->_tree->push(name, new File(name), this->_currentNode);
 
     }
 
     void FileSystem::pushDirectory(const std::string &name) {
 
-        std::vector<int> path;
-
-        for (const auto& [index, filename] : this->_currentPath)
-            path.emplace_back(index);
-
-        this->_tree->push(new Directory(name), path);
+        this->_tree->push(name, new Directory(name), this->_currentNode);
 
     }
 
@@ -52,18 +42,8 @@ namespace ng {
         if (path == "..") {
 
             this->_currentPath.pop_back();
+            this->_currentNode = this->_currentNode->parent();
             return;
-
-        }
-
-        for (int i = 0; i < this->_currentNode->children().size(); ++i) {
-
-            if (this->_currentNode->children().at(i)->value()->filename() == path) {
-
-                this->_currentPath.emplace_back(i, path);
-                break;
-
-            }
 
         }
 
@@ -71,12 +51,15 @@ namespace ng {
 
     void FileSystem::import(const std::string& path) {
 
-        const fs::path workdir = fs::current_path().parent_path() / "src";
+        const fs::path workdir = fs::current_path().parent_path();
 
         if (!this->_tree->empty())
             delete this->_tree;
 
-        this->_tree = new GeneralTree<FileSystemObject*>(new Directory(workdir.string()));
+        std::time_t time = _toTimeT(fs::last_write_time(workdir));
+        std::tm* fileTime = std::localtime(&time);
+
+        this->_tree = new GeneralMapTree<std::string, FileSystemObject*>(new Directory(workdir.string(), Time(fileTime), Date(fileTime)));
         Node* root = this->_tree->root();
 
         this->_directoryTraversal(workdir, root);
@@ -86,16 +69,16 @@ namespace ng {
     void FileSystem::printCurrentPath() const {
 
         for (std::size_t i = 0; i < this->_currentPath.size() - 1; ++i)
-            std::cout << this->_currentPath[i].second << "/";
+            std::cout << this->_currentPath[i] << "/";
 
-        std::cout << this->_currentPath.back().second << "~" << std::endl;
+        std::cout << this->_currentPath.back() << "~" << std::endl;
 
     }
 
     void FileSystem::printCurrentFiles() const {
 
-        for (const auto& child : this->_currentNode->children())
-            std::cout << std::setw(10) << child->value()->filename();
+        for (const auto& [key, child] : this->_currentNode->children())
+            std::cout << std::setw(10) << key;
 
         std::cout << std::endl;
 
@@ -130,22 +113,22 @@ namespace ng {
 
                 std::cout << "dir = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
 
-                Node* node = this->_tree->push(new Directory(
-                        elem.path(),
-                        Time(fileTime),
-                        Date(fileTime)
-                ), parent);
+                Node* node = this->_tree->push(
+                    elem.path().filename().string(),
+                    new Directory(elem.path(), Time(fileTime), Date(fileTime)),
+                    parent
+                );
                 this->_directoryTraversal(elem.path(), node);
 
             } else {
 
                 std::cout << "file = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
 
-                this->_tree->push(new File(
-                        elem.path(),
-                        Time(fileTime),
-                        Date(fileTime)
-                ), parent);
+                this->_tree->push(
+                    elem.path().filename().string(),
+                    new File(elem.path(), Time(fileTime), Date(fileTime)),
+                    parent
+                );
 
             }
 

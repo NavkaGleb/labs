@@ -47,6 +47,8 @@ struct Edge {
 
 int main() {
 
+    std::map<std::string, int> map;
+
 //    ng::GeneralTree<int> tree(0);
 //
 //    tree.push(32);
@@ -59,8 +61,6 @@ int main() {
 
     fileSystem.import("fas");
     fileSystem.printTree(fileSystem.root());
-
-    fileSystem.import("D:\\documents\\it\\clion_projects\\knu_labs\\3term\\oop\\lab1");
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //

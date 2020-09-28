@@ -50,8 +50,8 @@ namespace ng {
 
             stream << std::setfill('0');
 
-            return stream << std::setw(2) << date.day << "."
-                          << std::setw(2) << date.month << "."
+            return stream << std::setw(2) << date.day << "/"
+                          << std::setw(2) << date.month << "/"
                           << std::setw(4) << date.year;
 
         }

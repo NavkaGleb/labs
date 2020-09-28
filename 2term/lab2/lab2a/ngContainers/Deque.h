@@ -15,8 +15,11 @@ namespace ng {
 	template <class T, template <class> class C = ng::DList>
 	class Deque : public DequeInterface<T> {
 	private:
+	    class Node {
+	        int val;
+	    };
 		// variables
-		C<T> container;
+		C<Node> container;
 
 	public:
 		// constructor / destructor
