@@ -12,6 +12,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <set>
 
 #include "DataStructures/Array.hpp"
 #include "DataStructures/Graphs/MatrixGraph.hpp"
@@ -53,11 +55,19 @@ int main() {
 //
 //    tree.tprint();
 
-    ng::FileSystem fileSystem;
+    ng::FileSystem fileSystem("fuck");
 
-    fileSystem.push("fuck.txt");
+    fileSystem.pushDirectory("fuck");
+    fileSystem.pushDirectory("fuck this shit");
+    fileSystem.pushFile("fuck.txt");
+    fileSystem.move("fuck");
+    fileSystem.pushFile("alina.doc");
+    fileSystem.move("..");
+    fileSystem.pushFile("gleb.access");
 
     fileSystem.print();
+
+    fileSystem.import("D:\\documents\\it\\clion_projects\\knu_labs\\3term\\oop\\lab1");
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //

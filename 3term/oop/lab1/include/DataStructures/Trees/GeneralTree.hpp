@@ -4,12 +4,13 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <set>
 
 #include "Random/Random.hpp"
 
 namespace ng {
 
-    template <typename T>
+    template <typename T, typename C = int>
     class GeneralTree {
     public:
         // inner class
@@ -50,6 +51,7 @@ namespace ng {
 
         // accessors
         [[nodiscard]] bool empty() const;
+        [[nodiscard]] Node* root() const;
         [[nodiscard]] const std::size_t& nodes() const;
         [[nodiscard]] std::size_t nodes(const Node* node) const;
         std::size_t height(const Node* node) const;
@@ -57,7 +59,7 @@ namespace ng {
         std::vector<int> path(const Node* node) const;
 
         // public methods
-        const Node* push(const T& value, const std::vector<int>& path = {});
+        Node* push(const T& value, const std::vector<int>& path = {});
         void pop(const Node* node);
         void pop(const std::initializer_list<int>& path);
         void popChildren(const Node* node);
@@ -82,11 +84,11 @@ namespace ng {
 
     ///* ------------------------------------------ class Node ------------------------------------------ *///
     // constructor / destructor
-    template <typename T>
-    GeneralTree<T>::Node::Node(T _value, Node* _parent) : _value(_value), _parent(_parent) {}
+    template <typename T, typename C>
+    GeneralTree<T, C>::Node::Node(T _value, Node* _parent) : _value(_value), _parent(_parent) {}
 
-    template <typename T>
-    GeneralTree<T>::Node::~Node() {
+    template <typename T, typename C> 
+    GeneralTree<T, C>::Node::~Node() {
 
         for (auto& child : this->_children)
             delete child;
@@ -94,18 +96,18 @@ namespace ng {
     }
 
     // accessors
-    template <typename T>
-    const T& GeneralTree<T>::Node::value() const { return this->_value; }
+    template <typename T, typename C> 
+    const T& GeneralTree<T, C>::Node::value() const { return this->_value; }
 
-    template <typename T>
-    const typename GeneralTree<T>::Node* GeneralTree<T>::Node::parent() const { return this->_parent; }
+    template <typename T, typename C> 
+    const typename GeneralTree<T, C>::Node* GeneralTree<T, C>::Node::parent() const { return this->_parent; }
 
-    template <typename T>
-    const std::vector<typename GeneralTree<T>::Node*>& GeneralTree<T>::Node::children() const { return this->_children; }
+    template <typename T, typename C> 
+    const std::vector<typename GeneralTree<T, C>::Node*>& GeneralTree<T, C>::Node::children() const { return this->_children; }
 
     // operators
-    template <typename T>
-    typename GeneralTree<T>::Node& GeneralTree<T>::Node::operator=(const Node& other) {
+    template <typename T, typename C> 
+    typename GeneralTree<T, C>::Node& GeneralTree<T, C>::Node::operator=(const Node& other) {
 
         if (this == &other)
             return *this;
@@ -116,8 +118,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    bool GeneralTree<T>::Node::operator==(const Node& other) {
+    template <typename T, typename C> 
+    bool GeneralTree<T, C>::Node::operator==(const Node& other) {
 
         return this->_value == other._value && this->_parent == other._parent && this->_children == other._children;
 
@@ -125,8 +127,8 @@ namespace ng {
 
     ///* ------------------------------------------ class GeneralTree ------------------------------------------ *///
     // private methods
-    template <typename T>
-    int GeneralTree<T>::_height(const Node* node, const int& height) const {
+    template <typename T, typename C> 
+    int GeneralTree<T, C>::_height(const Node* node, const int& height) const {
 
         int mheight = height;										// max height
         int cheight;												// current height
@@ -144,8 +146,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    int GeneralTree<T>::_erase(Node* node, const T& value) {
+    template <typename T, typename C> 
+    int GeneralTree<T, C>::_erase(Node* node, const T& value) {
 
         int nodes = 0;
 
@@ -168,8 +170,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    void GeneralTree<T>::_print(const Node* node, const int& level, const int& index) const {
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::_print(const Node* node, const int& level, const int& index) const {
 
         if (!node)
             return;
@@ -196,8 +198,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    void GeneralTree<T>::_print(const Node* node, const int& level) const {
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::_print(const Node* node, const int& level) const {
 
         if (!node)
             return;
@@ -235,24 +237,27 @@ namespace ng {
     }
 
     // constructor / destructor
-    template <typename T>
-    GeneralTree<T>::GeneralTree() : _root(nullptr) { std::cout << "default constructor" << std::endl; }
+    template <typename T, typename C> 
+    GeneralTree<T, C>::GeneralTree() : _root(nullptr) { std::cout << "default constructor" << std::endl; }
 
-    template <typename T>
-    GeneralTree<T>::GeneralTree(T value) : _root(new Node(value)) {}
+    template <typename T, typename C> 
+    GeneralTree<T, C>::GeneralTree(T value) : _root(new Node(value)) {}
 
-    template <typename T>
-    GeneralTree<T>::GeneralTree(Node* root) : _root(root) {}
+    template <typename T, typename C> 
+    GeneralTree<T, C>::GeneralTree(Node* root) : _root(root) {}
 
-    template <typename T>
-    GeneralTree<T>::~GeneralTree() { delete this->_root; }
+    template <typename T, typename C> 
+    GeneralTree<T, C>::~GeneralTree() { delete this->_root; }
 
     // accessors
-    template <typename T>
-    bool GeneralTree<T>::empty() const { return this->_root == nullptr; }
+    template <typename T, typename C> 
+    bool GeneralTree<T, C>::empty() const { return this->_root == nullptr; }
 
-    template <typename T>
-    std::size_t GeneralTree<T>::nodes(const Node* node) const {
+    template <typename T, typename C> 
+    typename GeneralTree<T, C>::Node* GeneralTree<T, C>::root() const { return this->_root; }
+
+    template <typename T, typename C> 
+    std::size_t GeneralTree<T, C>::nodes(const Node* node) const {
 
         int amount = 0;
 
@@ -263,11 +268,11 @@ namespace ng {
 
     }
 
-    template <typename T>
-    std::size_t GeneralTree<T>::height(const Node* node) const { return this->_height(node, 1); }
+    template <typename T, typename C> 
+    std::size_t GeneralTree<T, C>::height(const Node* node) const { return this->_height(node, 1); }
 
-    template <typename T>
-    const typename GeneralTree<T>::Node* GeneralTree<T>::path(const std::initializer_list<int>& path) const {
+    template <typename T, typename C> 
+    const typename GeneralTree<T, C>::Node* GeneralTree<T, C>::path(const std::initializer_list<int>& path) const {
 
         if (!this->_root)
             return nullptr;
@@ -287,8 +292,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    std::vector<int> GeneralTree<T>::path(const Node* node) const {
+    template <typename T, typename C> 
+    std::vector<int> GeneralTree<T, C>::path(const Node* node) const {
 
         if (node == this->_root)
             return std::vector<int>();
@@ -318,8 +323,8 @@ namespace ng {
     }
 
     // public methods
-    template <typename T>
-    const typename GeneralTree<T>::Node* GeneralTree<T>::push(const T& value, const std::vector<int>& path) {
+    template <typename T, typename C> 
+    typename GeneralTree<T, C>::Node* GeneralTree<T, C>::push(const T& value, const std::vector<int>& path) {
 
         /* return new added node */
 
@@ -349,8 +354,8 @@ namespace ng {
 
     }
 
-    template <typename T>
-    void GeneralTree<T>::pop(const Node* node) {
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::pop(const Node* node) {
 
         if (node == this->_root) {
 
@@ -376,24 +381,24 @@ namespace ng {
 
     }
 
-    template <typename T>
-    void GeneralTree<T>::pop(const std::initializer_list<int>& path) {
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::pop(const std::initializer_list<int>& path) {
 
          this->erase(this->path(path));
 
     }
 
-    //    template <typename T>
-    //    void GeneralTree<T>::eraseSubTree(const T& value) {
+    //    template <typename T, typename C> 
+    //    void GeneralTree<T, C>::eraseSubTree(const T& value) {
     //
     //        return this->_erase(this->_root, value);
     //
     //    }
 
-    template <typename T>
-    void GeneralTree<T>::tprint() const { this->_print(this->_root, 1, 0); }
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::tprint() const { this->_print(this->_root, 1, 0); }
 
-    template <typename T>
-    void GeneralTree<T>::pprint() const { this->_print(this->_root, 1); }
+    template <typename T, typename C> 
+    void GeneralTree<T, C>::pprint() const { this->_print(this->_root, 1); }
 
 } // namespace ng
