@@ -19,27 +19,34 @@ namespace ng {
         FileSystem(const std::string& root);
         virtual ~FileSystem();
 
+        // accessors
+        const Node* root() const;
+        const Node* current() const;
+
         // public methods
         void pushFile(const std::string& name);
         void pushDirectory(const std::string& name);
 
         void move(const std::string& path);
 
-        void import(const std::string& root);
+        void import(const std::string& path);
 
-        void print();
+        // out
+        void printCurrentPath() const;
+        void printCurrentFiles() const;
+        void printTree(const Node* node) const;
 
     private:
         // variables
         GeneralTree<FileSystemObject*>* _tree;
-        GeneralTree<FileSystemObject*>::Node* _currentNode;
+        Node* _currentNode;
         std::vector<std::pair<int, std::string>> _currentPath;
 
         // static private methods
         static std::time_t _toTimeT(const fs::file_time_type& fileTime);
 
         // private methods
-        void _directoryTraversal(const fs::path& path);
+        void _directoryTraversal(const fs::path& path, Node* node);
 
     }; // class FileSystem
 

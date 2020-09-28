@@ -55,17 +55,10 @@ int main() {
 //
 //    tree.tprint();
 
-    ng::FileSystem fileSystem("fuck");
+    ng::FileSystem fileSystem;
 
-    fileSystem.pushDirectory("fuck");
-    fileSystem.pushDirectory("fuck this shit");
-    fileSystem.pushFile("fuck.txt");
-    fileSystem.move("fuck");
-    fileSystem.pushFile("alina.doc");
-    fileSystem.move("..");
-    fileSystem.pushFile("gleb.access");
-
-    fileSystem.print();
+    fileSystem.import("fas");
+    fileSystem.printTree(fileSystem.root());
 
     fileSystem.import("D:\\documents\\it\\clion_projects\\knu_labs\\3term\\oop\\lab1");
 

@@ -8,8 +8,8 @@ namespace ng {
     public:
         // constructor / destructor
         Directory();
-        Directory(const std::string& name);
-        Directory(const std::string& name, const Time& creationTime, const Date& creationDate)
+        Directory(const fs::path& path);
+        Directory(const fs::path& path, const Time& creationTime, const Date& creationDate);
 
         // public methods
 

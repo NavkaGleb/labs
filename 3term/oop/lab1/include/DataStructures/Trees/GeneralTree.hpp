@@ -36,7 +36,7 @@ namespace ng {
 
             // operators
             friend std::ostream& operator<<(std::ostream& ostream, const Node& node) {
-                return ostream << &node << " -> " << *node._value;
+                return ostream << *node._value;
             }
             Node& operator=(const Node& other);
             bool operator==(const Node& other);
@@ -60,11 +60,12 @@ namespace ng {
 
         // public methods
         Node* push(const T& value, const std::vector<int>& path = {});
+        Node* push(const T& value, Node* parent);
         void pop(const Node* node);
         void pop(const std::initializer_list<int>& path);
         void popChildren(const Node* node);
 
-        void tprint() const;
+        void tprint(const Node* root) const;
         void pprint() const;
 
     private:
@@ -159,7 +160,7 @@ namespace ng {
 
             for (int i = 0; i < node->_children.size();) {
 
-                int dnodes = this->_erase(node->_children[i], value);                          // deleted nodes
+                int dnodes = this->_erase(node->_children[i], value);
                 (dnodes == 0) ? i++ : nodes += dnodes;
 
             }
@@ -354,6 +355,17 @@ namespace ng {
 
     }
 
+    template <typename T, typename C>
+    typename GeneralTree<T, C>::Node* GeneralTree<T, C>::push(const T& value, Node* parent) {
+
+        Node* newNode = new Node(value, parent);
+
+        parent->_children.emplace_back(newNode);
+
+        return newNode;
+
+    }
+
     template <typename T, typename C> 
     void GeneralTree<T, C>::pop(const Node* node) {
 
@@ -396,7 +408,7 @@ namespace ng {
     //    }
 
     template <typename T, typename C> 
-    void GeneralTree<T, C>::tprint() const { this->_print(this->_root, 1, 0); }
+    void GeneralTree<T, C>::tprint(const Node* root) const { this->_print(root, 1, 0); }
 
     template <typename T, typename C> 
     void GeneralTree<T, C>::pprint() const { this->_print(this->_root, 1); }

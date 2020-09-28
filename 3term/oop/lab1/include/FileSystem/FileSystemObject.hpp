@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 #include "DateTime/Date.hpp"
 #include "DateTime/Time.hpp"
+
+namespace fs = std::filesystem;
 
 namespace ng {
 
@@ -14,7 +17,8 @@ namespace ng {
         virtual ~FileSystemObject() = default;
 
         // accessors
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] std::string path() const;
+        [[nodiscard]] std::string filename() const;
 
         // public methods
 
@@ -23,8 +27,8 @@ namespace ng {
 
     protected:
         // variables
-        std::string _name;
-        long long _size;
+        fs::path _path;
+        uintmax_t _size;
         Time _creationTime;
         Date _creationDate;
         bool _directory;

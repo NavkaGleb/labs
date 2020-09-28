@@ -7,7 +7,9 @@ namespace ng {
     class File : public FileSystemObject {
     public:
         // constructor / destructor
-        File(const std::string& name);
+        File();
+        File(const fs::path& path);
+        File(const fs::path& path, const Time& creationTime, const Date& creationDate);
 
         // public methods
 

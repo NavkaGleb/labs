@@ -1,6 +1,5 @@
 #include "FileSystem/FileSystem.hpp"
 
-#include <filesystem>
 #include <chrono>
 
 namespace fs = std::filesystem;
@@ -19,6 +18,11 @@ namespace ng {
     }
 
     FileSystem::~FileSystem() { delete this->_tree; }
+
+    // accessors
+    const Node* FileSystem::root() const { return this->_tree->root(); }
+
+    const Node* FileSystem::current() const { return this->_currentNode; }
 
     // public methods
     void FileSystem::pushFile(const std::string& name) {
@@ -54,7 +58,7 @@ namespace ng {
 
         for (int i = 0; i < this->_currentNode->children().size(); ++i) {
 
-            if (this->_currentNode->children().at(i)->value()->name() == path) {
+            if (this->_currentNode->children().at(i)->value()->filename() == path) {
 
                 this->_currentPath.emplace_back(i, path);
                 break;
@@ -65,48 +69,41 @@ namespace ng {
 
     }
 
-    void FileSystem::import(const std::string& root) {
+    void FileSystem::import(const std::string& path) {
 
-        const fs::path workdir = fs::current_path().parent_path() / "src" / "FileSystem";
-        const fs::path a = workdir.filename();
-
-        std::cout << "workdir = " << workdir << std::endl;
+        const fs::path workdir = fs::current_path().parent_path() / "src";
 
         if (!this->_tree->empty())
             delete this->_tree;
 
         this->_tree = new GeneralTree<FileSystemObject*>(new Directory(workdir.string()));
+        Node* root = this->_tree->root();
 
-        for (const auto& elem : std::filesystem::directory_iterator(workdir)) {
-
-            if (elem.is_directory()) {
-
-                Node* node = this->_tree->push(new Directory())
-
-            }
-
-            if (fs::is_directory(e.path()))
-                std::cout << "directory - " << e.path().filename() << " -> " << std::endl;
-            else {
-
-                std::cout << "file - " << e.path().filename() << ", size = " << fs::file_size(e.path()) << std::endl;
-
-                std::time_t tt = _toTimeT(fs::last_write_time(e.path()));
-                std::tm* now = std::localtime(&tt);
-
-                std::cout << Time(now) << " " << Date(now) << std::endl;
-
-            }
-
-            std::cout << std::endl;
-
-        }
+        this->_directoryTraversal(workdir, root);
 
     }
 
-    void FileSystem::print() {
+    void FileSystem::printCurrentPath() const {
 
-        this->_tree->tprint();
+        for (std::size_t i = 0; i < this->_currentPath.size() - 1; ++i)
+            std::cout << this->_currentPath[i].second << "/";
+
+        std::cout << this->_currentPath.back().second << "~" << std::endl;
+
+    }
+
+    void FileSystem::printCurrentFiles() const {
+
+        for (const auto& child : this->_currentNode->children())
+            std::cout << std::setw(10) << child->value()->filename();
+
+        std::cout << std::endl;
+
+    }
+
+    void FileSystem::printTree(const Node* node) const {
+
+        this->_tree->tprint(node);
 
     }
 
@@ -122,10 +119,39 @@ namespace ng {
     }
 
     // private methods
-    void FileSystem::_directoryTraversal(const fs::path& path) {
+    void FileSystem::_directoryTraversal(const fs::path& path, Node* parent) {
 
-        for (const auto& child : fs::directory_iterator(path))
-            int a;
+        for (const auto& elem : fs::directory_iterator(path)) {
+
+            std::time_t time = _toTimeT(fs::last_write_time(elem.path()));
+            std::tm* fileTime = std::localtime(&time);
+
+            if (elem.is_directory()) {
+
+                std::cout << "dir = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
+
+                Node* node = this->_tree->push(new Directory(
+                        elem.path(),
+                        Time(fileTime),
+                        Date(fileTime)
+                ), parent);
+                this->_directoryTraversal(elem.path(), node);
+
+            } else {
+
+                std::cout << "file = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
+
+                this->_tree->push(new File(
+                        elem.path(),
+                        Time(fileTime),
+                        Date(fileTime)
+                ), parent);
+
+            }
+
+            std::cout << std::endl;
+
+        }
 
     }
 
