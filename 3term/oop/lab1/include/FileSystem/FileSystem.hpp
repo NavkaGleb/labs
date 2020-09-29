@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <functional>
 
 #include "DataStructures/Trees/GeneralMapTree.hpp"
 #include "File.hpp"
@@ -11,6 +12,7 @@ namespace fs = std::filesystem;
 namespace ng {
 
     typedef GeneralMapTree<std::string, FileSystemObject*>::Node Node;
+    typedef std::function<bool(const FileSystemObject&)> SearchFunc;
 
     class FileSystem {
     public:
@@ -22,6 +24,7 @@ namespace ng {
         // accessors
         const Node* root() const;
         const Node* current() const;
+        std::string path(const FileSystemObject* object) const;
 
         // public methods
         void pushFile(const std::string& name);
@@ -29,7 +32,7 @@ namespace ng {
         void pop(const std::string& name);
         void move(const std::string& path);
 
-        void search();
+        void search(const std::string& path, SearchFunc func) const;
         void import(const std::string& path);
 
         void printCurrentPath() const;
@@ -46,6 +49,7 @@ namespace ng {
         static std::time_t _toTimeT(const fs::file_time_type& fileTime);
 
         // private methods
+        void _directoryTraversal(Node* node, SearchFunc func) const;
         void _directoryTraversal(const fs::path& path, Node* node);
 
     }; // class FileSystem

@@ -17,8 +17,10 @@ namespace ng {
         virtual ~FileSystemObject() = default;
 
         // accessors
-        [[nodiscard]] std::string path() const;
+        [[nodiscard]] fs::path path() const;
         [[nodiscard]] std::string filename() const;
+        [[nodiscard]] const uintmax_t& size() const;
+        [[nodiscard]] const bool& directory() const;
 
         // public methods
 
@@ -36,7 +38,5 @@ namespace ng {
         bool _directory;
 
     }; // class File
-
-    ;
 
 } // namespace ng

@@ -48,28 +48,44 @@ struct Edge {
 
 int main() {
 
-    std::map<std::string, int> map;
+    struct stat fileInfo;
 
-//    ng::GeneralTree<int> tree(0);
-//
-//    tree.push(32);
-//    tree.push(85);
-//    tree.push(32, { 0 });
-//
-//    tree.tprint();
+    stat("..\\README.md", &fileInfo);
 
-//    ng::FileSystem fileSystem;
+    std::cout << ng::Time(&fileInfo.st_ctime) << " " << ng::Date(&fileInfo.st_ctime) << std::endl;
+
+    ng::FileSystem fileSystem;
+
+    std::function<bool(const ng::FileSystemObject&)> f = [](const ng::FileSystemObject& object) {
+
+        return object.filename().find(".txt") != std::string::npos;
+
+    };
+
+//    fileSystem.pushDirectory("root");
+//    fileSystem.pushDirectory("fuck");
+//    fileSystem.pushDirectory("alina");
+//    fileSystem.pushFile("la.txt");
+//    fileSystem.move("alina");
+//    fileSystem.pushFile("gleb.txt");
+//    fileSystem.pushFile("paper.txt");
+//    fileSystem.pushDirectory("images");
+
+    fileSystem.import(".");
+    fileSystem.printTree(fileSystem.root());
 //
+//    fileSystem.search(".", f);
+
 //    fileSystem.import("fas");
 //    fileSystem.printTree(fileSystem.root());
 
-    ng::ExpressionTree tree;
-    tree.expression("sin(cos(2*ln(x)))");
-    std::cout << tree << std::endl;
-
-    std::map<std::string, double> vars = { { "x", 21 } };
-
-    std::cout << tree.calc(vars) << std::endl;
+//    ng::ExpressionTree tree;
+//    tree.expression("sin(cos(2*ln(x)))");
+//    std::cout << tree << std::endl;
+//
+//    std::map<std::string, double> vars = { { "x", 21 } };
+//
+//    std::cout << tree.calc(vars) << std::endl;
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //

@@ -41,11 +41,91 @@ namespace ng {
 
         // constructor
         Date() : day(0), month(0), year(0) {}
-        Date(const std::tm* time) : day(time->tm_mday), month(time->tm_mon + 1), year(time->tm_year + 1900) {}
         Date(const Day& day, const Month& month, const Year& year)
             : day(day.value), month(month.value), year(year.value) {}
+        Date(const std::time_t* timeT) {
+
+            std::tm* time = std::localtime(timeT);
+
+            this->day = time->tm_mday;
+            this->month = time->tm_mon + 1;
+            this->year = time->tm_year + 1900;
+
+        }
 
         // operators
+        bool operator<(const Date& other) {
+
+            if (this->year != other.year)
+                return this->year < other.year;
+
+            if (this->month != other.month)
+                return this->month < other.month;
+
+            return this->day < other.day;
+
+        }
+
+        bool operator>(const Date& other) {
+
+            if (this->year != other.year)
+                return this->year > other.year;
+
+            if (this->month != other.month)
+                return this->month > other.month;
+
+            return this->day > other.day;
+
+        }
+
+        bool operator<=(const Date& other) {
+
+            if (this->year != other.year)
+                return this->year < other.year;
+
+            if (this->month != other.month)
+                return this->month < other.month;
+
+            return this->day <= other.day;
+
+        }
+
+        bool operator>=(const Date& other) {
+
+            if (this->year != other.year)
+                return this->year > other.year;
+
+            if (this->month != other.month)
+                return this->month > other.month;
+
+            return this->day >= other.day;
+
+        }
+
+        bool operator!=(const Date& other) {
+
+            if (this->year != other.year)
+                return true;
+
+            if (this->month != other.month)
+                return true;
+
+            return this->day != other.day;
+
+        }
+
+        bool operator==(const Date& other) {
+
+            if (this->year != other.year)
+                return false;
+
+            if (this->month != other.month)
+                return false;
+
+            return this->day == other.day;
+
+        }
+        
         friend std::ostream& operator<<(std::ostream& stream, const Date& date) {
 
             stream << std::setfill('0');

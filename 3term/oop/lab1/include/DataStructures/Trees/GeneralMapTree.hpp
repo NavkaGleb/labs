@@ -13,17 +13,7 @@ namespace ng {
     public:
         // inner class
         class Node {
-        private:
-            // variables
-            T _value;
-            K _key;
-            Node* _parent;
-            std::map<K, Node*, C> _children;
-
         public:
-            // friends
-            friend GeneralMapTree;
-
             // constructor
             explicit Node(const T& value, const K& key = K(), Node* parent = nullptr);
             virtual ~Node();
@@ -35,11 +25,19 @@ namespace ng {
             const std::map<K, Node*, C>& children() const;
 
             // operators
-            friend std::ostream& operator<<(std::ostream& stream, const Node& node) {
-                return stream << node._value;
-            }
             Node& operator=(const Node& other);
             bool operator==(const Node& other);
+            friend std::ostream& operator<<(std::ostream& stream, const Node& node) { return stream << node.value(); }
+
+        private:
+            // variables
+            T _value;
+            K _key;
+            Node* _parent;
+            std::map<K, Node*, C> _children;
+
+            // friends
+            friend GeneralMapTree;
 
         };
 
@@ -99,6 +97,9 @@ namespace ng {
     // accessors
     template <typename K, typename T, typename C>
     const T& GeneralMapTree<K, T, C>::Node::value() const { return this->_value; }
+
+    template <typename K, typename T, typename C>
+    const K& GeneralMapTree<K, T, C>::Node::key() const { return this->_key; }
 
     template <typename K, typename T, typename C>
     typename GeneralMapTree<K, T, C>::Node* GeneralMapTree<K, T, C>::Node::parent() const { return this->_parent; }
@@ -353,6 +354,9 @@ namespace ng {
 
     template <typename K, typename T, typename C>
     typename GeneralMapTree<K, T, C>::Node* GeneralMapTree<K, T, C>::push(const K& key, const T& value, Node* parent) {
+
+        if (!this->_root)
+            return this->_root = new Node(value, key);
 
         Node* newNode = new Node(value, key, parent);
 

@@ -143,6 +143,13 @@ namespace ng {
 
     }
 
+    void ExpressionTree::variables(const std::map<std::string, double>& variables) {
+
+        for (const auto& [key, value] : variables)
+            this->_variables[key].value = value;
+
+    }
+
     // public methods
     void ExpressionTree::clear() { this->_clear(); }
 
@@ -150,8 +157,8 @@ namespace ng {
     
     double ExpressionTree::calc(const std::map<std::string, double>& variables) {
     
-        for (auto& p : variables)
-            this->_variables[p.first].value = p.second;
+        for (const auto& [key, value] : variables)
+            this->_variables[key].value = value;
 
         return this->_calc(this->_root);
     

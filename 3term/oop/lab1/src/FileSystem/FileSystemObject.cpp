@@ -3,9 +3,13 @@
 namespace ng {
 
     // accessors
-    std::string FileSystemObject::path() const { return this->_path.string(); }
+    fs::path FileSystemObject::path() const { return this->_path; }
 
     std::string FileSystemObject::filename() const { return this->_path.filename().string(); }
+
+    const uintmax_t& FileSystemObject::size() const { return this->_size; }
+
+    const bool& FileSystemObject::directory() const { return this->_directory; }
 
     // operators
     std::ostream& operator<<(std::ostream& stream, const FileSystemObject& object) {

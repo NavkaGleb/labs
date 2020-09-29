@@ -1,5 +1,6 @@
 #include "FileSystem/FileSystem.hpp"
 
+#include <sys/stat.h>
 #include <chrono>
 
 namespace fs = std::filesystem;
@@ -24,24 +25,37 @@ namespace ng {
 
     const Node* FileSystem::current() const { return this->_currentNode; }
 
+    std::string FileSystem::path(const FileSystemObject* object) const {
+
+        std::string result;
+        Node* current = this->_tree->root();
+
+//        object->filename();
+
+        return "";
+
+    }
+
     // public methods
     void FileSystem::pushFile(const std::string& name) {
 
-        this->_tree->push(name, new File(name), this->_currentNode);
+        this->_tree->push(name, new File(this->_currentNode->value()->path() / name), this->_currentNode);
 
     }
 
-    void FileSystem::pushDirectory(const std::string &name) {
+    void FileSystem::pushDirectory(const std::string& name) {
 
-        this->_tree->push(name, new Directory(name), this->_currentNode);
+        if (this->_currentNode)
+            this->_tree->push(name, new Directory(this->_currentNode->value()->path() / name), this->_currentNode);
+        else
+            this->_tree->push(name, new Directory(name), this->_currentNode);
+
+        if (!this->_currentNode)
+            this->_currentNode = this->_tree->root();
 
     }
 
-    void FileSystem::pop(const std::string& name) {
-
-        this->_tree->pop(name, this->_currentNode);
-
-    }
+    void FileSystem::pop(const std::string& name) { this->_tree->pop(name, this->_currentNode); }
 
     void FileSystem::move(const std::string& path) {
 
@@ -53,8 +67,41 @@ namespace ng {
 
         }
 
-        this->_currentPath.emplace_back(path);
-        this->_currentNode = this->_currentNode->children().at(path);
+        if (this->_currentNode->children().count(path) == 1) {
+
+            this->_currentPath.emplace_back(path);
+            this->_currentNode = this->_currentNode->children().at(path);
+
+        } else {
+
+            std::cerr << "no such path" << std::endl;
+
+        }
+
+    }
+
+    void FileSystem::search(const std::string& path, SearchFunc func) const {
+
+        Node* root = this->_tree->root();
+
+        if (long long start = 0, end; root && !path.empty() && path != ".") {
+
+            for (std::size_t i = 0, depth = std::count(path.begin(), path.end(), '/'); i <= depth; ++i) {
+
+                end = path.find("/");
+
+                if (std::string current = path.substr(start, end); root->children().count(current) == 1)
+                    root = root->children().at(current);
+                else
+                    return;
+
+                start = end + 1;
+
+            }
+
+        }
+
+        this->_directoryTraversal(root, func);
 
     }
 
@@ -65,11 +112,22 @@ namespace ng {
         if (!this->_tree->empty())
             delete this->_tree;
 
-        std::time_t time = _toTimeT(fs::last_write_time(workdir));
-        std::tm* fileTime = std::localtime(&time);
+        struct stat info;
+        stat(workdir.string().c_str(), &info);
 
-        this->_tree = new GeneralMapTree<std::string, FileSystemObject*>(new Directory(workdir.string(), Time(fileTime), Date(fileTime)));
+        this->_tree = new GeneralMapTree<std::string, FileSystemObject*>(new Directory(
+            workdir.filename().string(),
+            info.st_size,
+            Time(&info.st_ctime),
+            Date(&info.st_ctime))
+        );
+
         Node* root = this->_tree->root();
+
+        std::cout << "WORKDIR = " << workdir.string() << std::endl;
+        std::cout << root->value()->path() << std::endl;
+        std::cout << root->value() << std::endl;
+        std::cout << root->value()->size() << std::endl;
 
         this->_directoryTraversal(workdir, root);
 
@@ -111,31 +169,63 @@ namespace ng {
     }
 
     // private methods
+    void FileSystem::_directoryTraversal(Node* node, SearchFunc func) const {
+
+        for (const auto& [key, child] : node->children()) {
+
+            if (child->value()->directory()) {
+
+                this->_directoryTraversal(child, func);
+
+            } else {
+
+                if (func(*child->value()))
+                    std::cout << "searched -> " << child->value()->path() << std::endl;
+
+            }
+
+        }
+
+    }
+
     void FileSystem::_directoryTraversal(const fs::path& path, Node* parent) {
 
         for (const auto& elem : fs::directory_iterator(path)) {
 
-            std::time_t time = _toTimeT(fs::last_write_time(elem.path()));
-            std::tm* fileTime = std::localtime(&time);
+            std::cout << "parent path = " << parent->value()->path().string() << std::endl;
+            std::cout << "current filename = " << elem.path().filename().string() << std::endl;
+
+            std::cout << "--new file name" << elem.path().string() << std::endl;
+
+            struct stat info;
+            stat(elem.path().string().c_str(), &info);
+
+            std::cout << Time(&info.st_ctime) << " " << Date(&info.st_ctime) << "size = " << info.st_size << std::endl;
 
             if (elem.is_directory()) {
 
-                std::cout << "dir = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
-
                 Node* node = this->_tree->push(
                     elem.path().filename().string(),
-                    new Directory(elem.path(), Time(fileTime), Date(fileTime)),
+                    new Directory(
+                        elem.path(),
+                        info.st_size,
+                        Time(&info.st_ctime),
+                        Date(&info.st_ctime)
+                    ),
                     parent
                 );
                 this->_directoryTraversal(elem.path(), node);
 
             } else {
 
-                std::cout << "file = " << elem.path().filename() << " -> " << Time(fileTime) << " " << Date(fileTime) << std::endl;
-
                 this->_tree->push(
                     elem.path().filename().string(),
-                    new File(elem.path(), Time(fileTime), Date(fileTime)),
+                    new File(
+                        elem.path(),
+                        info.st_size,
+                        Time(&info.st_ctime),
+                        Date(&info.st_ctime)
+                    ),
                     parent
                 );
 

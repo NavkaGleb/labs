@@ -56,6 +56,7 @@ namespace ng {
         // modifiers
         void expression(const std::string& expression);
         void expression(std::string&& expression);
+        void variables(const std::map<std::string, double>& variables);
 
         // public methods
         void clear();

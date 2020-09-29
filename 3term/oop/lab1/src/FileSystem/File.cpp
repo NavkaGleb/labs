@@ -23,7 +23,7 @@ namespace ng {
 
         this->_path = path;
         this->_size = 0;
-        this->_creationTime = Time(now->tm_sec, now->tm_min, now->tm_hour);
+        this->_creationTime = Time(Hour(now->tm_hour), Minute(now->tm_min), Second(now->tm_sec));
         this->_creationDate = Date(Day(now->tm_mday), Month(now->tm_mon + 1), Year(now->tm_year + 1900));
         this->_directory = false;
         this->_modificationTime = this->_creationTime;
@@ -31,10 +31,10 @@ namespace ng {
 
     }
 
-    File::File(const fs::path& path, const Time& creationTime, const Date& creationDate) {
+    File::File(const fs::path& path, uintmax_t size, const Time& creationTime, const Date& creationDate) {
 
         this->_path = path;
-        this->_size = fs::file_size(path);
+        this->_size = size;
         this->_creationTime = creationTime;
         this->_creationDate = creationDate;
         this->_directory = false;
