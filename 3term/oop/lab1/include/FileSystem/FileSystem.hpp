@@ -45,9 +45,6 @@ namespace ng {
         Node* _currentNode;
         std::vector<std::string> _currentPath;
 
-        // static private methods
-        static std::time_t _toTimeT(const fs::file_time_type& fileTime);
-
         // private methods
         void _directoryTraversal(Node* node, SearchFunc func) const;
         void _directoryTraversal(const fs::path& path, Node* node);

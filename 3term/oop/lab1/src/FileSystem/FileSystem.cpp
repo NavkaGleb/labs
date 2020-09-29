@@ -154,23 +154,12 @@ namespace ng {
 
     }
 
-    // private static methods
-    std::time_t FileSystem::_toTimeT(const fs::file_time_type& fileTime) {
-
-        auto sctp = time_point_cast<ch::system_clock::duration>(
-            fileTime - fs::file_time_type::clock::now() + ch::system_clock::now()
-        );
-
-        return ch::system_clock::to_time_t(sctp);
-
-    }
-
     // private methods
     void FileSystem::_directoryTraversal(Node* node, SearchFunc func) const {
 
         for (const auto& [key, child] : node->children()) {
 
-            if (child->value()->directory()) {
+            if (child->value()->type() == FileSystemObject::Type::Directory) {
 
                 this->_directoryTraversal(child, func);
 

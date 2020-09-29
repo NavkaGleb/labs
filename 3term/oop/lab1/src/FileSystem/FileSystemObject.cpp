@@ -7,7 +7,7 @@ namespace ng {
 
     std::string FileSystemObject::filename() const { return this->_path.filename().string(); }
 
-    const bool& FileSystemObject::directory() const { return this->_directory; }
+    const short& FileSystemObject::type() const { return this->_type; }
 
     // operators
     std::ostream& operator<<(std::ostream& stream, const FileSystemObject& object) {
@@ -36,13 +36,15 @@ namespace ng {
 
     bool operator<(const FileSystemObject& object1, const FileSystemObject& object2) {
 
-        if (object1._directory && !object2._directory)
-            return false;
+//        if (object1._directory && !object2._directory)
+//            return false;
+//
+//        if (!object1._directory && object2._directory)
+//            return true;
+//
+//        return object1.filename() < object2.filename();
 
-        if (!object1._directory && object2._directory)
-            return true;
-
-        return object1.filename() < object2.filename();
+        return true;
 
     }
 

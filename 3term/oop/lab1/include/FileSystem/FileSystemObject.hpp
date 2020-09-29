@@ -11,6 +11,9 @@ namespace ng {
 
     class FileSystemObject {
     public:
+        // enums
+        enum Type { Unknown = -1, File = 0, Directory };
+
         // constructor / destructor
         FileSystemObject() = default;
         virtual ~FileSystemObject() = default;
@@ -18,7 +21,7 @@ namespace ng {
         // accessors
         [[nodiscard]] fs::path path() const;
         [[nodiscard]] std::string filename() const;
-        [[nodiscard]] const bool& directory() const;
+        [[nodiscard]] const short& type() const;
 
         // public methods
 
@@ -31,7 +34,7 @@ namespace ng {
         // variables
         fs::path _path;
         DateTime _creation;
-        bool _directory;
+        short _type;
 
     }; // class File
 

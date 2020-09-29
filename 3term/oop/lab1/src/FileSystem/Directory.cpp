@@ -8,7 +8,7 @@ namespace ng {
     Directory::Directory() {
 
         this->_creation = {};
-        this->_directory = true;
+        this->_type = FileSystemObject::Type::Directory;
 
     }
 
@@ -18,7 +18,7 @@ namespace ng {
 
         this->_path = path;
         this->_creation = DateTime(&t);
-        this->_directory = true;
+        this->_type = FileSystemObject::Type::Directory;
 
     }
 
@@ -26,7 +26,7 @@ namespace ng {
 
         this->_path = path;
         this->_creation = creation;
-        this->_directory = true;
+        this->_type = FileSystemObject::Type::Directory;
 
     }
 

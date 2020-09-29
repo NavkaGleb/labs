@@ -8,7 +8,7 @@ namespace ng {
     File::File() {
 
         this->_creation = DateTime();
-        this->_directory = false;
+        this->_type = FileSystemObject::Type::File;
         this->_size = 0;
         this->_modification = DateTime();
 
@@ -20,7 +20,7 @@ namespace ng {
 
         this->_path = path;
         this->_creation = DateTime(&t);
-        this->_directory = false;
+        this->_type = FileSystemObject::Type::File;
         this->_size = 0;
         this->_modification = this->_creation;
 
@@ -31,7 +31,7 @@ namespace ng {
         this->_path = path;
         this->_size = size;
         this->_creation = creation;
-        this->_directory = false;
+        this->_type = FileSystemObject::Type::File;
         this->_size = 0;
         this->_modification = modification;
 
