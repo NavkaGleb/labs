@@ -94,39 +94,37 @@ namespace ng {
     
     ///* ------------------------------------------ class ExpressionTree ------------------------------------------ *///
     // constructor / destructor
-    ExpressionTree::ExpressionTree() : _root(nullptr), _index(0), _result(nullptr) {}
+    ExpressionTree::ExpressionTree() : _root(nullptr) {}
     
-    ExpressionTree::ExpressionTree(std::string expression)
-        : _root(nullptr), _index(0), _expression(std::move(expression)), _result(nullptr) {
+    ExpressionTree::ExpressionTree(std::string expression) : _root(nullptr), _expression(std::move(expression)) {
 
         this->_build();
     
     }
     
-    ExpressionTree::ExpressionTree(Node* node) : _root(node), _index(0), _result(nullptr) {
+    ExpressionTree::ExpressionTree(Node* node) : _root(node) {
 
         this->_initVariables(this->_root);
 
     }
     
-    ExpressionTree::ExpressionTree(const ExpressionTree& other)
-        : _root(new Node(*other._root)), _index(0), _result(nullptr) {}
+    ExpressionTree::ExpressionTree(const ExpressionTree& other) : _root(new Node(*other._root)) {}
     
-    ExpressionTree::~ExpressionTree() {
-    
-        delete this->_root;
-        delete this->_result;
-    
-    }
+    ExpressionTree::~ExpressionTree() { delete this->_root; }
     
     // accessors
     bool ExpressionTree::empty() const { return this->_root == nullptr; }
 
     const std::string& ExpressionTree::expression() const { return this->_expression; }
 
-    double ExpressionTree::result() {
+    std::map<std::string, double> ExpressionTree::variables() const {
 
-        return (!this->_result) ? *(this->_result = new double(this->calc())) : *this->_result;
+        std::map<std::string, double> result;
+
+        for (const auto& [key, value] : this->_variables)
+            result[key];
+
+        return result;
 
     }
 
@@ -149,22 +147,6 @@ namespace ng {
     void ExpressionTree::clear() { this->_clear(); }
 
     void ExpressionTree::simplify() { this->_simplify(this->_root); }
-
-    double ExpressionTree::calc() {
-
-        if (!this->_variables.empty())
-            std::cout << "enter value of variables" << std::endl;
-
-        for (auto& p : this->_variables) {
-
-            std::cout << p.first << ":";
-            std::cin >> p.second.value;
-
-        }
-
-        return this->_calc(this->_root);
-
-    }
     
     double ExpressionTree::calc(const std::map<std::string, double>& variables) {
     
@@ -231,6 +213,7 @@ namespace ng {
     
     }
 
+    // operators
     std::istream& operator>>(std::istream& stream, ExpressionTree& tree) {
 
         tree.clear();
@@ -506,12 +489,17 @@ namespace ng {
     
     }
     
-    void ExpressionTree::_build(Node* parent, int index) {
-    
+    void ExpressionTree::_build(Node* parent, bool init) {
+
+        static int index;
+
+        if (init)
+            index = this->_postfixExpression.size() - 1;
+
         if (!this->_root) {
     
-            this->_root = this->_postfixExpression[this->_index--];
-            this->_build(this->_root, index);
+            this->_root = this->_postfixExpression[index--];
+            this->_build(this->_root);
     
         }
     
@@ -520,26 +508,25 @@ namespace ng {
     
         if (parent->_type == NodeType::Operator) {
     
-            Node* right = this->_index >= 0 ? this->_postfixExpression[this->_index--] : nullptr;
+            Node* right = index >= 0 ? this->_postfixExpression[index--] : nullptr;
     
             if (right && (right->_type == NodeType::Operator || right->_type == NodeType::Func))
-                this->_build(right, index);
-    
-    
-            Node* left = this->_index >= 0 ? this->_postfixExpression[this->_index--] : nullptr;
+                this->_build(right);
+
+            Node* left = index >= 0 ? this->_postfixExpression[index--] : nullptr;
     
             if (left && (left->_type == NodeType::Operator || left->_type == NodeType::Func))
-                this->_build(left, index);
+                this->_build(left);
     
             parent->_left = left;
             parent->_right = right;
     
         } else if (parent->_type == NodeType::Func) {
     
-            Node* left = this->_index >= 0 ? this->_postfixExpression[this->_index--] : nullptr;
+            Node* left = index >= 0 ? this->_postfixExpression[index--] : nullptr;
     
             if (left && (left->_type == NodeType::Operator || left->_type == NodeType::Func))
-                this->_build(left, index);
+                this->_build(left);
     
             parent->_left = left;
             parent->_right = nullptr;
@@ -600,8 +587,7 @@ namespace ng {
     
         }
 
-        this->_index = this->_postfixExpression.size() - 1;
-        this->_build(this->_root, 0);
+        this->_build(this->_root, true);
     
     }
     

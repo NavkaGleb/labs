@@ -67,9 +67,9 @@ int main() {
     tree.expression("sin(cos(2*ln(x)))");
     std::cout << tree << std::endl;
 
-//    std::map<std::string, double> vars = { { "x", 21 } };
-//
-//    std::cout << tree.calc(vars) << std::endl;
+    std::map<std::string, double> vars = { { "x", 21 } };
+
+    std::cout << tree.calc(vars) << std::endl;
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //

@@ -51,7 +51,7 @@ namespace ng {
         // accessors
         [[nodiscard]] bool empty() const;
         [[nodiscard]] const std::string& expression() const;
-        [[nodiscard]] double result();
+        [[nodiscard]] std::map<std::string, double> variables() const;
 
         // modifiers
         void expression(const std::string& expression);
@@ -60,8 +60,6 @@ namespace ng {
         // public methods
         void clear();
         void simplify();
-
-        double calc();
         double calc(const std::map<std::string, double>& variables);
         void bypass() const;
 
@@ -97,8 +95,6 @@ namespace ng {
         std::stack<Node*> _operators;
         std::vector<Node*> _postfixExpression;
         std::map<std::string, Variable> _variables;
-        int _index;
-        double* _result;
 
         // private methods
         static bool _isOperator(char symbol);
@@ -121,7 +117,7 @@ namespace ng {
 
         void _initVariables(Node* node);
 
-        void _build(Node* parent, int index);
+        void _build(Node* parent, bool init = false);
         void _build();
 
         bool _exist(Node* node, const std::string& value) const;
