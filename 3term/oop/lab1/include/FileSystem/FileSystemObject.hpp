@@ -3,8 +3,7 @@
 #include <string>
 #include <filesystem>
 
-#include "DateTime/Date.hpp"
-#include "DateTime/Time.hpp"
+#include "DateTime/DateTime.hpp"
 
 namespace fs = std::filesystem;
 
@@ -19,7 +18,6 @@ namespace ng {
         // accessors
         [[nodiscard]] fs::path path() const;
         [[nodiscard]] std::string filename() const;
-        [[nodiscard]] const uintmax_t& size() const;
         [[nodiscard]] const bool& directory() const;
 
         // public methods
@@ -32,9 +30,7 @@ namespace ng {
     protected:
         // variables
         fs::path _path;
-        uintmax_t _size;
-        Time _creationTime;
-        Date _creationDate;
+        DateTime _creation;
         bool _directory;
 
     }; // class File

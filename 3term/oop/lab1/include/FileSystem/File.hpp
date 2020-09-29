@@ -9,14 +9,17 @@ namespace ng {
         // constructor / destructor
         File();
         File(const fs::path& path);
-        File(const fs::path& path, uintmax_t size, const Time& creationTime, const Date& creationDate);
+        File(const fs::path& path, uintmax_t size, const DateTime& creation, const DateTime& modification);
+
+        // accessors
+        const uintmax_t& size() const;
 
         // public methods
 
     private:
         // variables
-        Time _modificationTime;
-        Date _modificationDate;
+        uintmax_t _size;
+        DateTime _modification;
 
         // private methods
 

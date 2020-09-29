@@ -7,8 +7,6 @@ namespace ng {
 
     std::string FileSystemObject::filename() const { return this->_path.filename().string(); }
 
-    const uintmax_t& FileSystemObject::size() const { return this->_size; }
-
     const bool& FileSystemObject::directory() const { return this->_directory; }
 
     // operators
@@ -16,8 +14,8 @@ namespace ng {
 
         stream << object._path.filename().string();
 
-        if (!object._directory)
-            stream << " (" << object._size << ")";
+//        if (!object._directory)
+//            stream << " (" << object._size << ")";
 
         return stream;
 
@@ -25,12 +23,12 @@ namespace ng {
 
     std::ostream& operator<<(std::ostream& stream, const FileSystemObject* object) {
 
-//        stream << object->_path.filename().string();
+//        stream << object->_path.filename() << " ";
 
-        stream << object->_creationTime << " " << object->_creationDate;
+        stream << object->_creation;
 
-        if (!object->_directory)
-            stream << " (" << object->_size << ")";
+//        if (!object->_directory)
+//            stream << " (" << object->_size << ")";
 
         return stream;
 

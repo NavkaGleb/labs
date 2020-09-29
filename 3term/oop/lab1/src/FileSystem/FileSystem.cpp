@@ -117,17 +117,14 @@ namespace ng {
 
         this->_tree = new GeneralMapTree<std::string, FileSystemObject*>(new Directory(
             workdir.filename().string(),
-            info.st_size,
-            Time(&info.st_ctime),
-            Date(&info.st_ctime))
-        );
+            DateTime(&info.st_ctime)
+        ));
 
         Node* root = this->_tree->root();
 
         std::cout << "WORKDIR = " << workdir.string() << std::endl;
         std::cout << root->value()->path() << std::endl;
         std::cout << root->value() << std::endl;
-        std::cout << root->value()->size() << std::endl;
 
         this->_directoryTraversal(workdir, root);
 
@@ -192,25 +189,16 @@ namespace ng {
 
         for (const auto& elem : fs::directory_iterator(path)) {
 
-            std::cout << "parent path = " << parent->value()->path().string() << std::endl;
-            std::cout << "current filename = " << elem.path().filename().string() << std::endl;
-
-            std::cout << "--new file name" << elem.path().string() << std::endl;
-
             struct stat info;
             stat(elem.path().string().c_str(), &info);
-
-            std::cout << Time(&info.st_ctime) << " " << Date(&info.st_ctime) << "size = " << info.st_size << std::endl;
 
             if (elem.is_directory()) {
 
                 Node* node = this->_tree->push(
                     elem.path().filename().string(),
                     new Directory(
-                        elem.path(),
-                        info.st_size,
-                        Time(&info.st_ctime),
-                        Date(&info.st_ctime)
+                        parent->value()->path() / elem.path().filename(),
+                        DateTime(&info.st_ctime)
                     ),
                     parent
                 );
@@ -221,17 +209,15 @@ namespace ng {
                 this->_tree->push(
                     elem.path().filename().string(),
                     new File(
-                        elem.path(),
+                        parent->value()->path() / elem.path().filename(),
                         info.st_size,
-                        Time(&info.st_ctime),
-                        Date(&info.st_ctime)
+                        DateTime(&info.st_ctime),
+                        DateTime(&info.st_mtime)
                     ),
                     parent
                 );
 
             }
-
-            std::cout << std::endl;
 
         }
 
