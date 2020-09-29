@@ -37,6 +37,12 @@ namespace ng {
 
     }
 
+    void FileSystem::pop(const std::string& name) {
+
+        this->_tree->pop(name, this->_currentNode);
+
+    }
+
     void FileSystem::move(const std::string& path) {
 
         if (path == "..") {
@@ -46,6 +52,9 @@ namespace ng {
             return;
 
         }
+
+        this->_currentPath.emplace_back(path);
+        this->_currentNode = this->_currentNode->children().at(path);
 
     }
 

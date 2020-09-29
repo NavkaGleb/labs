@@ -26,12 +26,12 @@ namespace ng {
         // public methods
         void pushFile(const std::string& name);
         void pushDirectory(const std::string& name);
-
+        void pop(const std::string& name);
         void move(const std::string& path);
 
+        void search();
         void import(const std::string& path);
 
-        // out
         void printCurrentPath() const;
         void printCurrentFiles() const;
         void printTree(const Node* node) const;

@@ -19,4 +19,9 @@ int main() {
 	std::cout << "traversal:" << std::endl;
 	bst.traversal();
 
+	ng::ExpressionTree tree;
+
+	tree.input();
+	tree.print();
+
 }

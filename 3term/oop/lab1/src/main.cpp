@@ -20,6 +20,7 @@
 #include "DataStructures/Graphs/ListGraph.hpp"
 #include "DataStructures/Trees/GeneralTree.hpp"
 #include "FileSystem/FileSystem.hpp"
+#include "DataStructures/Trees/ExpressionTree.hpp"
 
 struct Vertex {
 
@@ -57,10 +58,15 @@ int main() {
 //
 //    tree.tprint();
 
-    ng::FileSystem fileSystem;
+//    ng::FileSystem fileSystem;
+//
+//    fileSystem.import("fas");
+//    fileSystem.printTree(fileSystem.root());
 
-    fileSystem.import("fas");
-    fileSystem.printTree(fileSystem.root());
+    ng::ExpressionTree tree;
+    std::cin >> tree;
+
+    tree.print();
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //
