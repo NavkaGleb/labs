@@ -3,9 +3,9 @@
 #include <filesystem>
 #include <functional>
 
-#include "DataStructures/Trees/GeneralMapTree.hpp"
 #include "File.hpp"
 #include "Directory.hpp"
+#include "DataStructures/Trees/GeneralMapTree.hpp"
 
 namespace fs = std::filesystem;
 

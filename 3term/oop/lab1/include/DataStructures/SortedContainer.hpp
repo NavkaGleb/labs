@@ -1,8 +1,0 @@
-//
-// Created by navka on 02.09.2020.
-//
-
-#ifndef LAB1_SORTEDCONTAINER_HPP
-#define LAB1_SORTEDCONTAINER_HPP
-
-#endif //LAB1_SORTEDCONTAINER_HPP

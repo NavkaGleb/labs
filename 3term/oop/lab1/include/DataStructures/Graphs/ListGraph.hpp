@@ -60,10 +60,7 @@ namespace ng {
         std::map<N, T> bfs(N node, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
 
         template <typename T = E>
-        std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f = [](const E& e) { return; });
-//
-//		[[nodiscard]] std::vector<int> dijkstra(int snode) const override;
-//		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
+        std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f = [](const E& e) { return e; });
 //
 //		[[nodiscard]] std::vector<int> kahn() const override;
 //		[[nodiscard]] std::vector<int> topologicalSort() const override;
@@ -128,6 +125,12 @@ namespace ng {
 
     template <typename N, typename E>
     bool ListGraph<N, E>::connected() const {
+
+        if (this->_nodes.empty())
+            return false;
+
+        if (this->_directed)
+            return this->components().size() == 1;
 
         auto* visited = new bool[this->_nodes.size()]();
 
@@ -275,16 +278,31 @@ namespace ng {
 
         int index = this->_nodes[value];
 
+        this->_edges -= this->_list[value].size();
         this->_list.erase(value);
 
-        for (auto& [key, edges] : this->_list)
-            for (int i = 0; i < edges.size(); ++i)
-                if (edges[i].toNode == value)
+        for (auto& [key, edges] : this->_list) {
+
+            for (int i = 0; i < edges.size(); ++i) {
+
+                if (edges[i].toNode == value) {
+
                     edges.erase(edges.begin() + i--);
+
+                    if (this->_directed)
+                        --this->_edges;
+
+                }
+
+            }
+
+        }
 
         for (const auto& [key, value] : this->_nodes)
             if (value > index)
                 --this->_nodes[key];
+
+        this->_nodes.erase(value);
 
     }
 
@@ -341,6 +359,7 @@ namespace ng {
             if (this->_list[from][i].toNode == to) {
 
                 this->_list[from].erase(this->_list[from].begin() + i);
+                --this->_edges;
                 break;
 
             }
@@ -371,6 +390,8 @@ namespace ng {
         for (auto& [key, edges] : this->_list)
             edges.clear();
 
+        this->_edges = 0;
+
     }
 
     template <typename N, typename E>
@@ -379,17 +400,14 @@ namespace ng {
         for (auto& [key, edges] : this->_list)
             edges.clear();
 
+        this->_edges = 0;
         this->_list.clear();
         this->_nodes.clear();
+
     }
 
     template <typename N, typename E>
     void ListGraph<N, E>::print() const {
-
-        std::cout << "  ";
-        for (const auto& [key, value] : this->_nodes)
-            std::cout << value << " ";
-        std::cout << std::endl;
 
         for (const auto& [key, edges] : this->_list) {
 
@@ -404,11 +422,7 @@ namespace ng {
     }
 
     template <typename N, typename E>
-    void ListGraph<N, E>::dfs(const N& node, bool* visited) const {
-
-        this->_dfs(node, visited, nullptr);
-
-    }
+    void ListGraph<N, E>::dfs(const N& node, bool* visited) const { this->_dfs(node, visited, nullptr); }
 
     template <typename N, typename E>
     void ListGraph<N, E>::dfs(const N& node, std::vector<N>& path) const {
@@ -436,6 +450,9 @@ namespace ng {
 
         bool* visited = new bool[this->_nodes.size()]();
         std::queue<N> queue;
+
+        for (const auto& [key, value] : this->_nodes)
+            distance[key];
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);
@@ -468,6 +485,9 @@ namespace ng {
         bool* visited = new bool[this->_nodes.size()]();
         std::map<N, T> distance;
         std::queue<N> queue;
+
+        for (const auto& [key, value] : this->_nodes)
+            distance[key];
 
         visited[this->_nodes.at(node)] = true;
         queue.emplace(node);

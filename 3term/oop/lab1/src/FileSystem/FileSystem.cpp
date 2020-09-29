@@ -107,7 +107,9 @@ namespace ng {
 
     void FileSystem::import(const std::string& path) {
 
-        const fs::path workdir = fs::current_path().parent_path();
+        fs::path workdir;
+
+        workdir = path == "." ? fs::current_path().parent_path() : path;
 
         if (!this->_tree->empty())
             delete this->_tree;

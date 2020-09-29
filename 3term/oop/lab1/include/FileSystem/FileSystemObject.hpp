@@ -21,6 +21,7 @@ namespace ng {
         // accessors
         [[nodiscard]] fs::path path() const;
         [[nodiscard]] std::string filename() const;
+        [[nodiscard]] const DateTime& creation() const;
         [[nodiscard]] const short& type() const;
 
         // public methods

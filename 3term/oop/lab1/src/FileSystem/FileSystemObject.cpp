@@ -7,6 +7,8 @@ namespace ng {
 
     std::string FileSystemObject::filename() const { return this->_path.filename().string(); }
 
+    const DateTime& FileSystemObject::creation() const { return this->_creation; }
+
     const short& FileSystemObject::type() const { return this->_type; }
 
     // operators

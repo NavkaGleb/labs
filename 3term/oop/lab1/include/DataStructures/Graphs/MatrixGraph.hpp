@@ -57,7 +57,6 @@ namespace ng {
 
 		template <typename T = E>
 		std::map<N, T*> dijkstra(N node, std::function<T(const E&)> f = [](const E& e) { return e; }) const;
-//		[[nodiscard]] std::vector<std::vector<int>> floyd() const override;
 //
 //		[[nodiscard]] std::vector<int> kahn() const override;
 //		[[nodiscard]] std::vector<int> topologicalSort() const override;
@@ -118,14 +117,17 @@ namespace ng {
 	template <typename N, typename E>
 	bool MatrixGraph<N, E>::connected() const {
 
-	    if (this->_nodes.empty())
-	        return false;
+        if (this->_nodes.empty())
+            return false;
 
-		auto* visited = new bool[this->_nodes.size()]();
+	    if (this->_directed)
+	        return this->components().size() == 1;
 
-		this->_dfs(0, visited);
+        auto* visited = new bool[this->_nodes.size()]();
 
-		for (int i = 0; i < this->_nodes.size(); ++i) {
+        this->_dfs(0, visited);
+
+        for (int i = 0; i < this->_nodes.size(); ++i) {
 
             if (!visited[i]) {
 
@@ -136,8 +138,8 @@ namespace ng {
 
         }
 
-		delete [] visited;
-		return true;
+        delete [] visited;
+        return true;
 
 	}
 
@@ -279,6 +281,8 @@ namespace ng {
         for (const auto& [key, value] : this->_nodes)
             if (value > index)
                 --this->_nodes[key];
+
+        this->_nodes.erase(value);
 
 	}
 
