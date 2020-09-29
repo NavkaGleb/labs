@@ -27,6 +27,7 @@ namespace ng {
 
             // operators
             bool operator==(const Node& other) const;
+            friend std::ostream& operator<<(std::ostream& stream, const Node& node);
 
         private:
             // variables
@@ -49,32 +50,31 @@ namespace ng {
 
         // accessors
         [[nodiscard]] bool empty() const;
+        [[nodiscard]] const std::string& expression() const;
+        [[nodiscard]] double result();
+
+        // modifiers
+        void expression(const std::string& expression);
+        void expression(std::string&& expression);
 
         // public methods
         void clear();
-        [[nodiscard]] std::string error() const;
+        void simplify();
 
-        void build(const std::string& expression);
-        double result();
         double calc();
         double calc(const std::map<std::string, double>& variables);
         void bypass() const;
-
-        void simplify();
 
         [[nodiscard]] ExpressionTree* ndifferentiate() const;                               // differentiate _expression
         [[nodiscard]] ExpressionTree* ndifferentiate(const std::string& variable) const;    // differentiate by 'variable'
         ExpressionTree& differentiate();                                                    // differentiate current _expression
         ExpressionTree& differentiate(const std::string& variable);                         // differentiate current _expression
 
-        void print() const;
         void vprint() const;
 
-        void input();
-
         // operators
-        bool operator==(const ng::ExpressionTree& tree) const;
         friend std::istream& operator>>(std::istream& stream, ExpressionTree& tree);
+        friend std::ostream& operator<<(std::ostream& stream, const ExpressionTree& tree);
 
     private:
         // enums
@@ -83,11 +83,11 @@ namespace ng {
         // inner structs
         struct Variable {
             // variables
-            double _value;
-            int _count;
+            double value;
+            int count;
 
             // constructor
-            Variable() : _value(0.0), _count(0) {}
+            Variable() : value(0.0), count(0) {}
 
         };
 
@@ -97,9 +97,7 @@ namespace ng {
         std::stack<Node*> _operators;
         std::vector<Node*> _postfixExpression;
         std::map<std::string, Variable> _variables;
-        bool _error;
         int _index;
-        std::string _errorMessage;
         double* _result;
 
         // private methods
@@ -116,14 +114,14 @@ namespace ng {
         static double _mathConstants(const std::string& constant);
 
         static int _priority(char symbol);
-        [[nodiscard]] bool _morePriority(char symbol) const;
+        bool _morePriority(char symbol) const;
 
         void _clearOperators(char symbol);
         void _clearOperand(std::string& operand);
 
         void _initVariables(Node* node);
 
-        void _build(Node* parent);
+        void _build(Node* parent, int index);
         void _build();
 
         bool _exist(Node* node, const std::string& value) const;
@@ -141,13 +139,8 @@ namespace ng {
         bool _selectVariable(std::string& variable) const;
         Node* _derivative(Node* node, const std::string& variable) const;
 
-        void _print(Node* node, const int& level, const char* caption) const;
-
-        // operators
-//        friend std::ostream& operator<<(std::ostream& stream, const ng::ExpressionTree::Node& node);
+        void _print(std::ostream& stream, Node* node, const int& level, const char* caption, bool nextLine = false) const;
 
     };
-
-    std::ostream& operator<<(std::ostream& ostream, const ng::ExpressionTree::Node& node);
 
 } // namespace ng

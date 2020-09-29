@@ -64,10 +64,12 @@ int main() {
 //    fileSystem.printTree(fileSystem.root());
 
     ng::ExpressionTree tree;
-//    std::cin >> tree;
+    tree.expression("sin(cos(2*ln(x)))");
+    std::cout << tree << std::endl;
 
-    tree.input();
-    tree.print();
+//    std::map<std::string, double> vars = { { "x", 21 } };
+//
+//    std::cout << tree.calc(vars) << std::endl;
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
 //
