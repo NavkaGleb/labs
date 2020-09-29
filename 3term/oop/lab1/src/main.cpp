@@ -64,8 +64,9 @@ int main() {
 //    fileSystem.printTree(fileSystem.root());
 
     ng::ExpressionTree tree;
-    std::cin >> tree;
+//    std::cin >> tree;
 
+    tree.input();
     tree.print();
 
 //	ng::MatrixGraph<Vertex> graph(false, true);
