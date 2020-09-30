@@ -359,7 +359,6 @@ namespace ng {
             if (this->_list[from][i].toNode == to) {
 
                 this->_list[from].erase(this->_list[from].begin() + i);
-                --this->_edges;
                 break;
 
             }
@@ -381,6 +380,7 @@ namespace ng {
 
         }
 
+        --this->_edges;
 
     }
 

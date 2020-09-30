@@ -8,6 +8,7 @@
 #include <iostream>
 #include <queue>
 #include <functional>
+#include <iomanip>
 
 #include "Graph.hpp"
 
@@ -89,9 +90,16 @@ namespace ng {
 	template <typename N, typename E>
 	MatrixGraph<N, E>::~MatrixGraph() {
 
-		for (std::size_t i = 0; i < this->_nodes.size(); ++i)
-			for (std::size_t j = 0; j < this->_nodes.size(); ++j)
-				delete this->_matrix[i][j];
+		for (std::size_t i = 0; i < this->_nodes.size(); ++i) {
+
+            for (std::size_t j = 0; j < this->_nodes.size(); ++j)
+                delete this->_matrix[i][j];
+
+            this->_matrix[i].clear();
+
+        }
+
+		this->_matrix.clear();
 
 	}
 
@@ -272,8 +280,19 @@ namespace ng {
 
         int index = this->_nodes[value];
 
-        for (int i = 0; i < this->_nodes.size(); ++i)
+        for (int i = 0; i < this->_nodes.size(); ++i) {
+
+            if (this->_matrix[i][index])
+                --this->_edges;
+
+            if (this->_directed && this->_matrix[index][i])
+                --this->_edges;
+
+            delete this->_matrix[i][index];
+            delete this->_matrix[index][i];
             this->_matrix[i].erase(this->_matrix[i].begin() + index);
+
+        }
 
         this->_matrix.erase(this->_matrix.begin() + index);
         this->_nodes.erase(value);
@@ -351,29 +370,45 @@ namespace ng {
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::popEdges() {
 
-        for (const auto& row : this->_matrix)
-            for (const auto& e : row)
-                delete e;
+        for (std::size_t i = 0; i < this->_nodes.size(); ++i) {
+
+            for (std::size_t j = 0; j < this->_nodes.size(); ++j) {
+
+                delete this->_matrix[i][j];
+                this->_matrix[i][j] = nullptr;
+
+            }
+
+        }
+
+        this->_edges = 0;
 
 	}
 
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::clear() {
 
-        for (const auto& row : this->_matrix)
-            for (const auto& e : row)
-                delete e;
+        for (std::size_t i = 0; i < this->_nodes.size(); ++i) {
 
+            for (std::size_t j = 0; j < this->_nodes.size(); ++j)
+                delete this->_matrix[i][j];
+
+            this->_matrix[i].clear();
+
+        }
+
+        this->_matrix.clear();
         this->_nodes.clear();
+        this->_edges = 0;
 
 	}
 
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::print() const {
 
-	    std::cout << "  ";
+	    std::cout << "    ";
 	    for (int i = 0; i < this->_nodes.size(); ++i)
-	        std::cout << i << " ";
+	        std::cout << std::setw(4) << i;
 	    std::cout << std::endl;
 
 		for (int i = 0; i < this->_nodes.size(); ++i) {
@@ -381,12 +416,12 @@ namespace ng {
 			for (int j = 0; j < this->_nodes.size(); ++j) {
 
 			    if (j == 0)
-			        std::cout << i << " ";
+			        std::cout << std::setw(4) << i;
 
 				if (this->_matrix[i][j])
-					std::cout << *this->_matrix[i][j] << " ";
+					std::cout << std::setw(4) << *this->_matrix[i][j];
 				else
-					std::cout << "n" << " ";
+					std::cout << std::setw(4) << "n";
 
 			}
 
@@ -397,11 +432,7 @@ namespace ng {
 	}
 
 	template <typename N, typename E>
-	void MatrixGraph<N, E>::dfs(const N& node, bool* visited) const {
-
-        this->_dfs(node, visited, nullptr);
-
-	}
+	void MatrixGraph<N, E>::dfs(const N& node, bool* visited) const { this->_dfs(node, visited, nullptr); }
 
 	template <typename N, typename E>
 	void MatrixGraph<N, E>::dfs(const N& node, std::vector<N>& path) const {
@@ -512,7 +543,7 @@ namespace ng {
             for (const auto& [key, value] : this->_nodes) {
 
                 if (this->_matrix[this->_nodes.at(node)][value] && (
-                    !distance[value] ||
+                    !distance[key] ||
                     *distance[key] > *distance[node] + f(*this->_matrix[this->_nodes.at(node)][value]))) {
 
                     if (!distance[key])

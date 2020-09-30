@@ -21,7 +21,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/main.cpp
     tests/MatrixGraphFixture.cpp tests/ListGraphFixture.cpp
-        include/FileSystem/File.hpp include/DateTime/Date.hpp include/DateTime/Time.hpp include/FileSystem/Directory.hpp include/FileSystem/FileSystemObject.hpp include/DataStructures/Trees/GeneralTree.hpp include/Random/Random.hpp include/FileSystem/FileSystem.hpp src/FileSystem/FileSystem.cpp src/FileSystem/File.cpp src/FileSystem/FileSystemObject.cpp src/FileSystem/Directory.cpp include/DataStructures/Trees/GeneralMapTree.hpp include/DataStructures/Trees/ExpressionTree.hpp src/DataStructures/Trees/ExpressionTree.cpp tests/ExpressionTreeFixture.cpp include/DateTime/DateTime.hpp)
+        include/FileSystem/File.hpp include/DateTime/Date.hpp include/DateTime/Time.hpp include/FileSystem/Directory.hpp include/FileSystem/FileSystemObject.hpp include/DataStructures/Trees/GeneralTree.hpp include/Random/Random.hpp include/FileSystem/FileSystem.hpp src/FileSystem/FileSystem.cpp src/FileSystem/File.cpp src/FileSystem/FileSystemObject.cpp src/FileSystem/Directory.cpp include/DataStructures/Trees/GeneralMapTree.hpp include/DataStructures/Trees/ExpressionTree.hpp src/DataStructures/Trees/ExpressionTree.cpp tests/ExpressionTreeFixture.cpp include/DateTime/DateTime.hpp tests/TestFunc.hpp)
 
 # include directories
 include_directories(

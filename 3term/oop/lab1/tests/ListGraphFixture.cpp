@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "TestFunc.hpp"
 #include "DataStructures/Graphs/ListGraph.hpp"
 
 class ListGraphFixture : public ::testing::Test {
@@ -31,8 +32,6 @@ protected:
     }
 
 };
-
-bool POINTER_EQ(const double* a, const double* b) { return *a == *b; }
 
 TEST_F(ListGraphFixture, InitListGraph) {
 
@@ -136,7 +135,7 @@ TEST_F(ListGraphFixture, Dijkstra) {
     std::map<std::string, double*> actual = this->_graph->dijkstra("a");
 
     for (const auto& [key, value] : expected)
-        EXPECT_PRED2(POINTER_EQ, expected[key], value);
+        EXPECT_PRED2(POINTER_EQ<double>, expected[key], value);
 
     for (auto& [key, value] : actual) {
 
