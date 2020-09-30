@@ -1,6 +1,6 @@
-#include <iostream>
+#include "Solution.hpp"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+   ng::Solution solution;
+   solution.Solve();
 }

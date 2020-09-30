@@ -3,4 +3,8 @@ project(lab2)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(lab2 src/main.cpp)
+include_directories(
+    include
+)
+
+add_executable(lab2 src/main.cpp include/Solution.hpp src/Solution.cpp include/Random.hpp)
