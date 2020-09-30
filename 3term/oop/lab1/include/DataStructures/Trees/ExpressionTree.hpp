@@ -44,7 +44,7 @@ namespace ng {
         // constructor / destructor
         ExpressionTree();
         explicit ExpressionTree(std::string expression);
-        explicit ExpressionTree(Node* node);
+        ExpressionTree(Node* node);
         ExpressionTree(const ExpressionTree& other);
         ~ExpressionTree();
 
@@ -52,22 +52,19 @@ namespace ng {
         [[nodiscard]] bool empty() const;
         [[nodiscard]] const std::string& expression() const;
         [[nodiscard]] std::map<std::string, double> variables() const;
+        [[nodiscard]] std::string fullParenthesisExpression() const;
 
         // modifiers
         void expression(const std::string& expression);
         void expression(std::string&& expression);
-        void variables(const std::map<std::string, double>& variables);
 
         // public methods
         void clear();
         void simplify();
-        double calc(const std::map<std::string, double>& variables);
-        void bypass() const;
+        double calc(const std::map<std::string, double>& variables = {});
 
-        [[nodiscard]] ExpressionTree* ndifferentiate() const;                               // differentiate _expression
-        [[nodiscard]] ExpressionTree* ndifferentiate(const std::string& variable) const;    // differentiate by 'variable'
-        ExpressionTree& differentiate();                                                    // differentiate current _expression
-        ExpressionTree& differentiate(const std::string& variable);                         // differentiate current _expression
+        ExpressionTree* ndifferentiate(const std::string& variable = "") const;
+        ExpressionTree& differentiate(const std::string& variable = "");
 
         void vprint() const;
 
@@ -125,7 +122,7 @@ namespace ng {
 
         void _clear();
         double _calc(Node* node) const;
-        void _bypass(Node* node) const;
+        void _fullParenthesisExpression(Node* node, std::ostream& stream = std::cout) const;
 
         void _updateVariable(const std::string& key);
         void _updateVariables(Node* node);
@@ -133,7 +130,6 @@ namespace ng {
         static void _updateNode(Node*& node);
         void _simplify(Node*& node);
 
-        bool _selectVariable(std::string& variable) const;
         Node* _derivative(Node* node, const std::string& variable) const;
 
         void _print(std::ostream& stream, Node* node, const int& level, const char* caption, bool nextLine = false) const;

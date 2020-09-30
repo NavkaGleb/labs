@@ -105,6 +105,7 @@ namespace ng {
     ExpressionTree::ExpressionTree(Node* node) : _root(node) {
 
         this->_initVariables(this->_root);
+        this->_expression = this->fullParenthesisExpression();
 
     }
     
@@ -121,10 +122,25 @@ namespace ng {
 
         std::map<std::string, double> result;
 
-        for (const auto& [key, value] : this->_variables)
-            result[key];
+        for (const auto& [key, value] : this->_variables) {
+            std::cout << key << " -> " << value.value << " " << value.count << std::endl;
+
+            if (value.count != 0)
+                result[key];
+
+        }
 
         return result;
+
+    }
+
+    std::string ExpressionTree::fullParenthesisExpression() const {
+
+        std::stringstream ss;
+
+        this->_fullParenthesisExpression(this->_root, ss);
+
+        return ss.str();
 
     }
 
@@ -143,67 +159,59 @@ namespace ng {
 
     }
 
-    void ExpressionTree::variables(const std::map<std::string, double>& variables) {
-
-        for (const auto& [key, value] : variables)
-            this->_variables[key].value = value;
-
-    }
-
     // public methods
     void ExpressionTree::clear() { this->_clear(); }
 
     void ExpressionTree::simplify() { this->_simplify(this->_root); }
     
     double ExpressionTree::calc(const std::map<std::string, double>& variables) {
-    
-        for (const auto& [key, value] : variables)
-            this->_variables[key].value = value;
+
+        if (this->_variables.empty() && !variables.empty()) {
+
+            std::cerr << "no variable in expression!" << std::endl;
+            return 0.0;
+
+        }
+
+        for (const auto& [key, value] : variables) {
+
+            if (this->_variables.count(key) == 1 && this->_variables[key].count != 0)
+                this->_variables[key].value = value;
+            else if (this->_variables.count(key) == 1 && this->_variables[key].count == 0)
+                this->_variables.erase(key);
+
+        }
 
         return this->_calc(this->_root);
     
     }
-    
-    void ExpressionTree::bypass() const { this->_bypass(this->_root); }
-    
-    ExpressionTree* ExpressionTree::ndifferentiate() const {
-    
-        std::string variable;
-    
-        return (!this->_selectVariable(variable)) ? nullptr : new ExpressionTree(this->_derivative(this->_root, variable));
-    
-    }
+
     
     ExpressionTree* ExpressionTree::ndifferentiate(const std::string& variable) const {
-    
-        return (this->_variables.count(variable) == 0) ? nullptr : new ExpressionTree(this->_derivative(this->_root, variable));
-    
-    }
-    
-    ExpressionTree& ExpressionTree::differentiate() {
-    
-        std::string variable;
-    
-        if (this->_selectVariable(variable)) {
-    
-            Node* newRoot = this->_derivative(this->_root, variable);
-            delete this->_root;
-            this->_root = newRoot;
-            this->_initVariables(this->_root);
-    
+
+        if (this->_variables.count(variable) == 0) {
+
+            std::cerr << "no such variable" << std::endl;
+            return nullptr;
+
         }
-    
-        return *this;
+
+        return new ExpressionTree(this->_derivative(this->_root, variable));
     
     }
     
     ExpressionTree& ExpressionTree::differentiate(const std::string& variable) {
-    
-        if (this->_variables.count(variable) != 0) {
+
+        if (this->_variables.count(variable) == 0) {
+
+            std::cerr << "no such variable" << std::endl;
+
+        } else {
     
             Node* newRoot = this->_derivative(this->_root, variable);
             delete this->_root;
             this->_root = newRoot;
+            this->_variables.clear();
             this->_initVariables(this->_root);
     
         }
@@ -331,7 +339,7 @@ namespace ng {
             "sin", "cos", "tan",
             "asin", "acos", "atan",
             "ln", "log2", "log10",
-            "sqrt", "abs", "exp"
+            "sqrt", "exp"
         };
     
         for (const auto& function : functions)
@@ -483,7 +491,7 @@ namespace ng {
     }
     
     void ExpressionTree::_initVariables(Node* node) {
-    
+
         if (!node)
             return;
     
@@ -547,9 +555,7 @@ namespace ng {
         std::string operand;
         char prevSymbol = '(';
         char symbol;
-    
         int parentheses = 0;
-        bool operators = false;
     
         for (int i = 0; i < this->_expression.length(); i++) {
     
@@ -661,8 +667,6 @@ namespace ng {
                 result = std::log10(this->_calc(node->_left));
             if (node->_value == "sqrt")
                 result = std::sqrt(this->_calc(node->_left));
-            if (node->_value == "abs")
-                result = std::abs(this->_calc(node->_left));
             if (node->_value == "exp")
                 result = std::exp(this->_calc(node->_left));
     
@@ -672,29 +676,29 @@ namespace ng {
     
     }
     
-    void ExpressionTree::_bypass(Node* node) const {
+    void ExpressionTree::_fullParenthesisExpression(Node* node, std::ostream& stream) const {
     
         if (!node)
             return;
     
         if (node->_type == NodeType::Operator)
-            std::cout << "(";
+            stream << "(";
     
         else if (node->_type == NodeType::Func)
-            std::cout << node->_value << "<";
+            stream << node->_value << "<";
     
-        this->_bypass(node->_left);
+        this->_fullParenthesisExpression(node->_left, stream);
     
         if (node->_type != NodeType::Func)
-            std::cout << node->_value;
+            stream << node->_value;
     
         if (node->_type == NodeType::Func)
-            std::cout << ">";
+            stream << ">";
     
-        this->_bypass(node->_right);
+        this->_fullParenthesisExpression(node->_right, stream);
     
         if (node->_type == NodeType::Operator)
-            std::cout << ")";
+            stream << ")";
     
     }
     
@@ -706,7 +710,7 @@ namespace ng {
     }
     
     void ExpressionTree::_updateVariables(Node* node) {
-    
+
         if (!node)
             return;
     
@@ -864,28 +868,10 @@ namespace ng {
     
     }
     
-    bool ExpressionTree::_selectVariable(std::string& variable) const {
-    
-        std::cout << "there are all variables in expression: ";
-        this->vprint();
-        std::cout << "choose a variable by which you will differentiate:";
-        std::cin >> variable;
-    
-        if (this->_variables.count(variable) == 0) {
-    
-            std::cout << "no variable " << variable << std::endl;
-            return false;
-    
-        }
-    
-        return true;
-    
-    }
-    
     ExpressionTree::Node* ExpressionTree::_derivative(Node* node, const std::string& variable) const {
     
         if (node->_type == NodeType::Var && node->_value == variable) {
-    
+
             return new Node("1");
     
         } else if (node->_type == NodeType::Const || node->_type == NodeType::Var) {
@@ -956,7 +942,7 @@ namespace ng {
                 return new Node("*", left, right);
     
             } else if (node->_value == "cos") {
-    
+
                 Node* left = new Node("*", new Node("-1"), new Node("sin", new Node(*node->_left)));
                 Node* right = this->_derivative(node->_left, variable);
                 return new Node("*", left, right);
@@ -1015,6 +1001,12 @@ namespace ng {
                 Node* right = this->_derivative(node->_left, variable);
                 return new Node("*", left, right);
     
+            } else if (node->_value == "exp") {
+
+                Node* left = new Node(*node->_left);
+                Node* right = this->_derivative(node->_left, variable);
+                return new Node("*", left, right);
+
             }
     
         }
