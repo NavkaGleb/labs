@@ -19,6 +19,14 @@ protected:
 
 };
 
+bool DOUBLE_EQ(const double& a, const double& b) {
+
+    static const double eps = 0.000001;
+
+    return std::abs(a) - std::abs(b) <= eps;
+
+}
+
 TEST_F(ExpressionTreeFixture, SimpleExression) {
 
     std::map<std::string, double> variables = { { "x", 1.2 }, { "y", -2.32 } };

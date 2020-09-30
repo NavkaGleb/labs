@@ -29,7 +29,6 @@ namespace ng {
         // operators
         friend std::ostream& operator<<(std::ostream& stream, const FileSystemObject& object);
         friend std::ostream& operator<<(std::ostream& stream, const FileSystemObject* object);
-        friend bool operator<(const FileSystemObject& object1, const FileSystemObject& object2);
 
     protected:
         // variables

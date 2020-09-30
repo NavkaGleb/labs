@@ -24,7 +24,6 @@ namespace ng {
         // accessors
         const Node* root() const;
         const Node* current() const;
-        std::string path(const FileSystemObject* object) const;
 
         // public methods
         void pushFile(const std::string& name);
@@ -32,7 +31,7 @@ namespace ng {
         void pop(const std::string& name);
         void move(const std::string& path);
 
-        void search(const std::string& path, SearchFunc func) const;
+        std::vector<FileSystemObject> search(const std::string& path, SearchFunc func) const;
         void import(const std::string& path);
 
         void printCurrentPath() const;
@@ -46,7 +45,7 @@ namespace ng {
         std::vector<std::string> _currentPath;
 
         // private methods
-        void _directoryTraversal(Node* node, SearchFunc func) const;
+        void _directoryTraversal(Node* node, std::vector<FileSystemObject>& data, SearchFunc func) const;
         void _directoryTraversal(const fs::path& path, Node* node);
 
     }; // class FileSystem

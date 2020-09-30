@@ -126,8 +126,8 @@ namespace ng {
 
         void _updateVariable(const std::string& key);
         void _updateVariables(Node* node);
-        static void _updateNode(Node*& node, const std::string& value, const short& type);
-        static void _updateNode(Node*& node);
+        void _updateNode(Node*& node, const std::string& value, const short& type) const;
+        void _updateNode(Node*& node) const;
         void _simplify(Node*& node);
 
         Node* _derivative(Node* node, const std::string& variable) const;

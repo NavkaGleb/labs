@@ -54,7 +54,7 @@ namespace ng {
         }
 
         // operators
-        bool operator<(const Date& other) {
+        bool operator<(const Date& other) const {
 
             if (this->year != other.year)
                 return this->year < other.year;
@@ -66,7 +66,7 @@ namespace ng {
 
         }
 
-        bool operator>(const Date& other) {
+        bool operator>(const Date& other) const {
 
             if (this->year != other.year)
                 return this->year > other.year;
@@ -78,7 +78,7 @@ namespace ng {
 
         }
 
-        bool operator<=(const Date& other) {
+        bool operator<=(const Date& other) const {
 
             if (this->year != other.year)
                 return this->year < other.year;
@@ -90,7 +90,7 @@ namespace ng {
 
         }
 
-        bool operator>=(const Date& other) {
+        bool operator>=(const Date& other) const {
 
             if (this->year != other.year)
                 return this->year > other.year;
@@ -102,7 +102,7 @@ namespace ng {
 
         }
 
-        bool operator!=(const Date& other) {
+        bool operator!=(const Date& other) const {
 
             if (this->year != other.year)
                 return true;
@@ -114,7 +114,7 @@ namespace ng {
 
         }
 
-        bool operator==(const Date& other) {
+        bool operator==(const Date& other) const {
 
             if (this->year != other.year)
                 return false;

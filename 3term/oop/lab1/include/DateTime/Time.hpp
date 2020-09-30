@@ -54,7 +54,7 @@ namespace ng {
         }
 
         // operators
-        bool operator<(const Time& other) {
+        bool operator<(const Time& other) const {
 
             if (this->hour != other.hour)
                 return this->hour < other.hour;
@@ -66,7 +66,7 @@ namespace ng {
 
         }
 
-        bool operator>(const Time& other) {
+        bool operator>(const Time& other) const {
 
             if (this->hour != other.hour)
                 return this->hour > other.hour;
@@ -78,7 +78,7 @@ namespace ng {
 
         }
 
-        bool operator<=(const Time& other) {
+        bool operator<=(const Time& other) const {
 
             if (this->hour != other.hour)
                 return this->hour < other.hour;
@@ -90,7 +90,7 @@ namespace ng {
 
         }
 
-        bool operator>=(const Time& other) {
+        bool operator>=(const Time& other) const {
 
             if (this->hour != other.hour)
                 return this->hour > other.hour;
@@ -102,7 +102,7 @@ namespace ng {
 
         }
 
-        bool operator!=(const Time& other) {
+        bool operator!=(const Time& other) const {
 
             if (this->hour != other.hour)
                 return true;
@@ -114,7 +114,7 @@ namespace ng {
 
         }
 
-        bool operator==(const Time& other) {
+        bool operator==(const Time& other) const {
 
             if (this->hour != other.hour)
                 return false;

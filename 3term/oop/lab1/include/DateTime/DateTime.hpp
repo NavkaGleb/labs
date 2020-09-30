@@ -22,7 +22,7 @@ namespace ng {
 
         }
 
-        bool operator<(const DateTime& other) {
+        bool operator<(const DateTime& other) const {
 
             if (this->date != other.date)
                 return this->date < other.date;
@@ -31,7 +31,7 @@ namespace ng {
 
         }
 
-        bool operator>(const DateTime& other) {
+        bool operator>(const DateTime& other) const {
 
             if (this->date != other.date)
                 return this->date > other.date;
@@ -40,7 +40,7 @@ namespace ng {
 
         }
 
-        bool operator<=(const DateTime& other) {
+        bool operator<=(const DateTime& other) const {
 
             if (this->date != other.date)
                 return this->date < other.date;
@@ -49,7 +49,7 @@ namespace ng {
 
         }
 
-        bool operator>=(const DateTime& other) {
+        bool operator>=(const DateTime& other) const {
 
             if (this->date != other.date)
                 return this->date > other.date;
@@ -58,7 +58,7 @@ namespace ng {
 
         }
 
-        bool operator!=(const DateTime& other) {
+        bool operator!=(const DateTime& other) const {
 
             if (this->date != other.date)
                 return true;
@@ -67,7 +67,7 @@ namespace ng {
 
         }
 
-        bool operator==(const DateTime& other) {
+        bool operator==(const DateTime& other) const {
 
             if (this->date != other.date)
                 return false;

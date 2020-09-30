@@ -25,17 +25,6 @@ namespace ng {
 
     const Node* FileSystem::current() const { return this->_currentNode; }
 
-    std::string FileSystem::path(const FileSystemObject* object) const {
-
-        std::string result;
-        Node* current = this->_tree->root();
-
-//        object->filename();
-
-        return "";
-
-    }
-
     // public methods
     void FileSystem::pushFile(const std::string& name) {
 
@@ -61,6 +50,13 @@ namespace ng {
 
         if (path == "..") {
 
+            if (this->_currentNode == this->_tree->root()) {
+
+                std::cerr << "current pos is root" << std::endl;
+                return;
+
+            }
+
             this->_currentPath.pop_back();
             this->_currentNode = this->_currentNode->parent();
             return;
@@ -80,8 +76,9 @@ namespace ng {
 
     }
 
-    void FileSystem::search(const std::string& path, SearchFunc func) const {
+    std::vector<FileSystemObject> FileSystem::search(const std::string& path, SearchFunc func) const {
 
+        std::vector<FileSystemObject> data;
         Node* root = this->_tree->root();
 
         if (long long start = 0, end; root && !path.empty() && path != ".") {
@@ -93,7 +90,7 @@ namespace ng {
                 if (std::string current = path.substr(start, end); root->children().count(current) == 1)
                     root = root->children().at(current);
                 else
-                    return;
+                    return {};
 
                 start = end + 1;
 
@@ -101,8 +98,9 @@ namespace ng {
 
         }
 
-        this->_directoryTraversal(root, func);
+        this->_directoryTraversal(root, data, func);
 
+        return data;
     }
 
     void FileSystem::import(const std::string& path) {
@@ -123,10 +121,6 @@ namespace ng {
         ));
 
         Node* root = this->_tree->root();
-
-        std::cout << "WORKDIR = " << workdir.string() << std::endl;
-        std::cout << root->value()->path() << std::endl;
-        std::cout << root->value() << std::endl;
 
         this->_directoryTraversal(workdir, root);
 
@@ -157,20 +151,15 @@ namespace ng {
     }
 
     // private methods
-    void FileSystem::_directoryTraversal(Node* node, SearchFunc func) const {
+    void FileSystem::_directoryTraversal(Node* node, std::vector<FileSystemObject>& data, SearchFunc func) const {
 
         for (const auto& [key, child] : node->children()) {
 
-            if (child->value()->type() == FileSystemObject::Type::Directory) {
+            if (func(*child->value()))
+                data.emplace_back(*child->value());
 
-                this->_directoryTraversal(child, func);
-
-            } else {
-
-                if (func(*child->value()))
-                    std::cout << "searched -> " << child->value()->path() << std::endl;
-
-            }
+            if (child->value()->type() == FileSystemObject::Type::Directory)
+                this->_directoryTraversal(child, data, func);
 
         }
 

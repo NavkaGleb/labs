@@ -723,7 +723,7 @@ namespace ng {
     
     }
     
-    void ExpressionTree::_updateNode(Node*& node, const std::string& value, const short& type) {
+    void ExpressionTree::_updateNode(Node*& node, const std::string& value, const short& type) const {
     
         if (node->_type == NodeType::Operator) {
     
@@ -744,7 +744,7 @@ namespace ng {
     
     }
     
-    void ExpressionTree::_updateNode(Node*& node) {
+    void ExpressionTree::_updateNode(Node*& node) const {
     
         Node* newNode;
     
