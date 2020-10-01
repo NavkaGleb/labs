@@ -7,4 +7,16 @@ include_directories(
     include
 )
 
-add_executable(lab2 src/main.cpp include/Solution.hpp src/Solution.cpp include/Random.hpp)
+set(HEADER_FILES
+    include/Solution.hpp
+    include/Random.hpp
+    include/Timer.hpp
+)
+
+set(SOURCE_FILES
+    src/main.cpp
+    src/Solution.cpp
+    src/Timer.cpp
+)
+
+add_executable(lab2 ${SOURCE_FILES})

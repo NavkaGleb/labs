@@ -2,5 +2,5 @@
 
 int main() {
    ng::Solution solution;
-   solution.Solve();
+   solution.Solve(false);
 }

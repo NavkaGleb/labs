@@ -3,9 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <chrono>
-
-namespace ch = std::chrono;
 
 namespace ng {
 
@@ -15,19 +12,22 @@ namespace ng {
         Solution();
         virtual ~Solution() = default;
         // public methods
-        void Solve();
+        void Solve(bool print);
 
     private:
         // fields
         std::vector<int> bolts;
         std::vector<int> nuts;
+        double time;
 
         // private methods
         void Init();
         void Shuffle();
         int Partition(int left, int right);
         void Sort(int left, int right);
-        void Print();
-    };
+        void Print(const char* title = nullptr) const;
+        void PrintTime() const;
 
-}
+    }; // class Solution
+
+} // namespace ng
