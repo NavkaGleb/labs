@@ -32,6 +32,7 @@ namespace ng {
     void Solution::Init() {
         int n;
 
+        std::cout << "enter bolts and nuts count:" << std::endl;
         std::cin >> n;
         this->bolts.resize(n);
         this->nuts.resize(n);

@@ -9,7 +9,7 @@ namespace ng {
     class Timer {
     public:
         // constructor / destructor
-        Timer(double& data);
+        explicit Timer(double& data);
         virtual ~Timer();
 
     private:
