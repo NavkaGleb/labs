@@ -7,4 +7,4 @@ include_directories(
     include
 )
 
-add_executable(lab3 src/main.cpp include/Heap.hpp src/Heap.cpp include/Random.hpp)
+add_executable(lab3 src/main.cpp include/Heap.hpp include/Random.hpp)
