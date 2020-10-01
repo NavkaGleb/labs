@@ -1,9 +1,9 @@
-#Heap
+# Heap
 
 **Basic example**
 ```c++
 #include <iostream>
-#include "Heap.hpp>
+#include "Heap.hpp"
 
 int main() {
     ng::Heap<int, 4> heap;
@@ -23,4 +23,11 @@ int main() {
     heap.Increase(2, 10);
     std::cout << heap << std::endl;
 }
+```
+Output:
+```text
+Peak = 32
+[ 32 4 -7 0 5 ]
+[ 5 4 -7 0 ]
+[ 5 4 3 0 ]
 ```
