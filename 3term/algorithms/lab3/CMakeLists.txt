@@ -7,4 +7,4 @@ include_directories(
     include
 )
 
-add_executable(lab3 src/main.cpp include/BinaryHeap.hpp src/BinaryHeap.cpp include/PriorityQueue.hpp src/PriorityQueue.cpp)
+add_executable(lab3 src/main.cpp include/Heap.hpp src/Heap.cpp include/Random.hpp)
