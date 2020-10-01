@@ -13,12 +13,12 @@ namespace ng {
         virtual ~Heap();
 
         // accessors
-        [[nodiscard]] const int& Top() const;
+        [[nodiscard]] const int& Peak() const;
 
         // public methods
         void Push(int value);
         void Push(std::size_t index, int value);
-        const int& PopTop();
+        int PopPeak();
 
         // operators
         friend std::ostream& operator<<(std::ostream& stream, const Heap& heap);

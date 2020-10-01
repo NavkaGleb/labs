@@ -10,7 +10,7 @@ namespace ng {
     Heap::~Heap() {}
 
     // accessors
-    const int& Heap::Top() const {
+    const int& Heap::Peak() const {
         if (this->data.empty())
             throw std::out_of_range("PriorityQueue is empty");
 
@@ -27,8 +27,12 @@ namespace ng {
 
     }
 
-    const int& Heap::PopTop() {
-        return this->data.front();
+    int Heap::PopPeak() {
+        int peak = this->Peak();
+        std::swap(this->data.front(), this->data.back());
+        this->data.pop_back();
+
+        return peak;
     }
 
     // operators
