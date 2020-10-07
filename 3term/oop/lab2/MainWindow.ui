@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>856</width>
     <height>600</height>
    </rect>
   </property>
@@ -17,12 +17,64 @@
    <widget class="QLineEdit" name="newTask">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>40</y>
-      <width>511</width>
+      <x>140</x>
+      <y>60</y>
+      <width>561</width>
       <height>29</height>
      </rect>
     </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>new task</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="taskDate">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>60</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>date</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>100</y>
+      <width>354</width>
+      <height>276</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="calendarForm">
+     <item>
+      <widget class="QCalendarWidget" name="calendar">
+       <property name="gridVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTimeEdit" name="timeEdit"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>set</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -30,7 +82,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>856</width>
      <height>26</height>
     </rect>
    </property>

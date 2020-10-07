@@ -1,7 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <QMainWindow>
+
+#include "List.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,6 +18,15 @@ public:
 private slots:
     void on_newTask_editingFinished();
 
+    void on_taskDate_clicked();
+
+    void on_calendar_selectionChanged();
+
+    void on_pushButton_clicked();
+
 private:
-    Ui::MainWindow* ui;
+    // fields
+    Ui::MainWindow* _ui;
+    QVector<ng::List> _lists;
+
 };
