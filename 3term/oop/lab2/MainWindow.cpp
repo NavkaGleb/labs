@@ -6,59 +6,99 @@
 #include <QPushButton>
 #include <QCalendarWidget>
 #include <QTableView>
+#include <QLineEdit>
 #include <QObject>
+#include <QStringList>
+#include <QListWidgetItem>
 #include <iostream>
 
-void setLayoutVisible(QLayoutItem* item, bool visible) {
-    if (auto widget = item->widget())
-        return widget->setVisible(visible);
-
-    if (auto layout = item->layout())
-        for (int i = 0; i < layout->count(); ++i)
-            setLayoutVisible(layout->itemAt(i), visible);
-};
-
 // constructor / destructor
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task) {
     this->_ui->setupUi(this);
-    this->_lists.append(ng::List("today"));
-    this->_lists.append(ng::List("tomorrow"));
+    this->setWindowTitle("to do list");
+    this->_calendarForm = new CalendarForm(this);
+    this->_calendarForm->setModal(true);
 
-    setLayoutVisible(this->_ui->calendarForm, false);
+    this->_lists["today"];
+    this->_lists["tomorrow"];
 
-    for (int i = 0; i < this->_lists.size(); ++i) {
-        QPushButton* button = new QPushButton(this);
-        button->setText(this->_lists[i].name());
-        button->setFixedSize(100, 50);
-        button->move(20, (i + 1) * 60);
-        button->show();
-    }
+    this->_lists["today"].append(new Ng::Task("first"));
+    this->_lists["today"].append(new Ng::Task("second"));
+
+    this->initListsContainer();
+    this->initTasksContainer();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete this->_ui;
+
+    for (auto& [listName, tasks] : this->_lists.toStdMap())
+        for (auto& task : tasks)
+            delete task;
 }
 
 // private slots
-void MainWindow::on_newTask_editingFinished() {
-    this->_lists.front().append(ng::Task(this->_ui->newTask->text()));
+void MainWindow::on_dateButton_clicked() {
+    if (!this->_currentTask)
+        this->_currentTask = new Ng::Task;
+
+    this->_calendarForm->setTask(*this->_currentTask);
+    this->_calendarForm->show();
+    this->_calendarForm->exec();
+}
+
+void MainWindow::on_newTask_returnPressed() {
+    if (this->_ui->newTask->text().isEmpty())
+        return;
+
+    std::cout << "fuck this shit" << std::endl;
+    std::cout << "current task = " << this->_currentTask << std::endl;
+
+    if (!this->_currentTask)
+        this->_currentTask = new Ng::Task;
+
+    this->_currentTask->name(this->_ui->newTask->text());
+    this->_lists["today"].append(this->_currentTask);
+
+    QString value = this->_currentTask->name();
+    QListWidgetItem* item = new QListWidgetItem;
+
+    if (this->_currentTask->time())
+        value += this->_currentTask->time()->toString();
+
+    if (this->_currentTask->date())
+        value += this->_currentTask->date()->toString();
+
+    item->setText(value);
+    item->setCheckState(Qt::Unchecked);
+    this->_ui->tasksContainer->addItem(item);
+
     this->_ui->newTask->clear();
-
-    this->_lists.front().print();
+    this->_currentTask = nullptr;
 }
 
-void MainWindow::on_taskDate_clicked() {
-   setLayoutVisible(this->_ui->calendarForm, true);
-   this->_ui->calendar->showToday();
+// private methods
+void MainWindow::initListsContainer() {
+    this->_ui->listsContainer->setAlignment(Qt::AlignCenter | Qt::AlignTop);
+    this->_ui->listsContainer->setGeometry(QRect(0, 100, 100, 800));
+
+    for (const auto& list : this->_lists.keys()) {
+        QPushButton* button = new QPushButton(this);
+
+        button->setText(list);
+        button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        button->setMinimumHeight(50);
+        this->_ui->listsContainer->addWidget(button);
+    }
 }
 
-void MainWindow::on_calendar_selectionChanged() {
-    QDate date = this->_ui->calendar->selectedDate();
+void MainWindow::initTasksContainer() {
+    for (const auto& task : this->_lists["today"]) {
+        QListWidgetItem* item = new QListWidgetItem;
 
-    std::cout << date.day() << " " << date.month() << " " << date.year() << std::endl;
-}
-
-void MainWindow::on_pushButton_clicked() {
-    setLayoutVisible(this->_ui->calendarForm, false);
+        item->setText(task->name());
+        item->setCheckState(Qt::Unchecked);
+        this->_ui->tasksContainer->addItem(item);
+    }
 }

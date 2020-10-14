@@ -1,8 +1,12 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QLayoutItem>
+#include <QMap>
+#include <QVector>
 
-#include "List.h"
+#include "Task.h"
+#include "CalendarForm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,17 +20,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_newTask_editingFinished();
-
-    void on_taskDate_clicked();
-
-    void on_calendar_selectionChanged();
-
-    void on_pushButton_clicked();
+    void on_dateButton_clicked();
+    void on_newTask_returnPressed();
 
 private:
     // fields
     Ui::MainWindow* _ui;
-    QVector<ng::List> _lists;
+    CalendarForm* _calendarForm;
+    Ng::Task* _currentTask;
+    QMap<QString, QVector<Ng::Task*>> _lists;
 
+    // private methods
+    void initListsContainer();
+    void initTasksContainer();
 };

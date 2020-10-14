@@ -5,21 +5,10 @@
 #include <ctime>
 #include <cmath>
 
-namespace ng {
-
-    class random {
-    public:
-        // static methods
-        template <typename T>
-        static T irand(const T& left, const T& right);
-
-        template <typename T>
-        static T frand(const T& left, const T& right, const int& fpart = 1);
-
-    }; // class random
+namespace Ng::Random {
 
     template <typename T>
-    T random::irand(const T& left, const T& right) {
+    T Irand(const T& left, const T& right) {
         static std::random_device rd;
         static std::seed_seq seq{rd(), static_cast<unsigned>(time(nullptr))};
         static std::mt19937 mt(seq);
@@ -29,7 +18,7 @@ namespace ng {
     }
 
     template <typename T>
-    T random::frand(const T& left, const T& right, const int& fpart) {
+    T Frand(const T& left, const T& right, const int& fpart) {
         static std::random_device rd;
         static std::seed_seq seq{rd(), static_cast<unsigned>(time(nullptr))};
         static std::mt19937 mt(seq);
