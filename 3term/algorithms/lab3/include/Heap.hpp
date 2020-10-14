@@ -5,7 +5,7 @@
 
 namespace Ng {
 
-    template <typename T, std::size_t c = 2, typename C = std::greater<T>>
+    template <typename T, std::size_t ch = 2, typename C = std::greater<T>>
     class Heap {
     public:
         // constructor / destructor
@@ -18,6 +18,7 @@ namespace Ng {
         // public methods
         void Push(const T& value);
         void Increase(std::size_t index, const T& value);
+        void Decrease(std::size_t index, const T& value);
         T PopPeak();
 
         // operators
@@ -66,6 +67,15 @@ namespace Ng {
 
         this->data[index] += value;
         C()(value, 0) ? this->Up(index) : this->Down(index);
+    }
+
+    template <typename T, std::size_t ch, typename C>
+    void Heap<T, ch, C>::Decrease(std::size_t index, const T& value) {
+        if (this->data.empty() || index > this->data.size() - 1)
+            throw std::out_of_range("Heap: index out of range");
+
+        this->data[index] -= value;
+        C()(0, value) ? this->Up(index) : this->Down(index);
     }
 
     template <typename T, std::size_t ch, typename C>
