@@ -14,6 +14,7 @@ namespace Ng {
 
         // accessors
         [[nodiscard]] const T& Peak() const;
+        [[nodiscard]] size_t Size() const;
 
         // public methods
         void Push(const T& value);
@@ -52,6 +53,9 @@ namespace Ng {
 
         return this->data.front();
     }
+
+    template <typename T, std::size_t ch, typename C>
+    std::size_t Heap<T, ch, C>::Size() const { return this->data.size(); }
 
     // public methods
     template <typename T, std::size_t ch, typename C>
@@ -128,16 +132,16 @@ namespace Ng {
     template <typename T, std::size_t ch, typename C>
     void Heap<T, ch, C>::Down(std::size_t index) {
         while (this->Child(index, 0) < this->data.size()) {
-            int max_child = this->Child(index, 0);
+            std::size_t peak_child = this->Child(index, 0);
 
             for (int i = 1; i < this->children; ++i)
                 if (this->Child(index, i) < this->data.size() &&
-                    C()(this->data[this->Child(index, i)], this->data[max_child]))
-                    max_child = this->Child(index, i);
+                    C()(this->data[this->Child(index, i)], this->data[peak_child]))
+                    peak_child = this->Child(index, i);
 
-            if (C()(this->data[max_child], this->data[index])) {
-                std::swap(this->data[index], this->data[max_child]);
-                index = max_child;
+            if (C()(this->data[peak_child], this->data[index])) {
+                std::swap(this->data[index], this->data[peak_child]);
+                index = peak_child;
             } else {
                 return;
             }
