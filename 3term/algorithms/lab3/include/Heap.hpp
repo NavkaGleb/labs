@@ -14,9 +14,15 @@ namespace Ng {
 
         // accessors
         [[nodiscard]] const T& Peak() const;
-        [[nodiscard]] size_t Size() const;
+        [[nodiscard]] bool Empty() const;
+        [[nodiscard]] std::size_t Size() const;
+        [[nodiscard]] std::size_t Children() const;
+
+        // modifiers
+        void Children(std::size_t _children);
 
         // public methods
+        void Clear();
         void Push(const T& value);
         void Increase(std::size_t index, const T& value);
         void Decrease(std::size_t index, const T& value);
@@ -55,9 +61,26 @@ namespace Ng {
     }
 
     template <typename T, std::size_t ch, typename C>
+    bool Heap<T, ch, C>::Empty() const { return this->data.empty(); }
+
+
+    template <typename T, std::size_t ch, typename C>
     std::size_t Heap<T, ch, C>::Size() const { return this->data.size(); }
 
+    template <typename T, std::size_t ch, typename C>
+    std::size_t Heap<T, ch, C>::Children() const { return this->children; }
+
+    // modifiers
+    template <typename T, std::size_t ch, typename C>
+    void Heap<T, ch, C>::Children(std::size_t _children) { this->children = _children; }
+
     // public methods
+    template <typename T, std::size_t ch, typename C>
+    void Heap<T, ch, C>::Clear() {
+        this->data.clear();
+        this->data.shrink_to_fit();
+    }
+
     template <typename T, std::size_t ch, typename C>
     void Heap<T, ch, C>::Push(const T& value) {
         this->data.emplace_back(value);

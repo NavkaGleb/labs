@@ -24,5 +24,10 @@ int main() {
     heap.Decrease(2, 10);
     std::cout << heap << std::endl;
 
+    std::cout << "Pop Peaks" << std::endl;
+    while (!heap.Empty())
+        std::cout << heap.PopPeak() << " ";
+    std::cout << std::endl;
+
     return 0;
 }
