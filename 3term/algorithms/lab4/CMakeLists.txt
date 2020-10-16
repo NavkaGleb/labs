@@ -9,12 +9,14 @@ include_directories(
 
 # header files
 set(HEADER_FILES
-
+    include/Lab4/Solution.hpp
+    include/Lab4/Random.hpp
 )
 
 # source files
 set(SOURCE_FILES
     src/main.cpp
+    src/Solution.cpp
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
