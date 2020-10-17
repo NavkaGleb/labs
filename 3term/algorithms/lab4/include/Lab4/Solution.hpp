@@ -22,6 +22,9 @@ namespace Ng {
             bool operator>(const Pair& other) const;
         };
 
+        // accessors
+        const std::vector<Pair>& Data() const;
+
         // modifiers
         void Data(const std::vector<Pair>& _data);
 

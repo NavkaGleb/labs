@@ -17,12 +17,15 @@ namespace Ng {
 
     /* --------------- class Solution --------------- */
 
+    // accessors
+    const std::vector<Ng::Solution::Pair>& Solution::Data() const { return this->data; }
+
     // modifiers
     void Solution::Data(const std::vector<Pair>& _data) { this->data = _data; }
 
     // public methods
     void Solution::Rand(std::size_t count) {
-        this->Clear()m
+        this->Clear();
         this->data.resize(count);
 
         for (std::size_t i = 0; i < count; ++i)
