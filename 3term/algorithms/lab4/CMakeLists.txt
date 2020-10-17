@@ -11,14 +11,13 @@ include_directories(
 set(HEADER_FILES
     include/Lab4/Solution.hpp
     include/Lab4/Random.hpp
-        include/Lab4/ConsoleColor.hpp
+    include/Lab4/ConsoleColor.hpp
 )
 
 # source files
 set(SOURCE_FILES
     src/main.cpp
-    src/Solution.cpp
-        src/ConsoleColor.cpp
+    src/ConsoleColor.cpp
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})

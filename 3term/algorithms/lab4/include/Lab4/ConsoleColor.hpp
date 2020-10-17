@@ -4,47 +4,52 @@
 
 namespace Ng::Console {
 
-    class ForeGround {
+    class Color {
     public:
         // enums
-        enum class Color { Default = 39, Black = 30, Red, Green, Yellow, Blue, Magenta, Cyan, White };
-        enum class Style { Default = 0, Bold = 1 };
+        enum class ForeGround { Default = 39, Black = 30, Red, Green, Yellow, Blue, Magenta, Cyan, White };
+        enum class BackGround { Default = 49, Black = 40, Red, Green, Yellow, Blue, Magenta, Cyan, White };
+        enum class Style { Default = 0, Bold = 1, Italic = 3, UnderLine = 4 };
 
-        // static member data
-        static const ForeGround Black;
-        static const ForeGround Red;
-        static const ForeGround Green;
-        static const ForeGround Yellow;
-        static const ForeGround Blue;
-        static const ForeGround Magenta;
-        static const ForeGround Cyan;
-        static const ForeGround White;
-        static const ForeGround Default;
-
-        static const ForeGround BoldBlack;
-        static const ForeGround BoldRed;
-        static const ForeGround BoldGreen;
-        static const ForeGround BoldYellow;
-        static const ForeGround BoldBlue;
-        static const ForeGround BoldMagenta;
-        static const ForeGround BoldCyan;
-        static const ForeGround BoldWhite;
-        static const ForeGround BoldDefault;
+        // static methods
+        static Color Reset();
+        static Color Default();
+        static Color Black();
+        static Color Red();
+        static Color Green();
+        static Color Yellow();
+        static Color Blue();
+        static Color Magenta();
+        static Color Cyan();
+        static Color White();
 
         // constructor
-        ForeGround() : color(Color::Default), style(Style::Default) {}
-        explicit ForeGround(const Color& _color, const Style& _style = Style::Default)
-            : color(_color), style(_style) {}
-        ForeGround(const ForeGround& other) : color(other.color), style(other.style) { *this = other; }
+        Color() : foreground(ForeGround::Default), background(BackGround::Default), style(Style::Default) {}
+        explicit Color(const ForeGround& _foreground, const BackGround& _background = BackGround::Default,
+                       const Style& _style = Style::Default)
+                            : foreground(_foreground), background(_background), style(_style) {}
+        Color(const ForeGround& _foreground, const Style& _style)
+            : foreground(_foreground), background(BackGround::Default), style(_style) {}
+
+        // accessors
+        [[nodiscard]] const ForeGround& F() const;
+        [[nodiscard]] const BackGround& B() const;
+        [[nodiscard]] const Style& S() const;
+
+        // modifiers
+        void F(const ForeGround& _foreground);
+        void B(const BackGround& _background);
+        void S(const Style& _style);
 
         // operators
-        ForeGround& operator=(const ForeGround& other);
-        ForeGround& operator=(ForeGround&& other) noexcept;
-        friend std::ostream& operator<<(std::ostream& stream, const ForeGround& fore_ground);
+        Color& operator=(const Color& other);
+        Color& operator=(Color&& other) noexcept;
+        friend std::ostream& operator<<(std::ostream& stream, const Color& color);
 
     private:
         // member data
-        Color color;
+        ForeGround foreground;
+        BackGround background;
         Style style;
     };
 
