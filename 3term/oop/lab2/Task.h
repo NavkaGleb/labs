@@ -10,7 +10,7 @@ namespace Ng {
     class Task {
     public:
         // enums
-        enum class Priority { None = 0, Low = 1, Middle, High };
+        enum class Priority { None = 0, Low = 1, Medium, High };
 
         // constructor / destructor
         Task();

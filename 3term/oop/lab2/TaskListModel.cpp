@@ -39,6 +39,21 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const {
         case Qt::CheckStateRole:
             if (column == 0)
                 return task->done() ? Qt::Checked : Qt::Unchecked;
+        case Qt::ForegroundRole:
+            if (column == 0) {
+                switch (task->priority()) {
+                    case Ng::Task::Priority::None: break;
+                    case Ng::Task::Priority::Low: return QColor(43, 136, 242);
+                    case Ng::Task::Priority::Medium: return QColor(255, 166, 30);
+                    case Ng::Task::Priority::High: return QColor(255, 77, 77);
+                }
+            }
+        case Qt::FontRole:
+            if (column == 0) {
+                QFont font;
+                font.setBold(true);
+                return font;
+            }
         default:
             return {};
     }
@@ -47,18 +62,12 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const {
 }
 
 Qt::ItemFlags TaskListModel::flags(const QModelIndex& index) const {
-//    if (index.column() == 0)
-//        return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-
-
-    return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }
 
 Ng::Task* TaskListModel::getItem(const QModelIndex& index) const {
     if (!index.isValid())
         return nullptr;
-
-    std::cout << "ROW = " << index.row() << std::endl;
 
     return this->_tasks[index.row()];
 }
@@ -112,3 +121,7 @@ void TaskListModel::sort() {
 }
 
 void TaskListModel::update() { emit dataChanged(index(0, 0), index(this->_tasks.count(), 2)); }
+
+void TaskListModel::clear() {
+    this->_tasks.clear();
+}

@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QModelIndex>
+#include <QTreeWidget>
 #include <iostream>
 
 // constructor / destructor
@@ -14,8 +16,8 @@ MainWindow::MainWindow(QWidget* parent)
     this->_calendarForm = new CalendarForm(this);
     this->_calendarForm->setModal(true);
 
-    this->_lists["today"];
-    this->_lists["tomorrow"];
+    this->_lists["personal"];
+    this->_lists["work"];
 
     this->_taskListModel = new TaskListModel(this);
     this->_taskListDelegate = new TaskListDelegate(this);
@@ -61,7 +63,7 @@ void MainWindow::on_newTask_returnPressed() {
         this->_currentTask = new Ng::Task;
 
     this->_currentTask->setName(this->_ui->newTask->text());
-    this->_lists["today"].append(this->_currentTask);
+    this->_lists[this->_currentList].append(this->_currentTask);
 
     this->addTask(this->_currentTask);
     this->clear();
@@ -81,6 +83,7 @@ void MainWindow::on_tasksContainer_clicked(const QModelIndex& index) {
     if (this->_currentTask->date())
         this->_ui->taskDate->setDate(*this->_currentTask->date());
 
+    this->_ui->taskPriority->setCurrentIndex(static_cast<int>(this->_currentTask->priority()));
     this->_ui->taskName->setText(this->_currentTask->name());
     this->_ui->taskDescription->setText(this->_currentTask->description());
 }
@@ -103,6 +106,12 @@ void MainWindow::on_taskDate_editingFinished() {
     this->_taskListModel->update();
 }
 
+void MainWindow::on_taskPriority_activated(int index) {
+    this->_ui->taskPriority->clearFocus();
+    this->_currentTask->setPriority(static_cast<Ng::Task::Priority>(index));
+    this->_taskListModel->update();
+}
+
 void MainWindow::on_taskDescription_textChanged() {
     this->_currentTask->setDescription(this->_ui->taskDescription->toPlainText());
 }
@@ -112,18 +121,22 @@ void MainWindow::on_newTask_textChanged(const QString& /* arg */){
         this->_currentTask = nullptr;
 }
 
+void MainWindow::on_listsContainer_itemClicked(QTreeWidgetItem* item, int /* column */) {
+    this->_currentList = item->data(0, Qt::DisplayRole).toString();
+    this->updateTasks();
+}
+
 // private methods
 void MainWindow::initListsContainer() {
-    this->_ui->listsContainer->setAlignment(Qt::AlignCenter | Qt::AlignTop);
+    for (int i = 0; i < this->_lists.keys().count(); ++i) {
+        auto* item = new QTreeWidgetItem(this->_ui->listsContainer);
 
-    for (const auto& list : this->_lists.keys()) {
-        QPushButton* button = new QPushButton(this);
-
-        button->setText(list);
-        button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        button->setMinimumHeight(50);
-        this->_ui->listsContainer->addWidget(button);
+        item->setText(0, this->_lists.keys()[i]);
+        this->_ui->listsContainer->addTopLevelItem(item);
     }
+
+    this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0), 0, QItemSelectionModel::Select);
+    this->_currentList = "personal";
 }
 
 void MainWindow::initTasksContainer() {    
@@ -131,12 +144,12 @@ void MainWindow::initTasksContainer() {
     this->_ui->tasksContainer->verticalHeader()->setVisible(false);
     this->_ui->tasksContainer->horizontalHeader()->setVisible(false);
     this->_ui->tasksContainer->setItemDelegate(this->_taskListDelegate);
-//    this->_ui->tasksContainer->setColumnWidth(0, this->width() * 0.75);
-//    this->_ui->tasksContainer->horizontalHeader()->setStretchLastSection(true);
     this->_ui->tasksContainer->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->_ui->tasksContainer->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->_ui->tasksContainer->setEditTriggers(QAbstractItemView::AnyKeyPressed | QAbstractItemView::DoubleClicked);
     this->_ui->tasksContainer->setSortingEnabled(true);
+    this->_ui->tasksContainer->setFocusPolicy(Qt::NoFocus);
+    setStyleSheet("QTableView::item:selected {background: rgba(0, 0, 0, 1%);}");
 
     for (const auto& task : this->_lists["today"])
         this->addTask(task);
@@ -155,6 +168,7 @@ void MainWindow::clear() {
 void MainWindow::taskFormSetEnabled(bool enabled) {
     this->_ui->taskTime->setEnabled(enabled);
     this->_ui->taskDate->setEnabled(enabled);
+    this->_ui->taskPriority->setEnabled(enabled);
     this->_ui->taskName->setEnabled(enabled);
     this->_ui->taskDescription->setEnabled(enabled);
 }
@@ -163,5 +177,12 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
     this->_ui->tasksContainer->setColumnWidth(0, this->width() * 0.75);
     this->_ui->tasksContainer->horizontalHeader()->setStretchLastSection(true);
     QMainWindow::resizeEvent(event);
-    std::cout << "fuck this shit" << std::endl;
+}
+
+void MainWindow::updateTasks() {
+    this->_taskListModel->clear();
+    this->_taskListModel->update();
+
+    for (auto& task : this->_lists[this->_currentList])
+        this->_taskListModel->setItem(task);
 }

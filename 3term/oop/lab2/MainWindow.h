@@ -4,6 +4,8 @@
 #include <QLayoutItem>
 #include <QMap>
 #include <QVector>
+#include <QStandardItemModel>
+#include <QTreeWidget>
 
 #include "Task.h"
 #include "CalendarForm.h"
@@ -28,9 +30,11 @@ private slots:
     void on_tasksContainer_clicked(const QModelIndex& index);
     void on_taskTime_editingFinished();
     void on_taskDate_editingFinished();
+    void on_taskPriority_activated(int index);
     void on_taskName_returnPressed();
     void on_taskDescription_textChanged();
     void on_newTask_textChanged(const QString& arg);
+    void on_listsContainer_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
     // fields
@@ -40,6 +44,7 @@ private:
     QMap<QString, QVector<Ng::Task*>> _lists;
     TaskListModel* _taskListModel;
     TaskListDelegate* _taskListDelegate;
+    QString _currentList;
 
     // private methods
     void initListsContainer();
@@ -47,6 +52,7 @@ private:
     void addTask(Ng::Task* task);
     void clear();
     void taskFormSetEnabled(bool enabled);
+    void updateTasks();
 
     void resizeEvent(QResizeEvent* event);
 };
