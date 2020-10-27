@@ -18,7 +18,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     CalendarForm.cpp \
     Task.cpp \
-    TaskLine.cpp \
+    TaskListDelegate.cpp \
+    TaskListModel.cpp \
+    TaskWidgetItem.cpp \
     main.cpp \
     MainWindow.cpp
 
@@ -26,7 +28,9 @@ HEADERS += \
     CalendarForm.h \
     MainWindow.h \
     Task.h \
-    TaskLine.h
+    TaskListDelegate.h \
+    TaskListModel.h \
+    TaskWidgetItem.h
 
 FORMS += \
     CalendarForm.ui \

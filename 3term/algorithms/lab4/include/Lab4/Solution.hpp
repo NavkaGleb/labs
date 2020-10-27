@@ -44,7 +44,7 @@ namespace Ng {
         friend std::ostream& operator<<(std::ostream&, const Solution<T_>& solution);
 
     private:
-        // fields
+        // member data
         std::vector<Pair> data;
 
         // private methods
