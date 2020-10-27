@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QStandardItemModel>
 #include <QTreeWidget>
+#include <QHash>
 
 #include "Task.h"
 #include "CalendarForm.h"
@@ -34,19 +35,23 @@ private slots:
     void on_taskName_returnPressed();
     void on_taskDescription_textChanged();
     void on_newTask_textChanged(const QString& arg);
-    void on_listsContainer_itemClicked(QTreeWidgetItem *item, int column);
-
+    void on_listsContainer_itemClicked(QTreeWidgetItem* item, int column);
     void on_addList_clicked();
+    void on_listsContainer_itemChanged(QTreeWidgetItem* item, int column);
+
+    void on_listsContainer_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     // fields
     Ui::MainWindow* _ui;
     CalendarForm* _calendarForm;
     Ng::Task* _currentTask;
-    QMap<QString, QVector<Ng::Task*>> _lists;
+    QHash<QString, int> _lists;
+    QMap<int, QVector<Ng::Task*>> _tasks;
     TaskListModel* _taskListModel;
     TaskListDelegate* _taskListDelegate;
     QString _currentList;
+    int _index;
 
     // private methods
     void initListsContainer();

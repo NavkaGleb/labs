@@ -10,14 +10,14 @@
 
 // constructor / destructor
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task) {
+    : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task), _index(-1) {
     this->_ui->setupUi(this);
     this->setWindowTitle("to do list");
     this->_calendarForm = new CalendarForm(this);
     this->_calendarForm->setModal(true);
 
-    this->_lists["personal"];
-    this->_lists["work"];
+//    this->_lists["personal"] = 0;
+//    this->_lists["work"] = 1;
 
     this->_taskListModel = new TaskListModel(this);
     this->_taskListDelegate = new TaskListDelegate(this);
@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow() {
     delete this->_ui;
 
-    for (auto& [listName, tasks] : this->_lists.toStdMap())
+    for (auto& [listName, tasks] : this->_tasks.toStdMap())
         for (auto& task : tasks)
             delete task;
 }
@@ -63,7 +63,7 @@ void MainWindow::on_newTask_returnPressed() {
         this->_currentTask = new Ng::Task;
 
     this->_currentTask->setName(this->_ui->newTask->text());
-    this->_lists[this->_currentList].append(this->_currentTask);
+    this->_tasks[this->_lists[this->_currentList]].append(this->_currentTask);
 
     this->addTask(this->_currentTask);
     this->clear();
@@ -127,22 +127,48 @@ void MainWindow::on_listsContainer_itemClicked(QTreeWidgetItem* item, int /* col
 }
 
 void MainWindow::on_addList_clicked() {
-    this->_ui->listsContainer->editItem(this->_ui->listsContainer->topLevelItem(0), 0);
+    auto* item = new QTreeWidgetItem;
+
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    this->_ui->listsContainer->addTopLevelItem(item);
+    this->_ui->listsContainer->setCurrentItem(item);
+    this->_ui->listsContainer->editItem(item, 0);
+}
+
+void MainWindow::on_listsContainer_itemChanged(QTreeWidgetItem* item, int column) {
+    if (this->_index == -1) {
+        this->_lists[item->text(column)] = this->_lists.count();
+    } else {
+        this->_lists[item->text(column)] = this->_index;
+        this->_index = -1;
+    }
+
+    this->_currentList = item->text(column);
+    this->updateTasks();
+}
+
+void MainWindow::on_listsContainer_itemDoubleClicked(QTreeWidgetItem *item, int column) {
+    std::cout << "double click" << std::endl;
+    QString list = item->text(column);
+    this->_index = this->_lists[list];
+
+    this->_lists.remove(list);
 }
 
 // private methods
 void MainWindow::initListsContainer() {
     this->_ui->listsContainer->setHeaderHidden(true);
 
-    for (int i = 0; i < this->_lists.keys().count(); ++i) {
+    for (int i = 0; i < this->_lists.count(); ++i) {
         auto* item = new QTreeWidgetItem(this->_ui->listsContainer);
 
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
         item->setText(0, this->_lists.keys()[i]);
         this->_ui->listsContainer->addTopLevelItem(item);
     }
 
-    this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0), 0, QItemSelectionModel::Select);
-    this->_currentList = "personal";
+//    this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0), 0, QItemSelectionModel::Select);
+//    this->_currentList = "personal";
 }
 
 void MainWindow::initTasksContainer() {    
@@ -156,9 +182,6 @@ void MainWindow::initTasksContainer() {
     this->_ui->tasksContainer->setSortingEnabled(true);
     this->_ui->tasksContainer->setFocusPolicy(Qt::NoFocus);
     setStyleSheet("QTableView::item:selected {background: rgba(0, 0, 0, 1%);}");
-
-    for (const auto& task : this->_lists["today"])
-        this->addTask(task);
 }
 
 void MainWindow::addTask(Ng::Task* task) { this->_taskListModel->setItem(task); }
@@ -189,6 +212,6 @@ void MainWindow::updateTasks() {
     this->_taskListModel->clear();
     this->_taskListModel->update();
 
-    for (auto& task : this->_lists[this->_currentList])
+    for (auto& task : this->_tasks[this->_lists[this->_currentList]])
         this->_taskListModel->setItem(task);
 }
