@@ -20,7 +20,6 @@ SOURCES += \
     Task.cpp \
     TaskListDelegate.cpp \
     TaskListModel.cpp \
-    TaskWidgetItem.cpp \
     main.cpp \
     MainWindow.cpp
 
@@ -30,7 +29,6 @@ HEADERS += \
     Task.h \
     TaskListDelegate.h \
     TaskListModel.h \
-    TaskWidgetItem.h
 
 FORMS += \
     CalendarForm.ui \

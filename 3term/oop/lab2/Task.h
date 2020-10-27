@@ -20,17 +20,19 @@ namespace Ng {
 
         // accessors
         const QString& name() const;
+        const Priority& priority() const;
         QTime* time() const;
         QDate* date() const;
-        const Priority& priority() const;
+        const QString& description() const;
         const QDateTime& creationDateTime() const;
         bool done() const;
 
         // modifiers
         void setName(const QString& name);
+        void setPriority(const Priority& priority);
         void setTime(const QTime& time);
         void setDate(const QDate& date);
-        void setPriority(const Priority& priority);
+        void setDescription(const QString& description);
         void setDone(bool done);
 
         // operators
@@ -42,6 +44,7 @@ namespace Ng {
         Priority _priority;
         QTime* _time;
         QDate* _date;
+        QString _description;
         QDateTime _creationDateTime;
         QSet<QString> _tags;
         bool _done;

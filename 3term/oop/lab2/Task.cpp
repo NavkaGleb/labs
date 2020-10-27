@@ -27,11 +27,13 @@ namespace Ng {
     // accessors
     const QString& Task::name() const { return this->_name; }
 
+    const Task::Priority& Task::priority() const { return this->_priority; }
+
     QTime* Task::time() const { return this->_time; }
 
     QDate* Task::date() const { return this->_date; }
 
-    const Task::Priority& Task::priority() const { return this->_priority; }
+    const QString& Task::description() const { return this->_description; }
 
     const QDateTime& Task::creationDateTime() const { return this->_creationDateTime; }
 
@@ -40,11 +42,13 @@ namespace Ng {
     // modifiers
     void Task::setName(const QString& name) { this->_name = name; }
 
+    void Task::setPriority(const Priority& priority) { this->_priority = priority; }
+
     void Task::setTime(const QTime& time) { this->_time = new QTime(time); }
 
     void Task::setDate(const QDate& date) { this->_date = new QDate(date); }
 
-    void Task::setPriority(const Priority& priority) { this->_priority = priority; }
+    void Task::setDescription(const QString& description) { this->_description = description; }
 
     void Task::setDone(bool done) { this->_done = done; }
 

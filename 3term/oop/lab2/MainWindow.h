@@ -6,7 +6,6 @@
 #include <QVector>
 
 #include "Task.h"
-#include "TaskWidgetItem.h"
 #include "CalendarForm.h"
 #include "TaskListModel.h"
 #include "TaskListDelegate.h"
@@ -26,6 +25,7 @@ private slots:
     void on_dateButton_clicked();
     void on_priority_activated(int index);
     void on_newTask_returnPressed();
+    void on_tasksContainer_clicked(const QModelIndex& index);
 
 private:
     // fields

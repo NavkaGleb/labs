@@ -54,6 +54,15 @@ Qt::ItemFlags TaskListModel::flags(const QModelIndex& index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }
 
+Ng::Task* TaskListModel::getItem(const QModelIndex& index) const {
+    if (!index.isValid())
+        return nullptr;
+
+    std::cout << "ROW = " << index.row() << std::endl;
+
+    return this->_tasks[index.row()];
+}
+
 // modifiers
 bool TaskListModel::insertRows(int row, int count, const QModelIndex& parent) {
     for (int i = 0; i < count; ++i)
@@ -66,25 +75,15 @@ bool TaskListModel::setData(const QModelIndex& index, const QVariant& value, int
 //    if (role != Qt::EditRole)
 //        return false;
 
+    this->beginResetModel();
     auto*& task = this->_tasks[index.row()];
 
-    this->beginResetModel();
-
-    std::cout << value.toBool() << std::endl;
-    std::cout << value.toString().toStdString() << std::endl;
-
     if (role == Qt::EditRole) {
-        if (index.column() == 0) {
+        if (index.column() == 0)
             task->setName(value.toString());
-            return true;
-        }
     } else if (role == Qt::CheckStateRole) {
-        bool done = value.toBool();
-        std::cout << "bool value = " << done << std::endl;
-        task->setDone(done);
-        QModelIndex topLeft = index;
-        QModelIndex bottomRight = index;
-        emit dataChanged(topLeft, bottomRight);
+        task->setDone(value.toBool());
+        emit dataChanged(index, index);
     }
 
     this->endResetModel();

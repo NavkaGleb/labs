@@ -17,9 +17,6 @@ MainWindow::MainWindow(QWidget* parent)
     this->_lists["today"];
     this->_lists["tomorrow"];
 
-    this->_lists["today"].append(new Ng::Task("first"));
-    this->_lists["today"].append(new Ng::Task("second"));
-
     this->_taskListModel = new TaskListModel(this);
     this->_taskListDelegate = new TaskListDelegate(this);
 
@@ -69,6 +66,22 @@ void MainWindow::on_newTask_returnPressed() {
     this->clear();
 }
 
+void MainWindow::on_tasksContainer_clicked(const QModelIndex& index) {
+    Ng::Task* task = this->_taskListModel->getItem(index);
+
+    if (!task)
+        return;
+
+    if (task->time())
+        this->_ui->taskTime->setTime(*task->time());
+
+    if (task->date())
+        this->_ui->taskDate->setDate(*task->date());
+
+    this->_ui->taskName->setText(task->name());
+    this->_ui->taskDescription->setText(task->description());
+}
+
 // private methods
 void MainWindow::initListsContainer() {
     this->_ui->listsContainer->setAlignment(Qt::AlignCenter | Qt::AlignTop);
@@ -88,8 +101,9 @@ void MainWindow::initTasksContainer() {
     this->_ui->tasksContainer->verticalHeader()->setVisible(false);
     this->_ui->tasksContainer->horizontalHeader()->setVisible(false);
     this->_ui->tasksContainer->setItemDelegate(this->_taskListDelegate);
-    this->_ui->tasksContainer->setColumnWidth(0, this->width() * 0.75);
-    this->_ui->tasksContainer->horizontalHeader()->setStretchLastSection(true);
+//    this->_ui->tasksContainer->setColumnWidth(0, this->width() * 0.75);
+//    this->_ui->tasksContainer->horizontalHeader()->setStretchLastSection(true);
+    this->_ui->tasksContainer->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->_ui->tasksContainer->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->_ui->tasksContainer->setEditTriggers(QAbstractItemView::AnyKeyPressed | QAbstractItemView::DoubleClicked);
     this->_ui->tasksContainer->setSortingEnabled(true);
