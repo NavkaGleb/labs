@@ -26,6 +26,11 @@ private slots:
     void on_priority_activated(int index);
     void on_newTask_returnPressed();
     void on_tasksContainer_clicked(const QModelIndex& index);
+    void on_taskTime_editingFinished();
+    void on_taskDate_editingFinished();
+    void on_taskName_returnPressed();
+    void on_taskDescription_textChanged();
+    void on_newTask_textChanged(const QString& arg);
 
 private:
     // fields
@@ -41,6 +46,7 @@ private:
     void initTasksContainer();
     void addTask(Ng::Task* task);
     void clear();
+    void taskFormSetEnabled(bool enabled);
 
     void resizeEvent(QResizeEvent* event);
 };

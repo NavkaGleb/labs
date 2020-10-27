@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     this->initListsContainer();
     this->initTasksContainer();
+    this->taskFormSetEnabled(false);
 }
 
 MainWindow::~MainWindow() {
@@ -67,19 +68,48 @@ void MainWindow::on_newTask_returnPressed() {
 }
 
 void MainWindow::on_tasksContainer_clicked(const QModelIndex& index) {
-    Ng::Task* task = this->_taskListModel->getItem(index);
+    this->_currentTask = this->_taskListModel->getItem(index);
 
-    if (!task)
+    if (!this->_currentTask)
         return;
 
-    if (task->time())
-        this->_ui->taskTime->setTime(*task->time());
+    this->taskFormSetEnabled(true);
 
-    if (task->date())
-        this->_ui->taskDate->setDate(*task->date());
+    if (this->_currentTask->time())
+        this->_ui->taskTime->setTime(*this->_currentTask->time());
 
-    this->_ui->taskName->setText(task->name());
-    this->_ui->taskDescription->setText(task->description());
+    if (this->_currentTask->date())
+        this->_ui->taskDate->setDate(*this->_currentTask->date());
+
+    this->_ui->taskName->setText(this->_currentTask->name());
+    this->_ui->taskDescription->setText(this->_currentTask->description());
+}
+
+void MainWindow::on_taskTime_editingFinished() {
+    this->_ui->taskTime->clearFocus();
+    this->_currentTask->setTime(this->_ui->taskTime->time());
+    this->_taskListModel->update();
+}
+
+void MainWindow::on_taskName_returnPressed() {
+    this->_ui->taskName->clearFocus();
+    this->_currentTask->setName(this->_ui->taskName->text());
+    this->_taskListModel->update();
+}
+
+void MainWindow::on_taskDate_editingFinished() {
+    this->_ui->taskDate->clearFocus();
+    this->_currentTask->setDate(this->_ui->taskDate->date());
+    this->_taskListModel->update();
+}
+
+void MainWindow::on_taskDescription_textChanged() {
+    this->_currentTask->setDescription(this->_ui->taskDescription->toPlainText());
+}
+
+void MainWindow::on_newTask_textChanged(const QString& /* arg */){
+    if (this->_currentTask)
+        this->_currentTask = nullptr;
 }
 
 // private methods
@@ -120,6 +150,13 @@ void MainWindow::clear() {
     this->_ui->priority->setCurrentIndex(0);
     this->_currentTask = nullptr;
     this->_calendarForm->clear();
+}
+
+void MainWindow::taskFormSetEnabled(bool enabled) {
+    this->_ui->taskTime->setEnabled(enabled);
+    this->_ui->taskDate->setEnabled(enabled);
+    this->_ui->taskName->setEnabled(enabled);
+    this->_ui->taskDescription->setEnabled(enabled);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {

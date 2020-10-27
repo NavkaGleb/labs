@@ -15,12 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="listsContainer"/>
-    </item>
     <item row="0" column="1">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0" rowspan="4">
+      <item row="5" column="0" rowspan="4">
        <widget class="QTableView" name="tasksContainer">
         <property name="lineWidth">
          <number>0</number>
@@ -36,13 +33,23 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="5" column="1">
        <widget class="QTimeEdit" name="taskTime"/>
       </item>
-      <item row="1" column="2">
+      <item row="5" column="2">
        <widget class="QDateEdit" name="taskDate"/>
       </item>
-      <item row="4" column="1" colspan="2">
+      <item row="7" column="1" colspan="2">
+       <widget class="QLineEdit" name="taskName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" colspan="2">
        <widget class="QTextEdit" name="taskDescription">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -55,83 +62,88 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="2">
-       <widget class="QLineEdit" name="taskName">
+      <item row="2" column="0">
+       <widget class="QLineEdit" name="newTask">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>new task</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="priority">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>low (!)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>medium (!!)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>high (!!!)</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="0" column="0" colspan="3">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLineEdit" name="newTask">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>new task</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="dateButton">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>date</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="priority">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <item>
-           <property name="text">
-            <string>none</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>low (!)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>medium (!!)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>high (!!!)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="dateButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>date</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
+    </item>
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="listsContainer"/>
     </item>
    </layout>
   </widget>

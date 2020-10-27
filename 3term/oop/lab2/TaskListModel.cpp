@@ -107,6 +107,8 @@ void TaskListModel::sort() {
     std::sort(this->_tasks.begin(), this->_tasks.end(), [](const Ng::Task* left, const Ng::Task* right) {
         return *left < *right;
     });
+
     emit dataChanged(index(0, 0), index(this->_tasks.count(), 2));
-    std::cout << "sortring" << std::endl;
 }
+
+void TaskListModel::update() { emit dataChanged(index(0, 0), index(this->_tasks.count(), 2)); }

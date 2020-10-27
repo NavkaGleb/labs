@@ -36,20 +36,3 @@ void TaskListDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, 
 void TaskListDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& /* index */) const {
     editor->setGeometry(option.rect);
 }
-
-//void TaskListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-//    if (index.column() != 0) {
-//        QStyledItemDelegate::paint(painter,option,index);
-//    } else {
-//        bool value = index.model()->data(index,Qt::UserRole).toBool();
-//        std::cout << "--value = " << value << std::endl;
-////        QStyleOptionButton buttonVis;
-//        QCheckBox checkBox;
-////        checkBox.rect = option.rect;
-////        buttonVis.features |= QStyleOptionButton::Flat;
-////        checkBox.setState |= QStyle::State_Enabled;
-//        checkBox.setCheckState(index.data().toInt() == 0 ? Qt::Unchecked : Qt::Checked);
-////        QApplication::style()->drawControl(QStyle::CE_CheckBox, &checkBox,painter);
-//    }
-//}
-

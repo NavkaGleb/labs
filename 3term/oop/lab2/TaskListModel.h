@@ -25,6 +25,8 @@ public:
 
     // public methods
     void sort();
+    void update();
+
 private:
     // fields
     QList<Ng::Task*> _tasks;
