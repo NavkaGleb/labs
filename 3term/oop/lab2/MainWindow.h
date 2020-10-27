@@ -36,6 +36,8 @@ private slots:
     void on_newTask_textChanged(const QString& arg);
     void on_listsContainer_itemClicked(QTreeWidgetItem *item, int column);
 
+    void on_addList_clicked();
+
 private:
     // fields
     Ui::MainWindow* _ui;

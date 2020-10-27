@@ -20,14 +20,14 @@
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="addList">
           <property name="text">
            <string>add</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="removeList">
           <property name="text">
            <string>remove</string>
           </property>

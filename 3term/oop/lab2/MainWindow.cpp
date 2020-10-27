@@ -126,8 +126,14 @@ void MainWindow::on_listsContainer_itemClicked(QTreeWidgetItem* item, int /* col
     this->updateTasks();
 }
 
+void MainWindow::on_addList_clicked() {
+    this->_ui->listsContainer->editItem(this->_ui->listsContainer->topLevelItem(0), 0);
+}
+
 // private methods
 void MainWindow::initListsContainer() {
+    this->_ui->listsContainer->setHeaderHidden(true);
+
     for (int i = 0; i < this->_lists.keys().count(); ++i) {
         auto* item = new QTreeWidgetItem(this->_ui->listsContainer);
 
