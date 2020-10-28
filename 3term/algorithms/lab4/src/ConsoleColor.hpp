@@ -2,6 +2,16 @@
 
 #include <ostream>
 
+#if defined(_WIN32) || defined(_WIN64)
+    #define NG_OS_WINDOWS
+#elif defined(__APPLE__)
+    #define NG_OS_MACOS
+#elif defined(__unix__) || defined(__unix)
+    #define NG_OS_LINUX
+#else
+    #error unsupported platform
+#endif
+
 namespace Ng::Console {
 
     class Color {
@@ -24,12 +34,12 @@ namespace Ng::Console {
         static Color White();
 
         // constructor
-        Color() : foreground(ForeGround::Default), background(BackGround::Default), style(Style::Default) {}
-        explicit Color(const ForeGround& _foreground, const BackGround& _background = BackGround::Default,
-                       const Style& _style = Style::Default)
-                            : foreground(_foreground), background(_background), style(_style) {}
-        Color(const ForeGround& _foreground, const Style& _style)
-            : foreground(_foreground), background(BackGround::Default), style(_style) {}
+        Color() : m_Foreground(ForeGround::Default), m_Background(BackGround::Default), m_Style(Style::Default) {}
+        explicit Color(const ForeGround& foreground, const BackGround& background = BackGround::Default,
+                       const Style& style = Style::Default)
+            : m_Foreground(foreground), m_Background(background), m_Style(style) {}
+        Color(const ForeGround& foreground, const Style& style)
+            : m_Foreground(foreground), m_Background(BackGround::Default), m_Style(style) {}
 
         // accessors
         [[nodiscard]] const ForeGround& F() const;
@@ -48,9 +58,9 @@ namespace Ng::Console {
 
     private:
         // member data
-        ForeGround foreground;
-        BackGround background;
-        Style style;
+        ForeGround m_Foreground;
+        BackGround m_Background;
+        Style m_Style;
     };
 
 } // namespace Ng

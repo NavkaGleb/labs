@@ -1,4 +1,4 @@
-#include "Lab4/ConsoleColor.hpp"
+#include "ConsoleColor.hpp"
 
 #include <utility>
 
@@ -26,25 +26,25 @@ namespace Ng::Console {
     Color Color::White() { return Color(ForeGround::White); }
 
     // accessors
-    const Color::ForeGround& Color::F() const { return this->foreground; }
+    const Color::ForeGround& Color::F() const { return m_Foreground; }
 
-    const Color::BackGround& Color::B() const { return this->background; }
+    const Color::BackGround& Color::B() const { return m_Background; }
 
-    const Color::Style& Color::S() const { return this->style; }
+    const Color::Style& Color::S() const { return m_Style; }
 
     // modifiers
-    void Color::F(const Color::ForeGround& _foreground) { this->foreground = _foreground; }
+    void Color::F(const Color::ForeGround& _foreground) { m_Foreground = _foreground; }
 
-    void Color::B(const BackGround& _background) { this->background = _background; }
+    void Color::B(const BackGround& _background) { m_Background = _background; }
 
-    void Color::S(const Style& _style) { this->style = _style; }
+    void Color::S(const Style& _style) { m_Style = _style; }
 
     // operators
     Color& Color::operator=(const Color& other) {
         if (this != &other) {
-            this->foreground = other.foreground;
-            this->background = other.background;
-            this->style = other.style;
+            m_Foreground = other.m_Foreground;
+            m_Background = other.m_Background;
+            m_Style      = other.m_Style;
         }
 
         return *this;
@@ -52,18 +52,22 @@ namespace Ng::Console {
 
     Color& Color::operator=(Color&& other) noexcept {
         if (this != &other) {
-            this->foreground = std::exchange(other.foreground, ForeGround::Default);
-            this->background = std::exchange(other.background, BackGround::Default);
-            this->style = std::exchange(other.style, Style::Default);
+            m_Foreground = std::exchange(m_Foreground, ForeGround::Default);
+            m_Background = std::exchange(m_Background, BackGround::Default);
+            m_Style = std::exchange(m_Style, Style::Default);
         }
 
         return *this;
     }
 
     std::ostream& operator<<(std::ostream& stream, const Color& color) {
-        return stream << "\033[" << static_cast<int>(color.style) << ";"
-                                 << static_cast<int>(color.foreground) << ";"
-                                 << static_cast<int>(color.background) << "m";
+    #if defined(NG_OS_WINDOWS)
+        system("");
+    #endif
+
+        return stream << "\033[" << static_cast<int>(color.m_Style) << ";"
+                                 << static_cast<int>(color.m_Foreground) << ";"
+                                 << static_cast<int>(color.m_Background) << "m";
     }
 
 } // namespace Ng

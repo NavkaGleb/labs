@@ -12,12 +12,13 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task), _index(-1) {
     this->_ui->setupUi(this);
-    this->setWindowTitle("to do list");
+    this->setWindowTitle("todo list");
     this->_calendarForm = new CalendarForm(this);
     this->_calendarForm->setModal(true);
 
-//    this->_lists["personal"] = 0;
-//    this->_lists["work"] = 1;
+//    this->_lists["archive"] = 0;
+//    this->_tasks[0];
+//    this->_currentList = "archive";
 
     this->_taskListModel = new TaskListModel(this);
     this->_taskListDelegate = new TaskListDelegate(this);
@@ -122,7 +123,7 @@ void MainWindow::on_newTask_textChanged(const QString& /* arg */){
 }
 
 void MainWindow::on_listsContainer_itemClicked(QTreeWidgetItem* item, int /* column */) {
-    this->_currentList = item->data(0, Qt::DisplayRole).toString();
+    this->_currentList = item->text(0);
     this->updateTasks();
 }
 
@@ -136,6 +137,12 @@ void MainWindow::on_addList_clicked() {
 }
 
 void MainWindow::on_listsContainer_itemChanged(QTreeWidgetItem* item, int column) {
+    std::cout << "ITEM = " << item->text(column).toStdString() << std::endl;
+    std::cout << this->_index << std::endl;
+
+//    if (item->text(0).isEmpty())
+//        return;
+
     if (this->_index == -1) {
         this->_lists[item->text(column)] = this->_lists.count();
     } else {
@@ -145,19 +152,54 @@ void MainWindow::on_listsContainer_itemChanged(QTreeWidgetItem* item, int column
 
     this->_currentList = item->text(column);
     this->updateTasks();
+
+    std::cout << "!!!!!!!" << std::endl;
+    for (auto list : this->_lists.keys())
+        std::cout << "list " << list.toStdString() << ", " << this->_lists[list] << std::endl;
+    std::cout << std::endl;
 }
 
 void MainWindow::on_listsContainer_itemDoubleClicked(QTreeWidgetItem *item, int column) {
-    std::cout << "double click" << std::endl;
     QString list = item->text(column);
     this->_index = this->_lists[list];
 
     this->_lists.remove(list);
 }
 
+void MainWindow::on_removeList_clicked() {
+    auto* current = this->_ui->listsContainer->currentItem();
+    int index = this->_lists[current->text(0)];
+
+    this->_lists.remove(current->text(0));
+    this->_tasks.remove(index);
+
+    for (auto& [list, i] : this->_lists.toStdMap())
+        if (i > index)
+            --i;
+
+    for (auto& i : this->_tasks.keys())
+        if (i > index)
+            --i;
+
+    delete current;
+
+    if (this->_ui->listsContainer->topLevelItemCount() == 0) {
+        this->_currentList = "";
+        this->_taskListModel->clear();
+        this->_taskListModel->update();
+    } else {
+        this->_currentList = this->_ui->listsContainer->currentItem()->text(0);
+        this->updateTasks();
+    }
+}
+
 // private methods
 void MainWindow::initListsContainer() {
     this->_ui->listsContainer->setHeaderHidden(true);
+
+    this->_lists["archive"] = 0;
+    this->_tasks[0];
+    this->_currentList = "archive";
 
     for (int i = 0; i < this->_lists.count(); ++i) {
         auto* item = new QTreeWidgetItem(this->_ui->listsContainer);
@@ -165,10 +207,15 @@ void MainWindow::initListsContainer() {
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         item->setText(0, this->_lists.keys()[i]);
         this->_ui->listsContainer->addTopLevelItem(item);
+
+        std::cout << "i = " << i << " ----" << this->_lists.keys()[i].toStdString() << this->_lists[this->_lists.keys()[i]] << std::endl;
     }
 
-//    this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0), 0, QItemSelectionModel::Select);
-//    this->_currentList = "personal";
+    this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0));
+
+    for (auto list : this->_lists.keys())
+        std::cout << list.toStdString() << std::endl;
+
 }
 
 void MainWindow::initTasksContainer() {    

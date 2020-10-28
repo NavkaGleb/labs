@@ -38,15 +38,15 @@ private slots:
     void on_listsContainer_itemClicked(QTreeWidgetItem* item, int column);
     void on_addList_clicked();
     void on_listsContainer_itemChanged(QTreeWidgetItem* item, int column);
-
-    void on_listsContainer_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_listsContainer_itemDoubleClicked(QTreeWidgetItem* item, int column);
+    void on_removeList_clicked();
 
 private:
     // fields
     Ui::MainWindow* _ui;
     CalendarForm* _calendarForm;
     Ng::Task* _currentTask;
-    QHash<QString, int> _lists;
+    QMap<QString, int> _lists;
     QMap<int, QVector<Ng::Task*>> _tasks;
     TaskListModel* _taskListModel;
     TaskListDelegate* _taskListDelegate;

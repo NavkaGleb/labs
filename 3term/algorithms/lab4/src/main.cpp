@@ -1,5 +1,5 @@
-#include "Lab4/Solution.hpp"
-#include "Lab4/ConsoleColor.hpp"
+#include "Solution.hpp"
+#include "ConsoleColor.hpp"
 
 int main() {
     using Color = Ng::Console::Color;

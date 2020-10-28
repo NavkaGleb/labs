@@ -4,7 +4,7 @@
 #include <vector>
 #include <list>
 
-#include "Lab4/Random.hpp"
+#include "Random.hpp"
 
 namespace Ng {
 
