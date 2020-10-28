@@ -4,11 +4,7 @@ project(lab4)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(
-    lib/termcolor/include
-)
-
-add_subdirectory(
-    lib/termcolor
+    src
 )
 
 # header files
@@ -25,6 +21,4 @@ set(SOURCE_FILES
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-
-target_link_libraries(${PROJECT_NAME} termcolor)
 
