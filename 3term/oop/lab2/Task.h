@@ -46,7 +46,6 @@ namespace Ng {
         QDate* _date;
         QString _description;
         QDateTime _creationDateTime;
-        QSet<QString> _tags;
         bool _done;
 
     }; // class Task

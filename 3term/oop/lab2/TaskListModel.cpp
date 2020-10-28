@@ -6,8 +6,8 @@
 #include <QCheckBox>
 
 // constructor
-TaskListModel::TaskListModel(QObject* parent)
-    : QAbstractListModel(parent) {
+TaskListModel::TaskListModel(QMap<int, QVector<Ng::Task*>>& lists, QObject* parent)
+    : QAbstractListModel(parent), _lists(lists) {
 }
 
 // accessors
@@ -91,7 +91,21 @@ bool TaskListModel::setData(const QModelIndex& index, const QVariant& value, int
         if (index.column() == 0)
             task->setName(value.toString());
     } else if (role == Qt::CheckStateRole) {
+        bool done = value.toBool();
+
         task->setDone(value.toBool());
+
+        if (done) {
+            this->_lists[0].append(task);
+        } else {
+           for (int i = 0; i < this->_lists[0].size(); ++i) {
+               if (task == this->_lists[0][i]) {
+                   this->_lists[0].removeAt(i);
+                   break;
+               }
+           }
+        }
+
         emit dataChanged(index, index);
     }
 
@@ -120,7 +134,9 @@ void TaskListModel::sort() {
     emit dataChanged(index(0, 0), index(this->_tasks.count(), 2));
 }
 
-void TaskListModel::update() { emit dataChanged(index(0, 0), index(this->_tasks.count(), 2)); }
+void TaskListModel::update() {
+    this->sort();
+}
 
 void TaskListModel::clear() {
     this->_tasks.clear();

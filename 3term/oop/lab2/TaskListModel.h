@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QVector>
 
 #include "Task.h"
 
@@ -8,7 +9,7 @@ class TaskListModel : public QAbstractListModel {
     Q_OBJECT
 public:
     // constructor / destructor
-    explicit TaskListModel(QObject* parent = nullptr);
+    explicit TaskListModel(QMap<int, QVector<Ng::Task*>>& lists, QObject* parent = nullptr);
     virtual ~TaskListModel() = default;
 
     // accessors
@@ -30,4 +31,5 @@ public:
 private:
     // fields
     QList<Ng::Task*> _tasks;
+    QMap<int, QVector<Ng::Task*>>& _lists;
 };

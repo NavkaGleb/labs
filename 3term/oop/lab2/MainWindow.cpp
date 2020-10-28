@@ -10,18 +10,15 @@
 
 // constructor / destructor
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task), _index(-1) {
+    : QMainWindow(parent), _ui(new Ui::MainWindow), _currentTask(new Ng::Task), _index(0) {
     this->_ui->setupUi(this);
     this->setWindowTitle("todo list");
     this->_calendarForm = new CalendarForm(this);
     this->_calendarForm->setModal(true);
 
-//    this->_lists["archive"] = 0;
-//    this->_tasks[0];
-//    this->_currentList = "archive";
-
-    this->_taskListModel = new TaskListModel(this);
+    this->_taskListModel = new TaskListModel(this->_tasks, this);
     this->_taskListDelegate = new TaskListDelegate(this);
+    this->_ui->newTask->setEnabled(false);
 
     this->initListsContainer();
     this->initTasksContainer();
@@ -80,9 +77,13 @@ void MainWindow::on_tasksContainer_clicked(const QModelIndex& index) {
 
     if (this->_currentTask->time())
         this->_ui->taskTime->setTime(*this->_currentTask->time());
+    else
+        this->_ui->taskTime->setTime(QTime(0, 0));
 
     if (this->_currentTask->date())
         this->_ui->taskDate->setDate(*this->_currentTask->date());
+    else
+        this->_ui->taskDate->setDate(QDate(0, 1, 1));
 
     this->_ui->taskPriority->setCurrentIndex(static_cast<int>(this->_currentTask->priority()));
     this->_ui->taskName->setText(this->_currentTask->name());
@@ -125,6 +126,12 @@ void MainWindow::on_newTask_textChanged(const QString& /* arg */){
 void MainWindow::on_listsContainer_itemClicked(QTreeWidgetItem* item, int /* column */) {
     this->_currentList = item->text(0);
     this->updateTasks();
+
+    if (this->_currentList == "archive")
+        this->_ui->newTask->setEnabled(false);
+    else {
+        this->_ui->newTask->setEnabled(true);
+    }
 }
 
 void MainWindow::on_addList_clicked() {
@@ -137,11 +144,8 @@ void MainWindow::on_addList_clicked() {
 }
 
 void MainWindow::on_listsContainer_itemChanged(QTreeWidgetItem* item, int column) {
-    std::cout << "ITEM = " << item->text(column).toStdString() << std::endl;
-    std::cout << this->_index << std::endl;
-
-//    if (item->text(0).isEmpty())
-//        return;
+    if (item->text(0).isEmpty())
+        return;
 
     if (this->_index == -1) {
         this->_lists[item->text(column)] = this->_lists.count();
@@ -162,13 +166,19 @@ void MainWindow::on_listsContainer_itemChanged(QTreeWidgetItem* item, int column
 void MainWindow::on_listsContainer_itemDoubleClicked(QTreeWidgetItem *item, int column) {
     QString list = item->text(column);
     this->_index = this->_lists[list];
-
-    this->_lists.remove(list);
 }
 
 void MainWindow::on_removeList_clicked() {
     auto* current = this->_ui->listsContainer->currentItem();
     int index = this->_lists[current->text(0)];
+
+    if (current->text(0) == "archive") {
+        QMessageBox messageBox;
+
+        messageBox.setText("Cannot remove 'archive' list");
+        messageBox.exec();
+        return;
+    }
 
     this->_lists.remove(current->text(0));
     this->_tasks.remove(index);
@@ -190,6 +200,12 @@ void MainWindow::on_removeList_clicked() {
     } else {
         this->_currentList = this->_ui->listsContainer->currentItem()->text(0);
         this->updateTasks();
+
+        if (this->_currentList == "archive")
+            this->_ui->newTask->setEnabled(false);
+        else {
+            this->_ui->newTask->setEnabled(true);
+        }
     }
 }
 
@@ -207,15 +223,9 @@ void MainWindow::initListsContainer() {
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         item->setText(0, this->_lists.keys()[i]);
         this->_ui->listsContainer->addTopLevelItem(item);
-
-        std::cout << "i = " << i << " ----" << this->_lists.keys()[i].toStdString() << this->_lists[this->_lists.keys()[i]] << std::endl;
     }
 
     this->_ui->listsContainer->setCurrentItem(this->_ui->listsContainer->topLevelItem(0));
-
-    for (auto list : this->_lists.keys())
-        std::cout << list.toStdString() << std::endl;
-
 }
 
 void MainWindow::initTasksContainer() {    
