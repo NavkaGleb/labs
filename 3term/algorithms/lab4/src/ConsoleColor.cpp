@@ -5,25 +5,25 @@
 namespace Ng::Console {
 
     // static methods
-    Color Color::Reset() { return Color(ForeGround::Default); }
+    std::ostream& Color::Reset(std::ostream& stream) { return Paint(stream, ForeGround::Default); }
 
-    Color Color::Default() { return Color(ForeGround::Default); }
+    std::ostream& Color::Default(std::ostream& stream) { return Paint(stream, ForeGround::Default); }
 
-    Color Color::Black() { return Color(ForeGround::Black); }
+    std::ostream& Color::Black(std::ostream& stream) { return Paint(stream, ForeGround::Black); }
 
-    Color Color::Red() { return Color(ForeGround::Red); }
+    std::ostream& Color::Red(std::ostream& stream) { return Paint(stream, ForeGround::Red); }
 
-    Color Color::Green() { return Color(ForeGround::Green); }
+    std::ostream& Color::Green(std::ostream& stream) { return Paint(stream, ForeGround::Green); }
 
-    Color Color::Yellow() { return Color(ForeGround::Yellow); }
+    std::ostream& Color::Yellow(std::ostream& stream) { return Paint(stream, ForeGround::Yellow); }
 
-    Color Color::Blue() { return Color(ForeGround::Blue); }
+    std::ostream& Color::Blue(std::ostream& stream) { return Paint(stream, ForeGround::Blue); }
 
-    Color Color::Magenta() { return Color(ForeGround::Magenta); }
+    std::ostream& Color::Magenta(std::ostream& stream) { return Paint(stream, ForeGround::Magenta); }
 
-    Color Color::Cyan() { return Color(ForeGround::Cyan); }
+    std::ostream& Color::Cyan(std::ostream& stream) { return Paint(stream, ForeGround::Cyan); }
 
-    Color Color::White() { return Color(ForeGround::White); }
+    std::ostream& Color::White(std::ostream& stream) { return Paint(stream, ForeGround::White); }
 
     // accessors
     const Color::ForeGround& Color::F() const { return m_Foreground; }
@@ -68,6 +68,16 @@ namespace Ng::Console {
         return stream << "\033[" << static_cast<int>(color.m_Style) << ";"
                                  << static_cast<int>(color.m_Foreground) << ";"
                                  << static_cast<int>(color.m_Background) << "m";
+    }
+
+    std::ostream& Color::Paint(std::ostream& stream, const ForeGround& foreground) {
+    #if defined(NG_OS_WINDOWS)
+        system("");
+    #endif
+
+        return stream << "\033[" << static_cast<int>(Style::Default) << ";"
+                      << static_cast<int>(foreground) << ";"
+                      << static_cast<int>(BackGround::Default) << "m";
     }
 
 } // namespace Ng
