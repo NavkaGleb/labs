@@ -9,12 +9,12 @@ include_directories(
 
 # header files
 set(HEADER_FILES
-
+    src/Matrix.hpp
 )
 
 # source files
 set(SOURCE_FILES
     src/main.cpp
-)
+        src/Random.hpp)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
