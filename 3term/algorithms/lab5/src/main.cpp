@@ -2,18 +2,24 @@
 
 #include "Matrix.hpp"
 #include "Random.hpp"
+#include "Strassen.hpp"
 
 int main() {
 
-    Ng::Matrix<int> matrix(4, 4);
+    Ng::Matrix<int> matrix1 = {
+        { 2, 2, 1 },
+        { 1, 2, 1 },
+        { 3, 5, 7 }
+    };
 
-    std::cout << matrix.Rows() << " " << matrix.Columns() << std::endl;
+    Ng::Matrix<int> matrix2 = {
+        { 1 },
+        { 1 },
+        { 1 }
+    };
 
-    for (std::size_t i = 0; i < matrix.Rows(); ++i)
-        for (std::size_t j = 0; j < matrix.Columns(); ++j)
-            matrix[i][j] = Ng::Random::Irand(-10, 10);
+    std::cout << matrix1 * matrix2 << std::endl;
 
-    std::cout << matrix << std::endl;
 
     return 0;
 }

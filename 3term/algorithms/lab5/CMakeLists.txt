@@ -10,7 +10,7 @@ include_directories(
 # header files
 set(HEADER_FILES
     src/Matrix.hpp
-)
+        src/Strassen.hpp)
 
 # source files
 set(SOURCE_FILES
