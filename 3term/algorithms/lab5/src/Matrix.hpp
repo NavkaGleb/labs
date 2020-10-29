@@ -20,7 +20,7 @@ namespace Ng {
         [[nodiscard]] inline std::size_t Rows() const { return m_Rows; }
         [[nodiscard]] inline std::size_t Columns() const { return m_Columns; }
         [[nodiscard]] inline T& operator()(std::size_t i, std::size_t j) { return m_Data[i][j]; }
-        [[nodiscard]] inline const T& At(std::size_t i, std::size_t j) { return m_Data.at(i).at(j); }
+        [[nodiscard]] inline const T& At(std::size_t i, std::size_t j) const { return m_Data.at(i).at(j); }
 
         // modifiers
         // public methods
@@ -85,7 +85,7 @@ namespace Ng {
 
         for (std::size_t i = 0; i < m_Rows; ++i)
             for (std::size_t j = 0; j < m_Columns; ++j)
-                result[i][j] = m_Data[i][j] + other.m_Data[i][j];
+                result.m_Data[i][j] = m_Data[i][j] + other.m_Data[i][j];
 
         return result;
     }
@@ -99,7 +99,7 @@ namespace Ng {
 
         for (std::size_t i = 0; i < m_Rows; ++i)
             for (std::size_t j = 0; j < m_Columns; ++j)
-                result[i][j] = m_Data[i][j] - other.m_Data[i][j];
+                result.m_Data[i][j] = m_Data[i][j] - other.m_Data[i][j];
 
         return result;
     }
@@ -114,7 +114,7 @@ namespace Ng {
         for (std::size_t i = 0; i < m_Rows; ++i)
             for (std::size_t j = 0; j < other.m_Columns; ++j)
                 for (std::size_t k = 0; k < m_Columns; ++k)
-                    result[i][j] += m_Data[i][k] * other.m_Data[k][j];
+                    result.m_Data[i][j] += m_Data[i][k] * other.m_Data[k][j];
 
         return result;
     }

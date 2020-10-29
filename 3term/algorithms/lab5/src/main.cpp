@@ -20,6 +20,9 @@ int main() {
 
     std::cout << matrix1 * matrix2 << std::endl;
 
+    auto res = Ng::Strassen::Run(matrix1, matrix2);
+
+    std::cout << res << std::endl;
 
     return 0;
 }
