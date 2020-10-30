@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Matrix.hpp"
-
 #include <iostream>
 #include <functional>
+#include <cmath>
+
+#include "Matrix.hpp"
 
 namespace Ng::Strassen {
 
@@ -12,18 +13,25 @@ namespace Ng::Strassen {
         using std::size_t;
 
         template <typename T>
-        Matrix<T> SquareN2(const Matrix<T>& matrix) {
-            size_t size = std::max(matrix.Rows(), matrix.Columns());
-            size_t newSize = 1;
+        bool CheckSize(const Matrix<T>& left, const Matrix<T>& right) {
+            return left.Rows() == right.Rows() && left.Columns() == right.Columns();
+        }
 
-            while (newSize < size)
-                newSize *= 2;
+        template <typename T>
+        bool CheckSquareN2(const Matrix<T>& matrix) {
+            return matrix.Rows() == matrix.Columns() &&
+                   matrix.Rows() != 0 &&
+                   (matrix.Rows() & (matrix.Rows() - 1)) == 0;
+        }
 
+        template <typename T>
+        Matrix<T> SquareN2(const Matrix<T>& matrix, size_t size) {
+            auto newSize = static_cast<size_t>(pow(2, std::ceil(std::log2(size))));
             Matrix<T> result(newSize, newSize);
 
             for (size_t i = 0; i < matrix.Rows(); ++i)
                 for (size_t j = 0; j < matrix.Columns(); ++j)
-                    result(i, j) = matrix.At(i, j);
+                    result[i][j] = matrix.At(i, j);
 
             return result;
         }
@@ -33,32 +41,38 @@ namespace Ng::Strassen {
             size_t size = matrix.Rows() / 2;
             std::vector<Matrix<T>> result(4, Matrix<T>(size, size));
 
-            std::function<void(Matrix<T>&, size_t, size_t, size_t, size_t)> Fill =
-                [&matrix](Matrix<T>& to, size_t rowBegin, size_t rowEnd, size_t columnBegin, size_t columnEnd) {
-
-                for (size_t i = 0; i < rowEnd - rowBegin; ++i)
-                    for (size_t j = 0; j < columnEnd - columnBegin; ++j)
-                        to(i, j) = matrix.At(i + rowBegin, j + columnBegin);
-            };
-
-            Fill(result[0], 0, size, 0, size);
-            Fill(result[1], 0, size, size, size * 2);
-            Fill(result[2], size, size * 2, 0, size);
-            Fill(result[3], size, size * 2, size, size * 2);
+            for (size_t i = 0; i < size; ++i) {
+                for (size_t j = 0; j < size; ++j) {
+                    result[0][i][j] = matrix.At(i, j);
+                    result[1][i][j] = matrix.At(i, j + size);
+                    result[2][i][j] = matrix.At(i + size, j);
+                    result[3][i][j] = matrix.At(i + size, j + size);
+                }
+            }
 
             return result;
         }
 
         template <typename T>
         Matrix<T> Collect(const std::vector<Matrix<T>>& splits) {
-            Matrix<T> result(splits.front().Rows() * 2);
+            size_t size = splits.front().Rows();
+            Matrix<T> result(size * 2, size * 2);
 
-            
+            for (size_t i = 0; i < size; ++i) {
+                for (size_t j = 0; j < size; ++j) {
+                    result[i][j]               = splits[0].At(i, j);
+                    result[i][j + size]        = splits[1].At(i, j);
+                    result[i + size][j]        = splits[2].At(i, j);
+                    result[i + size][j + size] = splits[3].At(i, j);
+                }
+            }
+
+            return result;
         }
 
         template <typename T>
         Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right) {
-            if (left.Rows() <= 64)
+           if (left.Rows() <= 64)
                 return left * right;
 
             auto leftSplit = Split(left);
@@ -85,12 +99,22 @@ namespace Ng::Strassen {
     template <typename T>
     Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right) {
         if (left.Columns() != right.Rows())
-            throw std::invalid_argument("Strassen");
+            throw std::invalid_argument("Ng::Strassen: Matrices have different size");
 
-        Matrix<T> _left = _Internal::SquareN2(left);
-        Matrix<T> _right = _Internal::SquareN2(right);
-        Matrix<T> result = _Internal::Run(_left, _right);
+        if (_Internal::CheckSize(left, right) && _Internal::CheckSquareN2(left) && _Internal::CheckSquareN2(right))
+            return _Internal::Run(left, right);
 
+        size_t size = std::max({ left.Rows(), left.Columns(), right.Rows(), right.Columns() });
+        Matrix<T> result;
+
+        if (!_Internal::CheckSquareN2(left) && !_Internal::CheckSquareN2(right))
+            result = _Internal::Run(_Internal::SquareN2(left, size), _Internal::SquareN2(right, size));
+        else if (!_Internal::CheckSquareN2(left))
+            result = _Internal::Run(_Internal::SquareN2(left, size), right);
+        else
+            result = _Internal::Run(left, _Internal::SquareN2(right, size));
+
+        result.Clean();
         return result;
     }
 

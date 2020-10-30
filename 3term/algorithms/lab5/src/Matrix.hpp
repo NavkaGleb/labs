@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include <algorithm>
 #include <initializer_list>
 
 namespace Ng {
@@ -19,12 +20,21 @@ namespace Ng {
         [[nodiscard]] inline bool Empty() const { return m_Data.emtpy(); }
         [[nodiscard]] inline std::size_t Rows() const { return m_Rows; }
         [[nodiscard]] inline std::size_t Columns() const { return m_Columns; }
-        [[nodiscard]] inline T& operator()(std::size_t i, std::size_t j) { return m_Data[i][j]; }
+        [[nodiscard]] inline std::vector<T>& operator[](std::size_t index) { return m_Data[index]; }
         [[nodiscard]] inline const T& At(std::size_t i, std::size_t j) const { return m_Data.at(i).at(j); }
 
         // modifiers
+
+
         // public methods
         void Clear();
+        void Clean();
+        void PopRow(std::size_t index);
+        void PopLastRow();
+        void PopColumn(std::size_t index);
+        void PopLastColumn();
+        std::size_t RowCount(std::size_t row, const T& value) const;
+        std::size_t ColumnCount(std::size_t column, const T& value) const;
 
         // operators
         Matrix<T> operator+(const Matrix<T>& other) const;
@@ -75,11 +85,64 @@ namespace Ng {
         m_Data.shrink_to_fit();
     }
 
+    template <typename T>
+    void Matrix<T>::Clean() {
+        for (size_t i = m_Rows; i > 0; --i) {
+            if (RowCount(i - 1, T()) == m_Columns)
+                PopLastRow();
+            else
+                break;
+        }
+
+        for (size_t i = m_Columns; i > 0; --i) {
+            if (ColumnCount(i - 1, T()) == m_Rows)
+                PopLastColumn();
+            else
+                break;
+        }
+    }
+
+    template <typename T>
+    void Matrix<T>::PopRow(std::size_t index) {
+        m_Data.erase(m_Data.begin() + index);
+        --m_Rows;
+    }
+
+    template <typename T>
+    void Matrix<T>::PopLastRow() { PopRow(m_Rows - 1); }
+
+    template <typename T>
+    void Matrix<T>::PopColumn(std::size_t index) {
+        for (size_t i = 0; i < m_Rows; ++i)
+            m_Data[i].erase(m_Data[i].begin() + index);
+
+        --m_Columns;
+    }
+
+    template <typename T>
+    void Matrix<T>::PopLastColumn() { PopColumn(m_Columns - 1); }
+
+    template <typename T>
+    std::size_t Matrix<T>::RowCount(std::size_t row, const T& value) const {
+        return std::count(m_Data[row].begin(), m_Data[row].end(), value);
+    }
+
+    template <typename T>
+    std::size_t Matrix<T>::ColumnCount(std::size_t column, const T& value) const {
+        size_t count = 0;
+
+        for (size_t i = 0; i < m_Rows; ++i)
+            if (m_Data[i][column] == value)
+                ++count;
+
+        return count;
+    }
+
     // operators
     template <typename T>
     Matrix<T> Matrix<T>::operator+(const Matrix<T>& other) const {
         if (m_Rows != other.m_Rows || m_Columns != other.m_Columns)
-            throw std::invalid_argument("matrix have different size");
+            throw std::invalid_argument("Matrix::operator+: Matrices have different size");
 
         Matrix<T> result(m_Rows, m_Columns);
 
@@ -93,7 +156,7 @@ namespace Ng {
     template <typename T>
     Matrix<T> Matrix<T>::operator-(const Matrix<T>& other) const {
         if (m_Rows != other.m_Rows || m_Columns != other.m_Columns)
-            throw std::invalid_argument("matrix have different size");
+            throw std::invalid_argument("Matrix::operator-: Matrices have different size");
 
         Matrix<T> result(m_Rows, m_Columns);
 
@@ -107,7 +170,7 @@ namespace Ng {
     template <typename T>
     Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
         if (m_Columns != other.m_Rows)
-            throw std::invalid_argument("matrix have different size");
+            throw std::invalid_argument("Matrix::operator*: Matrices have different size");
 
         Matrix<T> result(m_Rows, other.m_Columns);
 
@@ -138,7 +201,8 @@ namespace Ng {
             for (int j = 0; j < matrix.m_Columns; ++j)
                 stream << matrix.m_Data[i][j] << " ";
 
-            stream << std::endl;
+            if (i != matrix.m_Rows - 1)
+                stream << std::endl;
         }
 
         return stream;
