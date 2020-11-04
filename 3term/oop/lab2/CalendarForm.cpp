@@ -6,6 +6,7 @@
 // constructor / destructor
 CalendarForm::CalendarForm(QWidget* parent)
     : QDialog(parent), _ui(new Ui::CalendarForm) {
+    this->setWindowTitle("Calendar");
     this->_ui->setupUi(this);
 }
 

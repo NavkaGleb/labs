@@ -190,6 +190,9 @@
         <property name="text">
          <string/>
         </property>
+        <property name="maxLength">
+         <number>40</number>
+        </property>
         <property name="placeholderText">
          <string>new task</string>
         </property>
