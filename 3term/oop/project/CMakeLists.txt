@@ -12,13 +12,17 @@ find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
 # header files
 set(HEADER_FILES
-
+    src/Application/Application.hpp
+    src/States/State.hpp
+    src/States/MandelbrotState.hpp
 )
 
 # source files
 set(SOURCE_FILES
     src/main.cpp
-)
+    src/Application/Application.cpp
+    src/States/MandelbrotState.cpp
+        src/Fractals/MandelbrotSet.cpp src/Fractals/MandelbrotSet.hpp)
 
 include_directories(src)
 
