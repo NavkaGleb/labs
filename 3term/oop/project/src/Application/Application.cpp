@@ -60,20 +60,21 @@ namespace ng {
     }
 
     void Application::update() {
+        if (!m_states.empty())
+            m_states.top()->update(m_frameTime.asSeconds());
+
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.f / m_frameTime.asSeconds() - m_lastFrameTime.asSeconds()))
         );
-
-        if (!m_states.empty())
-            m_states.top()->update(m_frameTime.asSeconds());
     }
 
     void Application::render() {
         m_window.clear();
-        m_window.draw(m_statisticsText);
 
         if (!m_states.empty())
             m_states.top()->render(m_window);
+
+        m_window.draw(m_statisticsText);
 
         m_window.display();
     }
