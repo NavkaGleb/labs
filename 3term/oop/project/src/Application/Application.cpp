@@ -9,7 +9,7 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(1280, 720), "SFML", sf::Style::Close) {
+        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close) {
 
         // window
         m_window.setFramerateLimit(60);
@@ -64,7 +64,8 @@ namespace ng {
             m_states.top()->update(m_frameTime.asSeconds());
 
         m_statisticsText.setString(
-            "FPS: " + std::to_string((1.f / m_frameTime.asSeconds() - m_lastFrameTime.asSeconds()))
+            "FPS: " + std::to_string((1.f / m_frameTime.asSeconds())) + "\n" +
+            "time: " + std::to_string(m_frameTime.asSeconds())
         );
     }
 
