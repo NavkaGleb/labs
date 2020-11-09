@@ -11,13 +11,14 @@ namespace ng {
 
     // constructor / destructor
     MandelbrotState::MandelbrotState(float width, float height)
-        : m_windowSize(width, height) {
+        : m_windowSize(width, height),
+          m_showCoordinates(true) {
 
         if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
             throw std::invalid_argument("ng::MandelbrotState::MandelbrotState: failed to load font");
 
         // mandelbrot set
-        m_mandelbrotSet.setSize(sf::Vector2<double>(m_windowSize));
+        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(m_windowSize));
 
         // text
         m_text.setFont(m_font);
@@ -75,9 +76,16 @@ namespace ng {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             m_mandelbrotSet.move(-300.f * ftime, 0.f);
+
+        // todo: add key time
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
+            m_showCoordinates = !m_showCoordinates;
     }
 
     void MandelbrotState::updateText() {
+        if (!m_showCoordinates)
+            return;
+
         // left text
         m_left.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
         m_left.setPosition(
@@ -121,6 +129,10 @@ namespace ng {
     void MandelbrotState::render(sf::RenderTarget& target) {
         target.draw(m_mandelbrotSet);
         target.draw(m_text);
+
+        if (!m_showCoordinates)
+            return;
+
         target.draw(m_left);
         target.draw(m_right);
         target.draw(m_bottom);

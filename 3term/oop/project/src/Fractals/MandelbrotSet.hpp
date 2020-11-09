@@ -16,6 +16,9 @@ namespace ng {
 
     class MandelbrotSet : public sf::Drawable {
     public:
+        // usings
+        using PointType = long double;
+
         // constructor / destructor
         MandelbrotSet();
         ~MandelbrotSet() override;
@@ -26,14 +29,14 @@ namespace ng {
         [[nodiscard]] inline double getRight() const { return m_right; }
         [[nodiscard]] inline double getBottom() const { return m_bottom; }
         [[nodiscard]] inline double getTop() const { return m_top; }
-        [[nodiscard]] inline const sf::Vector2<double>& getSize() const { return m_size; }
+        [[nodiscard]] inline const sf::Vector2<PointType>& getSize() const { return m_size; }
         [[nodiscard]] inline int getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
             return m_implementations.at(m_implementation).name;
         }
 
         // modifiers
-        void setSize(const sf::Vector2<double>& size);
+        void setSize(const sf::Vector2<PointType>& size);
         void setImplementation(int implementation);
 
         // public methods
@@ -61,14 +64,14 @@ namespace ng {
         sf::Image m_image;
         sf::Texture m_texture;
         sf::Sprite m_sprite;
-        sf::Vector2<double> m_size;
+        sf::Vector2<PointType> m_size;
         int m_iterations;
-        double m_left;
-        double m_right;
-        double m_bottom;
-        double m_top;
-        double m_sizeX;
-        double m_sizeY;
+        PointType m_left;
+        PointType m_right;
+        PointType m_bottom;
+        PointType m_top;
+        PointType m_sizeX;
+        PointType m_sizeY;
         int m_implementation;
         std::unordered_map<int, Implementation> m_implementations;
 

@@ -4,8 +4,6 @@
 #include <complex>
 #include <thread>
 
-#include <SFML/System/Thread.hpp>
-
 namespace ng {
 
     // constructor / destructor
@@ -26,8 +24,8 @@ namespace ng {
                                                             std::size_t startJ, std::size_t endJ) {
             for (std::size_t i = 0; i < m_image.getSize().x; i += 1) {
                 for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
-                    std::complex<double> z = 0;
-                    std::complex<double> c(
+                    std::complex<PointType> z = 0;
+                    std::complex<PointType> c(
                         m_left + i / m_size.x * (m_right - m_left),
                         m_bottom + j / m_size.y * (m_top - m_bottom)
                     );
@@ -52,15 +50,15 @@ namespace ng {
                                                             std::size_t startJ, std::size_t endJ) {
             for (std::size_t i = startI; i < endI; i += 1) {
                 for (std::size_t j = startJ; j < endJ; j += 1) {
-                    double realZ = 0.0;
-                    double imagineZ = 0.0;
-                    double realC = m_left + i / m_size.x * (m_right - m_left);
-                    double imagineC = m_bottom + j / m_size.y * (m_top - m_bottom);
+                    PointType realZ = 0.0;
+                    PointType imagineZ = 0.0;
+                    PointType realC = m_left + i / m_size.x * (m_right - m_left);
+                    PointType imagineC = m_bottom + j / m_size.y * (m_top - m_bottom);
 
                     int iteration;
 
                     for (iteration = 0; iteration < m_iterations && realZ * realZ + imagineZ * imagineZ < 4.0; ++iteration) {
-                        double temp = realZ * realZ - imagineZ * imagineZ + realC;
+                        PointType temp = realZ * realZ - imagineZ * imagineZ + realC;
                         imagineZ = 2 * realZ * imagineZ + imagineC;
                         realZ = temp;
                     }
@@ -80,7 +78,7 @@ namespace ng {
     }
 
     // modifiers
-    void MandelbrotSet::setSize(const sf::Vector2<double>& size) {
+    void MandelbrotSet::setSize(const sf::Vector2<PointType>& size) {
         m_size = size;
         m_image.create(m_size.x, m_size.y);
         m_sizeX = (m_right - m_left) / m_size.x;

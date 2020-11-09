@@ -31,6 +31,7 @@ namespace ng {
         sf::Text m_right;
         sf::Text m_bottom;
         sf::Text m_top;
+        bool m_showCoordinates;
 
     }; // class MandelbrotState
 
