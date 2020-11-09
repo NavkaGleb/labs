@@ -8,7 +8,7 @@ namespace ng {
     class MandelbrotState : public State {
     public:
         // constructor / destructor
-        MandelbrotState();
+        MandelbrotState(float width, float height);
         ~MandelbrotState() override = default;
 
         // accessors
@@ -17,11 +17,13 @@ namespace ng {
         // public methods
         void mouseWheelMoved(const sf::Event& event) final;
         void updateInput(const float& ftime);
+        void updateText();
         void update(const float& ftime) final;
         void render(sf::RenderTarget& target) final;
 
     private:
         // member data
+        sf::Vector2f m_windowSize;
         MandelbrotSet m_mandelbrotSet;
         sf::Font m_font;
         sf::Text m_text;

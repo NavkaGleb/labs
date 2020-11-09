@@ -27,7 +27,7 @@ namespace ng {
         m_statisticsText.setFillColor(sf::Color::White);
 
         // states
-        m_states.emplace(std::make_unique<MandelbrotState>());
+        m_states.emplace(std::make_unique<MandelbrotState>(800.f, 800.f));
     }
 
     // public methods

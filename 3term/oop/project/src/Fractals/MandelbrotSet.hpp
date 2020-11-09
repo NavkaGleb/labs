@@ -39,8 +39,7 @@ namespace ng {
         // public methods
         void move(const sf::Vector2f& offset);
         void move(float offsetX, float offsetY);
-        void zoomIn();
-        void zoomOut();
+        void zoom(float factor);
         void increaseIterations();
         void decreaseIterations();
         void update(const float& ftime);

@@ -10,6 +10,8 @@ set(CMAKE_LIBRARY_PATH "lib/SFML")
 set(SFML_INCLUDE_DIR "lib/SFML/include")
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
+message(STATUS ${Boost_INCLUDE_DIR})
+
 # multi threading
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
@@ -29,21 +31,8 @@ set(SOURCE_FILES
     src/Fractals/MandelbrotSet.cpp
 )
 
-add_subdirectory(lib/boost/assert)
-add_subdirectory(lib/boost/config)
-add_subdirectory(lib/boost/iterator)
-#add_subdirectory(lib/boost/range)
-add_subdirectory(lib/boost/lexical_cast)
-add_subdirectory(lib/boost/mpl)
-
 include_directories(
     src
-    lib/boost/assert/include
-    lib/boost/config/include
-    lib/boost/iterator/include
-    lib/boost/range/include
-    lib/boost/lexical_cast/include
-    lib/boost/mpl/include
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
@@ -52,5 +41,12 @@ if (SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES})
 elseif ()
-    message(ERROR SFML_NOT_FOUNT)
-endif()
+    message(ERROR SFML_NOT_FOUND)
+endif ()
+
+if (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
+elseif ()
+    message(ERROR Boost_NOT_FOUND)
+endif ()

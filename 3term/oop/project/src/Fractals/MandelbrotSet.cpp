@@ -104,21 +104,11 @@ namespace ng {
         m_top -= offsetY * m_sizeY;
     }
 
-    void MandelbrotSet::zoomIn() {
-        m_left += m_sizeX * 30.f;
-        m_right -= m_sizeX * 30.f;
-        m_bottom += m_sizeY * 30.f;
-        m_top -= m_sizeY * 30.f;
-
-        m_sizeX = (m_right - m_left) / m_size.x;
-        m_sizeY = (m_top - m_bottom) / m_size.y;
-    }
-
-    void MandelbrotSet::zoomOut() {
-        m_left -= m_sizeX * 20.f;
-        m_right += m_sizeX * 20.f;
-        m_bottom -= m_sizeY * 20.f;
-        m_top += m_sizeY * 20.f;
+    void MandelbrotSet::zoom(float factor) {
+        m_left += m_sizeX * factor;
+        m_right -= m_sizeX * factor;
+        m_bottom += m_sizeY * factor;
+        m_top -= m_sizeY * factor;
 
         m_sizeX = (m_right - m_left) / m_size.x;
         m_sizeY = (m_top - m_bottom) / m_size.y;
