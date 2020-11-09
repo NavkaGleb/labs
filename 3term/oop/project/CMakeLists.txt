@@ -29,13 +29,21 @@ set(SOURCE_FILES
     src/Fractals/MandelbrotSet.cpp
 )
 
-add_subdirectory(
-    lib/boost/lexical_cast
-)
+add_subdirectory(lib/boost/assert)
+add_subdirectory(lib/boost/config)
+add_subdirectory(lib/boost/iterator)
+#add_subdirectory(lib/boost/range)
+add_subdirectory(lib/boost/lexical_cast)
+add_subdirectory(lib/boost/mpl)
 
 include_directories(
     src
+    lib/boost/assert/include
+    lib/boost/config/include
+    lib/boost/iterator/include
+    lib/boost/range/include
     lib/boost/lexical_cast/include
+    lib/boost/mpl/include
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
