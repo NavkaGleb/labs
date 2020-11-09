@@ -10,11 +10,15 @@ set(CMAKE_LIBRARY_PATH "lib/SFML")
 set(SFML_INCLUDE_DIR "lib/SFML/include")
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
+# multi threading
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 # header files
 set(HEADER_FILES
     src/Application/Application.hpp
     src/States/State.hpp
     src/States/MandelbrotState.hpp
+    src/Fractals/MandelbrotSet.hpp
 )
 
 # source files
@@ -22,9 +26,17 @@ set(SOURCE_FILES
     src/main.cpp
     src/Application/Application.cpp
     src/States/MandelbrotState.cpp
-        src/Fractals/MandelbrotSet.cpp src/Fractals/MandelbrotSet.hpp)
+    src/Fractals/MandelbrotSet.cpp
+)
 
-include_directories(src)
+add_subdirectory(
+    lib/boost/lexical_cast
+)
+
+include_directories(
+    src
+    lib/boost/lexical_cast/include
+)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 

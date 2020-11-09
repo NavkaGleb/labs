@@ -9,10 +9,11 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close) {
+        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close),
+        m_frameLimit(60u) {
 
         // window
-        m_window.setFramerateLimit(60);
+        m_window.setFramerateLimit(m_frameLimit);
         m_window.setVerticalSyncEnabled(true);
 
         // font
@@ -21,7 +22,7 @@ namespace ng {
 
         // text
         m_statisticsText.setFont(m_font);
-        m_statisticsText.setPosition(std::floor(5.f), std::floor(5.f));
+        m_statisticsText.setPosition(std::floor(5.0f), std::floor(5.0f));
         m_statisticsText.setCharacterSize(20);
         m_statisticsText.setFillColor(sf::Color::White);
 
@@ -53,6 +54,9 @@ namespace ng {
                 case sf::Event::Closed:
                     m_window.close();
                     break;
+                case sf::Event::MouseWheelMoved:
+                    if (!m_states.empty())
+                        m_states.top()->mouseWheelMoved(event);
                 default:
                     break;
             }
@@ -64,7 +68,7 @@ namespace ng {
             m_states.top()->update(m_frameTime.asSeconds());
 
         m_statisticsText.setString(
-            "FPS: " + std::to_string((1.f / m_frameTime.asSeconds())) + "\n" +
+            "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
             "time: " + std::to_string(m_frameTime.asSeconds())
         );
     }

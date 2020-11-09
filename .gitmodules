@@ -1,0 +1,3 @@
+[submodule "3term/oop/project/lib/boost/lexical_cast"]
+	path = 3term/oop/project/lib/boost/lexical_cast
+	url = https://github.com/boostorg/lexical_cast

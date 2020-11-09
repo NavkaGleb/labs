@@ -2,14 +2,17 @@
 
 #include <iostream>
 #include <complex>
+#include <thread>
+
+#include <SFML/System/Thread.hpp>
 
 namespace ng {
 
     // constructor / destructor
     MandelbrotSet::MandelbrotSet()
         : m_iterations(40),
-          m_left(-2.5), m_right(2.5),
-          m_bottom(-2.5), m_top(2.5),
+          m_left(-2.5e-0), m_right(1.5),
+          m_bottom(-2.0), m_top(2.0),
           m_sizeX(0.0), m_sizeY(0.0),
           m_implementation(1) {
 
@@ -19,7 +22,8 @@ namespace ng {
         m_sprite.setTexture(m_texture);
 
         m_implementations[0].name = "Pseudo code";
-        m_implementations[0].func = [&](const float& ftime) {
+        m_implementations[0].func = [&](const float& ftime, std::size_t startI, std::size_t endI,
+                                                            std::size_t startJ, std::size_t endJ) {
             for (std::size_t i = 0; i < m_image.getSize().x; i += 1) {
                 for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
                     std::complex<double> z = 0;
@@ -44,9 +48,10 @@ namespace ng {
         };
 
         m_implementations[1].name = "Own implementation";
-        m_implementations[1].func = [&](const float& ftime) {
-            for (std::size_t i = 0; i < m_image.getSize().x; i += 1) {
-                for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
+        m_implementations[1].func = [&](const float& ftime, std::size_t startI, std::size_t endI,
+                                                            std::size_t startJ, std::size_t endJ) {
+            for (std::size_t i = startI; i < endI; i += 1) {
+                for (std::size_t j = startJ; j < endJ; j += 1) {
                     double realZ = 0.0;
                     double imagineZ = 0.0;
                     double realC = m_left + i / m_size.x * (m_right - m_left);
@@ -61,9 +66,7 @@ namespace ng {
                     }
 
                     int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
-                    sf::Color color;
-                    color = sf::Color(factor, factor, factor);
-                    m_image.setPixel(i, j, color);
+                    m_image.setPixel(i, j, sf::Color(factor, factor, factor));
                 }
             }
 
@@ -129,7 +132,13 @@ namespace ng {
     }
 
     void MandelbrotSet::update(const float& ftime) {
-        m_implementations[m_implementation](ftime);
+        std::thread thread1(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, 0,                m_size.y / 2);
+        std::thread thread2(m_implementations[m_implementation].func, ftime, m_size.x / 2 + 1, m_size.x,     0,                m_size.y / 2);
+        std::thread thread3(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, m_size.y / 2 + 1, m_size.y);
+        m_implementations[m_implementation](                          ftime, m_size.x / 2 + 1, m_size.x,     m_size.y / 2 + 1, m_size.y);
+        thread1.join();
+        thread2.join();
+        thread3.join();
     }
 
     // member methods

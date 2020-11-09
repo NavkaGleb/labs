@@ -22,6 +22,10 @@ namespace ng {
 
         // accessors
         [[nodiscard]] inline int getIterations() const { return m_iterations; }
+        [[nodiscard]] inline double getLeft() const { return m_left; }
+        [[nodiscard]] inline double getRight() const { return m_right; }
+        [[nodiscard]] inline double getBottom() const { return m_bottom; }
+        [[nodiscard]] inline double getTop() const { return m_top; }
         [[nodiscard]] inline const sf::Vector2<double>& getSize() const { return m_size; }
         [[nodiscard]] inline int getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
@@ -46,10 +50,12 @@ namespace ng {
         struct Implementation {
             // data
             std::string name;
-            std::function<void(const float&)> func;
+            std::function<void(const float&, std::size_t, std::size_t, std::size_t, std::size_t)> func;
 
             // operators
-            void operator()(const float& ftime) const { func(ftime); }
+            void operator()(const float& ftime,
+                            std::size_t startI, std::size_t endI,
+                            std::size_t startJ, std::size_t endJ) const { func(ftime, startI, endI, startJ, endJ); };
         };
 
         // member data

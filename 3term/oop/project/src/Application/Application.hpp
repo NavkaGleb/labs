@@ -22,9 +22,10 @@ namespace ng {
     private:
         // member data
         sf::RenderWindow m_window;
+        unsigned m_frameLimit;
         sf::Clock m_clock;
-        sf::Time m_lastFrameTime;
         sf::Time m_frameTime;
+        sf::Time m_lastFrameTime;
         sf::Font m_font;
         sf::Text m_statisticsText;
         std::stack<std::unique_ptr<State>> m_states;
