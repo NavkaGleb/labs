@@ -4,18 +4,22 @@
 #include <complex>
 #include <thread>
 #include <vector>
+#include <immintrin.h>
 
 namespace ng {
+
+    std::atomic<int> MandelbrotSet::Thread::complete = 0;
 
     // constructor / destructor
     MandelbrotSet::MandelbrotSet()
         : m_iterations(40),
-          m_left(-2.5e-0), m_right(1.5),
-          m_bottom(-2.0), m_top(2.0),
+          m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
           m_sizeX(0.0), m_sizeY(0.0),
           m_implementation(1) {
 
         std::cout << "threads = " << std::thread::hardware_concurrency() << std::endl;
+        std::cout << "long double = " << sizeof(long double) << std::endl;
+        std::cout << "double = " << sizeof(double) << std::endl;
 
         // sfml
         m_image.create(800.0, 800.0);
@@ -29,8 +33,8 @@ namespace ng {
                 for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
                     std::complex<PointType> z = 0;
                     std::complex<PointType> c(
-                        m_left + i / m_size.x * (m_right - m_left),
-                        m_bottom + j / m_size.y * (m_top - m_bottom)
+                        m_topLeft.x + i / m_size.x * (m_bottomRight.x - m_topLeft.x),
+                        m_topLeft.y + j / m_size.y * (m_bottomRight.y - m_topLeft.y)
                     );
 
                     int iteration;
@@ -55,8 +59,8 @@ namespace ng {
                 for (std::size_t j = startJ; j < endJ; j += 1) {
                     PointType realZ = 0.0;
                     PointType imagineZ = 0.0;
-                    PointType realC = m_left + i / m_size.x * (m_right - m_left);
-                    PointType imagineC = m_bottom + j / m_size.y * (m_top - m_bottom);
+                    PointType realC = m_topLeft.x + i / m_size.x * (m_bottomRight.x - m_topLeft.x);
+                    PointType imagineC = m_topLeft.y + j / m_size.y * (m_bottomRight.y - m_topLeft.y);
 
                     int iteration;
 
@@ -76,7 +80,7 @@ namespace ng {
 
         m_implementations[2].name = "Threads";
         m_implementations[2].func = [&](const float& ftime, std::size_t startI, std::size_t endI,
-                                        std::size_t startJ, std::size_t endJ) {
+                                                            std::size_t startJ, std::size_t endJ) {
             std::vector<std::thread> threads(std::thread::hardware_concurrency());
             size_t offset = endI / threads.size();
 
@@ -85,6 +89,28 @@ namespace ng {
 
             for (auto& thread : threads)
                 thread.join();
+        };
+
+        m_implementations[3].name = "Thread pool";
+        m_implementations[3].func = [&](const float& ftime, std::size_t startI, std::size_t endI,
+                                        std::size_t startJ, std::size_t endJ) {
+            std::vector<Thread> threads(32);
+            size_t offset = endI / threads.size();
+
+            Thread::complete = 0;
+
+            // init thread
+            for (std::size_t i = 0; i < threads.size(); ++i) {
+                threads[i].m_func = m_implementations[1];
+                threads[i].setThread(std::thread(&Thread::create, &threads[i], ftime, i * offset, (i + 1) * offset - 1, startJ, endJ));
+            }
+
+            // start thread
+            for (auto& thread : threads)
+                thread.launch();
+
+            // while loop
+            while (Thread::complete < 32) {}
         };
 
     }
@@ -97,35 +123,35 @@ namespace ng {
     void MandelbrotSet::setSize(const sf::Vector2<PointType>& size) {
         m_size = size;
         m_image.create(m_size.x, m_size.y);
-        m_sizeX = (m_right - m_left) / m_size.x;
-        m_sizeY = (m_top - m_bottom) / m_size.y;
+        m_sizeX = (m_bottomRight.x - m_topLeft.x) / m_size.x;
+        m_sizeY = (m_bottomRight.y - m_topLeft.y) / m_size.y;
     }
 
     void MandelbrotSet::setImplementation(int implementation) { m_implementation = implementation; }
 
     // public methods
     void MandelbrotSet::move(const sf::Vector2f& offset) {
-        m_left -= offset.x * m_sizeX;
-        m_right -= offset.x * m_sizeX;
-        m_bottom -= offset.y * m_sizeY;
-        m_top -= offset.y * m_sizeY;
+        m_topLeft.x -= offset.x * m_sizeX;
+        m_bottomRight.x -= offset.x * m_sizeX;
+        m_topLeft.y -= offset.y * m_sizeY;
+        m_bottomRight.y -= offset.y * m_sizeY;
     }
 
     void MandelbrotSet::move(float offsetX, float offsetY) {
-        m_left -= offsetX * m_sizeX;
-        m_right -= offsetX * m_sizeX;
-        m_bottom -= offsetY * m_sizeY;
-        m_top -= offsetY * m_sizeY;
+        m_topLeft.x -= offsetX * m_sizeX;
+        m_bottomRight.x -= offsetX * m_sizeX;
+        m_topLeft.y -= offsetY * m_sizeY;
+        m_bottomRight.y -= offsetY * m_sizeY;
     }
 
     void MandelbrotSet::zoom(float factor) {
-        m_left += m_sizeX * factor;
-        m_right -= m_sizeX * factor;
-        m_bottom += m_sizeY * factor;
-        m_top -= m_sizeY * factor;
+        m_topLeft.x += m_sizeX * factor;
+        m_bottomRight.x -= m_sizeX * factor;
+        m_topLeft.y += m_sizeY * factor;
+        m_bottomRight.y -= m_sizeY * factor;
 
-        m_sizeX = (m_right - m_left) / m_size.x;
-        m_sizeY = (m_top - m_bottom) / m_size.y;
+        m_sizeX = (m_bottomRight.x - m_topLeft.x) / m_size.x;
+        m_sizeY = (m_bottomRight.y - m_topLeft.y) / m_size.y;
     }
 
     void MandelbrotSet::increaseIterations() { m_iterations += 5; }

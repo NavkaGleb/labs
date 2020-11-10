@@ -29,7 +29,7 @@ set(SOURCE_FILES
     src/Application/Application.cpp
     src/States/MandelbrotState.cpp
     src/Fractals/MandelbrotSet.cpp
-        )
+)
 
 include_directories(
     src

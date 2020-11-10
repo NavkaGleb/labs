@@ -4,6 +4,9 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 // sfml lib
 #include <SFML/Graphics/Drawable.hpp>
@@ -11,6 +14,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 namespace ng {
 
@@ -26,10 +30,10 @@ namespace ng {
 
         // accessors
         [[nodiscard]] inline int getIterations() const { return m_iterations; }
-        [[nodiscard]] inline double getLeft() const { return m_left; }
-        [[nodiscard]] inline double getRight() const { return m_right; }
-        [[nodiscard]] inline double getBottom() const { return m_bottom; }
-        [[nodiscard]] inline double getTop() const { return m_top; }
+        [[nodiscard]] inline PointType getLeft() const { return m_topLeft.x; }
+        [[nodiscard]] inline PointType getRight() const { return m_bottomRight.x; }
+        [[nodiscard]] inline PointType getBottom() const { return m_bottomRight.y; }
+        [[nodiscard]] inline PointType getTop() const { return m_topLeft.y; }
         [[nodiscard]] inline const sf::Vector2<PointType>& getSize() const { return m_size; }
         [[nodiscard]] inline int getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
@@ -61,16 +65,58 @@ namespace ng {
                             std::size_t startJ, std::size_t endJ) const { func(ftime, startI, endI, startJ, endJ); };
         };
 
+        class Thread {
+        public:
+            // static
+            static std::atomic<int> complete;
+
+            // constructor / destructor
+            Thread() : m_iterations(0), m_alive(true) {}
+            ~Thread() {
+                m_thread.join();
+            };
+
+            // accessors
+            [[nodiscard]] inline std::function<void(const float&, std::size_t, std::size_t, std::size_t, std::size_t)>& getFunc() { return m_func; }
+
+            // modifiers
+            void setThread(std::thread&& thread) { m_thread = std::move(thread); }
+            void setFunc(const std::function<void(const float&, std::size_t, std::size_t, std::size_t, std::size_t)>& func) {
+                m_func = func;
+            }
+
+            // public methods
+            void launch() {
+                std::unique_lock<std::mutex> lm(m_mutex);
+                m_start.notify_one();
+            }
+
+            void create(const float& ftime, std::size_t bi, std::size_t endi, std::size_t bj, std::size_t endj) {
+                m_func(ftime, bi, endi, bj, endj);
+                ++complete;
+            }
+
+        public:
+            // member data
+            int m_iterations;
+            sf::Vector2<PointType> m_tl;
+            sf::Vector2<PointType> m_br;
+            std::condition_variable m_start;
+            bool m_alive;
+            std::mutex m_mutex;
+            std::thread m_thread;
+            std::function<void(const float&, std::size_t, std::size_t, std::size_t, std::size_t)> m_func;
+
+        }; // class Thread
+
         // member data
         sf::Image m_image;
         sf::Texture m_texture;
         sf::Sprite m_sprite;
         sf::Vector2<PointType> m_size;
         int m_iterations;
-        PointType m_left;
-        PointType m_right;
-        PointType m_bottom;
-        PointType m_top;
+        sf::Vector2<PointType> m_topLeft;
+        sf::Vector2<PointType> m_bottomRight;
         PointType m_sizeX;
         PointType m_sizeY;
         int m_implementation;
