@@ -16,8 +16,11 @@ namespace ng {
 
         // public methods
         void mouseWheelMoved(const sf::Event& event) final;
+        void keyPressed(const sf::Event& event) final;
+
         void updateInput(const float& ftime);
         void updateText();
+
         void update(const float& ftime) final;
         void render(sf::RenderTarget& target) final;
 

@@ -54,12 +54,18 @@ namespace ng {
                 case sf::Event::Closed:
                     m_window.close();
                     break;
+                case sf::Event::MouseButtonPressed:
+                    if (!m_states.empty())
+                        m_states.top()->mouseButtonPressed(event);
+                    break;
                 case sf::Event::MouseWheelMoved:
                     if (!m_states.empty())
                         m_states.top()->mouseWheelMoved(event);
+                    break;
                 case sf::Event::KeyPressed:
                     if (!m_states.empty())
                         m_states.top()->keyPressed(event);
+                    break;
                 default:
                     break;
             }

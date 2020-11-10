@@ -3,6 +3,7 @@
 #include <iostream>
 #include <complex>
 #include <thread>
+#include <vector>
 
 namespace ng {
 
@@ -13,6 +14,8 @@ namespace ng {
           m_bottom(-2.0), m_top(2.0),
           m_sizeX(0.0), m_sizeY(0.0),
           m_implementation(1) {
+
+        std::cout << "threads = " << std::thread::hardware_concurrency() << std::endl;
 
         // sfml
         m_image.create(800.0, 800.0);
@@ -71,6 +74,19 @@ namespace ng {
             m_texture.loadFromImage(m_image);
         };
 
+        m_implementations[2].name = "Threads";
+        m_implementations[2].func = [&](const float& ftime, std::size_t startI, std::size_t endI,
+                                        std::size_t startJ, std::size_t endJ) {
+            std::vector<std::thread> threads(std::thread::hardware_concurrency());
+            size_t offset = endI / threads.size();
+
+            for (std::size_t i = 0; i < threads.size(); ++i)
+                threads[i] = std::thread(m_implementations[1].func, ftime, i * offset, (i + 1) * offset - 1, startJ, endJ);
+
+            for (auto& thread : threads)
+                thread.join();
+        };
+
     }
 
     MandelbrotSet::~MandelbrotSet() {
@@ -112,22 +128,15 @@ namespace ng {
         m_sizeY = (m_top - m_bottom) / m_size.y;
     }
 
-    void MandelbrotSet::increaseIterations() { ++m_iterations; }
+    void MandelbrotSet::increaseIterations() { m_iterations += 5; }
 
     void MandelbrotSet::decreaseIterations() {
         if (m_iterations > 0)
-            --m_iterations;
+            m_iterations -= 5;
     }
 
     void MandelbrotSet::update(const float& ftime) {
-        // todo: to use std::async
-        std::thread thread1(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, 0,                m_size.y / 2);
-        std::thread thread2(m_implementations[m_implementation].func, ftime, m_size.x / 2 + 1, m_size.x,     0,                m_size.y / 2);
-        std::thread thread3(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, m_size.y / 2 + 1, m_size.y);
-        m_implementations[m_implementation](                          ftime, m_size.x / 2 + 1, m_size.x,     m_size.y / 2 + 1, m_size.y);
-        thread1.join();
-        thread2.join();
-        thread3.join();
+        m_implementations[m_implementation](ftime, 0, m_size.x, 0, m_size.y);
     }
 
     // member methods

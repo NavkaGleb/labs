@@ -52,13 +52,21 @@ namespace ng {
             m_mandelbrotSet.increaseIterations();
     }
 
-    void MandelbrotState::updateInput(const float& ftime) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    void MandelbrotState::keyPressed(const sf::Event& event) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
+            m_showCoordinates = !m_showCoordinates;
+
+        if (event.key.code == sf::Keyboard::Num1)
             m_mandelbrotSet.setImplementation(0);
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+        if (event.key.code == sf::Keyboard::Num2)
             m_mandelbrotSet.setImplementation(1);
 
+        if (event.key.code == sf::Keyboard::Num3)
+            m_mandelbrotSet.setImplementation(2);
+    }
+
+    void MandelbrotState::updateInput(const float& ftime) {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             m_mandelbrotSet.zoom(300.0f * ftime);
 
@@ -66,20 +74,16 @@ namespace ng {
             m_mandelbrotSet.zoom(-300.0f * ftime);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            m_mandelbrotSet.move(0.f, 300.f * ftime);
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            m_mandelbrotSet.move(300.f * ftime, 0.f);
+            m_mandelbrotSet.move(0.f, 200.f * ftime);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            m_mandelbrotSet.move(0.f, -300.f * ftime);
+            m_mandelbrotSet.move(0.f, -200.f * ftime);
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            m_mandelbrotSet.move(200.f * ftime, 0.f);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            m_mandelbrotSet.move(-300.f * ftime, 0.f);
-
-        // todo: add key time
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
-            m_showCoordinates = !m_showCoordinates;
+            m_mandelbrotSet.move(-200.f * ftime, 0.f);
     }
 
     void MandelbrotState::updateText() {
