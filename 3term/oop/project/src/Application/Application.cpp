@@ -57,6 +57,9 @@ namespace ng {
                 case sf::Event::MouseWheelMoved:
                     if (!m_states.empty())
                         m_states.top()->mouseWheelMoved(event);
+                case sf::Event::KeyPressed:
+                    if (!m_states.empty())
+                        m_states.top()->keyPressed(event);
                 default:
                     break;
             }

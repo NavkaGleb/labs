@@ -17,6 +17,7 @@ namespace ng {
     class MandelbrotSet : public sf::Drawable {
     public:
         // usings
+        // todo: implement long arithmetic for doubles
         using PointType = long double;
 
         // constructor / destructor

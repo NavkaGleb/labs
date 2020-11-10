@@ -120,6 +120,7 @@ namespace ng {
     }
 
     void MandelbrotSet::update(const float& ftime) {
+        // todo: to use std::async
         std::thread thread1(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, 0,                m_size.y / 2);
         std::thread thread2(m_implementations[m_implementation].func, ftime, m_size.x / 2 + 1, m_size.x,     0,                m_size.y / 2);
         std::thread thread3(m_implementations[m_implementation].func, ftime, 0,                m_size.x / 2, m_size.y / 2 + 1, m_size.y);
