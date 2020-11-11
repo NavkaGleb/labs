@@ -17,6 +17,6 @@ set(HEADER_FILES
 # source files
 set(SOURCE_FILES
     src/main.cpp
-)
+        src/Timer.hpp src/Benchmark.hpp src/Console/Color.cpp src/Console/Color.hpp)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})

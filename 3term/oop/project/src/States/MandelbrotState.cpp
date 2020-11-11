@@ -67,6 +67,9 @@ namespace ng {
 
         if (event.key.code == sf::Keyboard::Num4)
             m_mandelbrotSet.setImplementation(3);
+
+        if (event.key.code == sf::Keyboard::Num5)
+            m_mandelbrotSet.setImplementation(4);
     }
 
     void MandelbrotState::updateInput(const float& ftime) {

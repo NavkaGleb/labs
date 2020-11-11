@@ -71,20 +71,20 @@ namespace Ng::Strassen {
         }
 
         template <typename T>
-        Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right) {
-           if (left.Rows() <= 64)
+        Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right, std::size_t limit) {
+           if (left.Rows() <= limit)
                 return left * right;
 
             auto leftSplit = Split(left);
             auto rightSplit = Split(right);
 
-            Matrix<T> a = Run(leftSplit[0] + leftSplit[3], rightSplit[0] + rightSplit[3]);
-            Matrix<T> b = Run(leftSplit[2] + leftSplit[3], rightSplit[0]                );
-            Matrix<T> c = Run(leftSplit[0]               , rightSplit[1] - rightSplit[3]);
-            Matrix<T> d = Run(leftSplit[3]               , rightSplit[2] - rightSplit[0]);
-            Matrix<T> e = Run(leftSplit[0] + leftSplit[1], rightSplit[3]                );
-            Matrix<T> f = Run(leftSplit[2] - leftSplit[0], rightSplit[0] + rightSplit[1]);
-            Matrix<T> g = Run(leftSplit[1] - leftSplit[3], rightSplit[2] + rightSplit[3]);
+            Matrix<T> a = Run(leftSplit[0] + leftSplit[3], rightSplit[0] + rightSplit[3], limit);
+            Matrix<T> b = Run(leftSplit[2] + leftSplit[3], rightSplit[0]                , limit);
+            Matrix<T> c = Run(leftSplit[0]               , rightSplit[1] - rightSplit[3], limit);
+            Matrix<T> d = Run(leftSplit[3]               , rightSplit[2] - rightSplit[0], limit);
+            Matrix<T> e = Run(leftSplit[0] + leftSplit[1], rightSplit[3]                , limit);
+            Matrix<T> f = Run(leftSplit[2] - leftSplit[0], rightSplit[0] + rightSplit[1], limit);
+            Matrix<T> g = Run(leftSplit[1] - leftSplit[3], rightSplit[2] + rightSplit[3], limit);
 
             leftSplit[0] = a + d - e + g;
             leftSplit[1] = c + e;
@@ -97,22 +97,22 @@ namespace Ng::Strassen {
     } // namespace _Internal
 
     template <typename T>
-    Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right) {
+    Matrix<T> Run(const Matrix<T>& left, const Matrix<T>& right, std::size_t limit = 64) {
         if (left.Columns() != right.Rows())
             throw std::invalid_argument("Ng::Strassen: Matrices have different size");
 
         if (_Internal::CheckSize(left, right) && _Internal::CheckSquareN2(left) && _Internal::CheckSquareN2(right))
-            return _Internal::Run(left, right);
+            return _Internal::Run(left, right, limit);
 
         size_t size = std::max({ left.Rows(), left.Columns(), right.Rows(), right.Columns() });
         Matrix<T> result;
 
         if (!_Internal::CheckSquareN2(left) && !_Internal::CheckSquareN2(right))
-            result = _Internal::Run(_Internal::SquareN2(left, size), _Internal::SquareN2(right, size));
+            result = _Internal::Run(_Internal::SquareN2(left, size), _Internal::SquareN2(right, size), limit);
         else if (!_Internal::CheckSquareN2(left))
-            result = _Internal::Run(_Internal::SquareN2(left, size), right);
+            result = _Internal::Run(_Internal::SquareN2(left, size), right, limit);
         else
-            result = _Internal::Run(left, _Internal::SquareN2(right, size));
+            result = _Internal::Run(left, _Internal::SquareN2(right, size), limit);
 
         result.Clean();
         return result;
