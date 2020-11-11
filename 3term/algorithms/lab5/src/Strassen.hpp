@@ -43,9 +43,9 @@ namespace Ng::Strassen {
 
             for (size_t i = 0; i < size; ++i) {
                 for (size_t j = 0; j < size; ++j) {
-                    result[0][i][j] = matrix.At(i, j);
-                    result[1][i][j] = matrix.At(i, j + size);
-                    result[2][i][j] = matrix.At(i + size, j);
+                    result[0][i][j] = matrix.At(i,        j       );
+                    result[1][i][j] = matrix.At(i,        j + size);
+                    result[2][i][j] = matrix.At(i + size, j       );
                     result[3][i][j] = matrix.At(i + size, j + size);
                 }
             }

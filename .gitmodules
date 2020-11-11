@@ -1,0 +1,3 @@
+[submodule "3term/algorithms/lab5/lib/libfort"]
+	path = 3term/algorithms/lab5/lib/libfort
+	url = https://github.com/NavkaGleb/libfort

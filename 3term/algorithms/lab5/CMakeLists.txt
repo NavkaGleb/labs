@@ -3,20 +3,31 @@ project(lab5)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(
-    src
-)
 
 # header files
 set(HEADER_FILES
     src/Matrix.hpp
     src/Strassen.hpp
     src/Random.hpp
+    src/Timer.hpp
+    src/Benchmark.hpp
+    src/Console/Color.hpp
 )
 
 # source files
 set(SOURCE_FILES
     src/main.cpp
-        src/Timer.hpp src/Benchmark.hpp src/Console/Color.cpp src/Console/Color.hpp)
+    src/Console/Color.cpp
+)
+
+set(FORT_ENABLE_TESTING OFF CACHE INTERNAL "")
+add_subdirectory(lib/libfort)
+
+include_directories(
+        src
+        lib/libfort/lib
+)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE fort)
