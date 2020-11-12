@@ -1,10 +1,12 @@
 #pragma once
 
+// std lib
 #include <iostream>
 #include <functional>
 #include <cmath>
 
-#include "Matrix.hpp"
+// own files
+#include "Matrix/Matrix.hpp"
 
 namespace Ng::Strassen {
 

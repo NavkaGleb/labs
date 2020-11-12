@@ -9,6 +9,9 @@
 #include <thread>
 #include <cmath>
 #include <vector>
+#include <iostream>
+
+#include <immintrin.h>
 
 // sfml lib
 #include <SFML/Graphics/Drawable.hpp>
@@ -24,7 +27,7 @@ namespace ng {
     public:
         // usings
         // TODO: implement long arithmetic for doubles
-        using PointType = long double;
+        using PointType = double;
 
         // constructor / destructor
         MandelbrotSet();
@@ -106,31 +109,85 @@ namespace ng {
                     std::unique_lock<std::mutex> lm(m_mutex);
                     m_start.wait(lm);
 
-                    for (std::size_t i = bi; i < ei; i += 1) {
-                        for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
-                            PointType realZ = 0.0;
-                            PointType imagineZ = 0.0;
-                            PointType realC = m_topLeft.x + i / 800.0 * (m_bottomRight.x - m_topLeft.x);
-                            PointType imagineC = m_topLeft.y + j / 800.0 * (m_bottomRight.y - m_topLeft.y);
+                    double x_scale = (m_bottomRight.x - m_topLeft.x) / 800.0;
+                    double y_scale = (m_bottomRight.y - m_topLeft.y) / 800.0;
 
-                            int iteration;
+                    double y_pos = m_topLeft.y;
 
-                            for (iteration = 0; iteration < m_iterations && realZ * realZ + imagineZ * imagineZ < 4.0; ++iteration) {
-                                PointType temp = realZ * realZ - imagineZ * imagineZ + realC;
-                                imagineZ = 2 * realZ * imagineZ + imagineC;
-                                realZ = temp;
+                    int y_offset = 0;
+                    int row_size = 800;
+
+                    int x, y;
+
+                    __m256d _a, _b, _two, _four, _mask1;
+                    __m256d _zr, _zi, _zr2, _zi2, _cr, _ci;
+                    __m256d _x_pos_offsets, _x_pos, _x_scale, _x_jump;
+                    __m256i _one, _c, _n, _iterations, _mask2;
+
+                    _one = _mm256_set1_epi64x(1);
+                    _two = _mm256_set1_pd(2.0);
+                    _four = _mm256_set1_pd(4.0);
+                    _iterations = _mm256_set1_epi64x(m_iterations);
+
+                    _x_scale = _mm256_set1_pd(x_scale);
+                    _x_jump = _mm256_set1_pd(x_scale * 4);
+                    _x_pos_offsets = _mm256_set_pd(0, 1, 2, 3);
+                    _x_pos_offsets = _mm256_mul_pd(_x_pos_offsets, _x_scale);
+
+
+                    for (y = 0; y < m_image.getSize().y; y++)
+                    {
+                        // Reset x_position
+                        _a = _mm256_set1_pd(m_topLeft.x);
+                        _x_pos = _mm256_add_pd(_a, _x_pos_offsets);
+
+                        _ci = _mm256_set1_pd(y_pos);
+
+                        for (x = 0; x < m_image.getSize().x; x += 4)
+                        {
+                            _cr = _x_pos;
+                            _zr = _mm256_setzero_pd();
+                            _zi = _mm256_setzero_pd();
+                            _n = _mm256_setzero_si256();
+
+                            repeat:
+                            _zr2 = _mm256_mul_pd(_zr, _zr);
+                            _zi2 = _mm256_mul_pd(_zi, _zi);
+                            _a = _mm256_sub_pd(_zr2, _zi2);
+                            _a = _mm256_add_pd(_a, _cr);
+                            _b = _mm256_mul_pd(_zr, _zi);
+                            _b = _mm256_fmadd_pd(_b, _two, _ci);
+                            _zr = _a;
+                            _zi = _b;
+                            _a = _mm256_add_pd(_zr2, _zi2);
+                            _mask1 = _mm256_cmp_pd(_a, _four, _CMP_LT_OQ);
+                            _mask2 = _mm256_cmpgt_epi64(_iterations, _n);
+                            _mask2 = _mm256_and_si256(_mask2, _mm256_castpd_si256(_mask1));
+                            _c = _mm256_and_si256(_one, _mask2); // Zero out ones where n < iterations
+                            _n = _mm256_add_epi64(_n, _c); // n++ Increase all n
+                            if (_mm256_movemask_pd(_mm256_castsi256_pd(_mask2)) > 0)
+                                goto repeat;
+
+                            for (int i = 0; i < 4; ++i) {
+
+                                int iteration = _n[i];
+                                sf::Color color;
+
+                                if (iteration == m_iterations) {
+                                    color = sf::Color(255, 0, 0, 255);
+                                } else {
+                                    int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
+                                    color = sf::Color(factor, factor, factor);
+                                }
+
+                                m_image.setPixel(x + i, y_offset / row_size, color);
                             }
 
-                            sf::Color color;
-                            if (iteration == m_iterations) {
-                                color = sf::Color(255, 0, 0, 255);
-                            } else {
-                                int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
-                                color = sf::Color(factor, factor, factor);
-                            }
-
-                            m_image.setPixel(i, j, color);
+                            _x_pos = _mm256_add_pd(_x_pos, _x_jump);
                         }
+
+                        y_pos += y_scale;
+                        y_offset += row_size;
                     }
 
 //                    m_texture.loadFromImage(m_image);

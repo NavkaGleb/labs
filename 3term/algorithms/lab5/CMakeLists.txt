@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 # header files
 set(HEADER_FILES
-    src/Matrix.hpp
-    src/Strassen.hpp
-    src/Random.hpp
-    src/Timer.hpp
-    src/Benchmark.hpp
+    src/Matrix/Matrix.hpp
+    src/Algorithms/Strassen.hpp
+    src/Algorithms/Random.hpp
+    src/Benchmark/Timer.hpp
+    src/Benchmark/Benchmark.hpp
     src/Console/Color.hpp
 )
 
@@ -24,8 +24,8 @@ set(FORT_ENABLE_TESTING OFF CACHE INTERNAL "")
 add_subdirectory(lib/libfort)
 
 include_directories(
-        src
-        lib/libfort/lib
+    src
+    lib/libfort/lib
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})

@@ -2,10 +2,10 @@
 
 #include <fort.hpp>
 
-#include "Matrix.hpp"
-#include "Random.hpp"
-#include "Strassen.hpp"
-#include "Benchmark.hpp"
+#include "Matrix/Matrix.hpp"
+#include "Algorithms/Random.hpp"
+#include "Algorithms/Strassen.hpp"
+#include "Benchmark/Benchmark.hpp"
 #include "Console/Color.hpp"
 
 template <typename T>
@@ -13,6 +13,16 @@ void Rand(Ng::Matrix<T>& matrix, const T& left, const T& right) {
     for (std::size_t i = 0; i < matrix.Rows(); ++i)
         for (std::size_t j = 0; j < matrix.Columns(); ++j)
             matrix[i][j] = Ng::Random::Irand(left, right);
+}
+
+bool CheckMultiplication() {
+    Ng::Matrix<int> left(321, 658);
+    Ng::Matrix<int> right(658, 1023);
+
+    Rand(left, -10, 10);
+    Rand(right, -10, 10);
+
+    return left * right == Ng::Strassen::Run(left, right);
 }
 
 fort::char_table CreateTable(std::size_t pow2) {
@@ -53,16 +63,21 @@ fort::char_table CreateTable(std::size_t pow2) {
         for (std::size_t j = 1; j <= i; ++j) {
             std::size_t size = std::pow(2, i);
             std::size_t limit = std::pow(2, j);
-            Ng::Matrix<int> m1(size, size);
-            Ng::Matrix<int> m2(size, size);
+            Ng::Matrix<int> left(size, size);
+            Ng::Matrix<int> right(size, size);
 
-            Rand(m1, -10, 10);
-            Rand(m2, -10, 10);
-            table << std::to_string(Ng::Benchmark<std::milli>([=] { m1 * m2; }).count()) + "ms";
+            Rand(left, -10, 10);
+            Rand(right, -10, 10);
+            table << std::to_string(Ng::Benchmark<std::milli>([=] { left * right; }).count()) + "ms";
 
-            Rand(m1, -10, 10);
-            Rand(m2, -10, 10);
-            table << std::to_string(Ng::Benchmark<std::milli>(Ng::Strassen::Run<int>, m1, m2, limit).count()) + "ms";
+            Rand(left, -10, 10);
+            Rand(right, -10, 10);
+            table << std::to_string(Ng::Benchmark<std::milli>(
+                Ng::Strassen::Run<decltype(left)::ValueType>,
+                left,
+                right,
+                limit
+            ).count()) + "ms";
         }
 
         table[i].set_cell_text_align(fort::text_align::right);
@@ -80,18 +95,12 @@ fort::char_table CreateTable(std::size_t pow2) {
 }
 
 int main() {
-    using Color = Ng::Console::Color;
+    std::cout << "Matrix multiplication..." << std::endl;
+    if (CheckMultiplication())
+        std::cout << Ng::Console::Color::Magenta << "Multiplication is OK" << Ng::Console::Color::Reset << std::endl;
 
-    Ng::Matrix<int> matrix1(321, 658);
-    Ng::Matrix<int> matrix2(658, 1023);
-
-    Rand(matrix1, -10, 10);
-    Rand(matrix2, -10, 10);
-
-    if (matrix1 * matrix2 == Ng::Strassen::Run(matrix1, matrix2))
-        std::cout << Color::Magenta << "Multiplication is OK" << Color::Reset << std::endl;
-
-    std::cout << CreateTable(10).to_string() << std::endl;
+    std::cout << std::endl;
+    std::cout << CreateTable(11).to_string() << std::endl;
 
     return 0;
 }

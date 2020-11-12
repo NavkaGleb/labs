@@ -1,5 +1,6 @@
 #pragma once
 
+// std lib
 #include <string>
 #include <vector>
 #include <ostream>
@@ -8,23 +9,31 @@
 
 namespace Ng {
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// HEADER
+    ////////////////////////////////////////////////////////////////////////////
+
     template <typename T>
     class Matrix {
     public:
+        // alias
+        using ValueType = T;
+
         // constructor / destructor
-        explicit Matrix(std::size_t rows = 0, std::size_t columns = 0, const T& value = T());
-        Matrix(std::initializer_list<std::initializer_list<T>> initList);
+        explicit Matrix(std::size_t rows = 0, std::size_t columns = 0, const ValueType& value = ValueType());
+        Matrix(std::initializer_list<std::initializer_list<ValueType>> initList);
         virtual ~Matrix() = default;
 
         // accessors
         [[nodiscard]] inline bool Empty() const { return m_Data.emtpy(); }
         [[nodiscard]] inline std::size_t Rows() const { return m_Rows; }
         [[nodiscard]] inline std::size_t Columns() const { return m_Columns; }
-        [[nodiscard]] inline std::vector<T>& operator[](std::size_t index) { return m_Data[index]; }
+        [[nodiscard]] inline std::vector<ValueType>& operator[](std::size_t index) { return m_Data[index]; }
         [[nodiscard]] inline const T& At(std::size_t i, std::size_t j) const { return m_Data.at(i).at(j); }
 
         // modifiers
-
+        void Rows(std::size_t rows);
+        void Columns(std::size_t columns);
 
         // public methods
         void Clear();
@@ -33,22 +42,27 @@ namespace Ng {
         void PopLastRow();
         void PopColumn(std::size_t index);
         void PopLastColumn();
-        std::size_t RowCount(std::size_t row, const T& value) const;
-        std::size_t ColumnCount(std::size_t column, const T& value) const;
+        std::size_t RowCount(std::size_t row, const ValueType& value) const;
+        std::size_t ColumnCount(std::size_t column, const ValueType& value) const;
 
         // operators
-        Matrix<T> operator+(const Matrix<T>& other) const;
-        Matrix<T> operator-(const Matrix<T>& other) const;
-        Matrix<T> operator*(const Matrix<T>& other) const;
-        bool operator==(const Matrix<T>& other) const;
+        Matrix<ValueType> operator+(const Matrix<ValueType>& other) const;
+        Matrix<ValueType> operator-(const Matrix<ValueType>& other) const;
+        Matrix<ValueType> operator*(const Matrix<ValueType>& other) const;
+        bool operator==(const Matrix<ValueType>& other) const;
         template <typename T_> friend std::ostream& operator<<(std::ostream& stream, const Matrix<T_>& matrix);
 
     private:
         // member data
-        std::vector<std::vector<T>> m_Data;
+        std::vector<std::vector<ValueType>> m_Data;
         std::size_t m_Rows;
         std::size_t m_Columns;
+
     }; // class Matrix
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// SOURCE
+    ////////////////////////////////////////////////////////////////////////////
 
     // constructor / destructor
     template <typename T>
@@ -71,6 +85,21 @@ namespace Ng {
 
         for (const auto& row : initList)
             m_Data.emplace_back(row);
+    }
+
+    // modifiers
+    template <typename T>
+    void Matrix<T>::Rows(std::size_t rows) {
+        m_Rows = rows;
+        m_Data.resize(m_Rows);
+    }
+
+    template <typename T>
+    void Matrix<T>::Columns(std::size_t columns) {
+        m_Columns = columns;
+
+        for (auto& row : m_Data)
+            row.resize(m_Columns, T());
     }
 
     // public methods

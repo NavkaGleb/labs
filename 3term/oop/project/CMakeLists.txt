@@ -13,7 +13,7 @@ find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 message(STATUS ${Boost_INCLUDE_DIR})
 
 # multi threading
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native -mprefer-vector-width=256")
 
 # header files
 set(HEADER_FILES
