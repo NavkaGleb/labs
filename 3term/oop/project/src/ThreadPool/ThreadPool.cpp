@@ -1,9 +1,5 @@
 #include "ThreadPool.hpp"
 
-#include <algorithm>
-#include <random>
-#include <iostream>
-
 namespace ng {
 
     // constructor / destructor
@@ -18,7 +14,9 @@ namespace ng {
                     {
                         std::unique_lock<std::mutex> lock(m_mutex);
 
-                        m_cv.wait(lock, [&] { return m_stop || !m_tasks.empty(); });
+                        m_cv.wait(lock, [&] {
+                            return m_stop || !m_tasks.empty();
+                        });
 
                         if (m_stop && m_tasks.empty())
                             break;

@@ -6,14 +6,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 # init SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
-set(CMAKE_LIBRARY_PATH "lib/SFML")
-set(SFML_INCLUDE_DIR "lib/SFML/include")
+#set(CMAKE_LIBRARY_PATH "lib/SFML")
+#set(SFML_INCLUDE_DIR "lib/SFML/include")
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
-message(STATUS ${Boost_INCLUDE_DIR})
+#message(STATUS ${Boost_INCLUDE_DIR})
 
 # multi threading
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native -mprefer-vector-width=256")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
 
 # header files
 set(HEADER_FILES
@@ -48,9 +48,9 @@ elseif ()
     message(ERROR SFML_NOT_FOUND)
 endif ()
 
-if (Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
-elseif ()
-    message(ERROR Boost_NOT_FOUND)
-endif ()
+#if (Boost_FOUND)
+#    include_directories(${Boost_INCLUDE_DIRS})
+#    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
+#elseif ()
+#    message(ERROR Boost_NOT_FOUND)
+#endif ()

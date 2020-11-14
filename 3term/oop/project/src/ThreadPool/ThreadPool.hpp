@@ -7,6 +7,7 @@
 #include <functional>
 #include <queue>
 #include <future>
+#include <iostream>
 
 namespace ng {
 
@@ -24,7 +25,9 @@ namespace ng {
         virtual ~ThreadPool();
 
         // accessors
-        [[nodiscard]] inline std::size_t size() { return m_threads.size(); }
+        [[nodiscard]] inline bool isEmpty() { return m_tasks.empty(); }
+        [[nodiscard]] inline std::size_t getTasksCount() { return m_tasks.size(); }
+        [[nodiscard]] inline std::size_t getThreadsCount() { return m_threads.size(); }
 
         // public methods
         template <typename T>

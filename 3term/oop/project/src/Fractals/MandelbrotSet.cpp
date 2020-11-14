@@ -8,18 +8,13 @@
 
 namespace ng {
 
-    std::atomic<int> MandelbrotSet::Thread::complete = 0;
-
     // constructor / destructor
     MandelbrotSet::MandelbrotSet()
         : m_iterations(40),
           m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
           m_sizeX(0.0), m_sizeY(0.0),
-          m_implementation(4) {
-
-        std::cout << "threads = " << std::thread::hardware_concurrency() << std::endl;
-        std::cout << "long double = " << sizeof(long double) << std::endl;
-        std::cout << "double = " << sizeof(double) << std::endl;
+          m_implementation(4),
+          m_threadPool(32) {
 
         // sfml
         m_image.create(800.0, 800.0);
@@ -31,22 +26,10 @@ namespace ng {
         m_implementations[2].name = "Threads";
         m_implementations[3].name = "Thread pool";
         m_implementations[4].name = "AVX2";
-
-        m_threads.resize(32);
-
-        // init thread
-        for (auto & m_thread : m_threads) {
-            m_thread = new Thread(m_image, m_texture);
-            m_thread->m_thread = std::thread(&Thread::create, m_thread);
-        }
     }
 
     MandelbrotSet::~MandelbrotSet() {
-        for (auto&& thread : m_threads) {
-            thread->m_alive = false;
-            thread->m_start.notify_one();
-            delete thread;
-        }
+        std::cout << "destructor MandelbrotSet" << std::endl;
     }
 
     // modifiers
@@ -132,7 +115,6 @@ namespace ng {
                 for (iteration = 0; std::abs(z) < 2.0 && iteration < m_iterations; ++iteration)
                     z = z * z + c;
 
-
                 sf::Color color;
 
                 if (iteration == m_iterations) {
@@ -149,7 +131,7 @@ namespace ng {
         m_texture.loadFromImage(m_image);
     }
 
-    void MandelbrotSet::implementation2(std::size_t si, std::size_t ei) {
+    void MandelbrotSet::implementation2(std::size_t si, std::size_t ei, bool setImage) {
         for (std::size_t i = si; i < ei; i += 1) {
             for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
                 PointType realZ = 0.0;
@@ -178,7 +160,8 @@ namespace ng {
             }
         }
 
-        m_texture.loadFromImage(m_image);
+        if (setImage)
+            m_texture.loadFromImage(m_image);
     }
 
     void MandelbrotSet::implementation3() {
@@ -186,23 +169,26 @@ namespace ng {
         size_t offset = m_image.getSize().x / threads.size();
 
         for (std::size_t i = 0; i < threads.size(); ++i)
-            threads[i] = std::thread(&MandelbrotSet::implementation2, this, i * offset, (i + 1) * offset - 1);
+            threads[i] = std::thread(&MandelbrotSet::implementation2, this, i * offset, (i + 1) * offset, false);
 
         for (auto& thread : threads)
             thread.join();
+
+        m_texture.loadFromImage(m_image);
     }
 
     void MandelbrotSet::implementation4() {
-        size_t offset = m_image.getSize().x / m_threads.size();
+        size_t offset = m_image.getSize().x / m_threadPool.getThreadsCount();
 
-        Thread::complete = 0;
+        std::vector<std::future<void>> futures;
 
-        // start thread
-        for (std::size_t i = 0; i < 32; ++i)
-            m_threads[i]->launch(i * offset, (i + 1) * offset - 1, m_topLeft, m_bottomRight, m_iterations);
+        for (std::size_t i = 0; i < m_threadPool.getThreadsCount(); ++i)
+            futures.emplace_back(m_threadPool.enqueue([this, capture1 = i * offset, capture2 = (i + 1) * offset] {
+                implementation2(capture1, capture2, false);
+            }));
 
-        // while loop
-        while (Thread::complete < 32) {}
+        for (auto&& future : futures)
+            future.get();
 
         m_texture.loadFromImage(m_image);
     }
