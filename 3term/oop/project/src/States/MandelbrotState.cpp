@@ -44,6 +44,10 @@ namespace ng {
         m_top.setCharacterSize(12);
     }
 
+    MandelbrotState::~MandelbrotState() {
+        std::cout << "destructor MandelbrotState" << std::endl;
+    }
+
     // public methods
     void MandelbrotState::mouseWheelMoved(const sf::Event& event) {
         if (event.mouseWheel.delta == -1)
@@ -93,6 +97,11 @@ namespace ng {
     }
 
     void MandelbrotState::updateText() {
+        m_text.setString(
+            "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
+            "Implementation: " + m_mandelbrotSet.getImplementationName()
+        );
+
         if (!m_showCoordinates)
             return;
 
@@ -122,11 +131,6 @@ namespace ng {
         m_top.setPosition(
             std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
             std::floor(0.0f)
-        );
-
-        m_text.setString(
-            "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
-            "Implementation: " + m_mandelbrotSet.getImplementationName()
         );
     }
 

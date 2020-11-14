@@ -9,7 +9,8 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close) {
+        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close),
+        m_paused(false) {
 
         loadFonts();
 
@@ -50,6 +51,14 @@ namespace ng {
         m_states.push(new MandelbrotState(800.f, 800.f));
     }
 
+    void Application::pause() {
+        m_paused = true;
+    }
+
+    void Application::resume() {
+        m_paused = false;
+    }
+
     void Application::updateFrameTime() {
         m_lastFrameTime = m_frameTime;
         m_frameTime = m_clock.restart();
@@ -62,6 +71,14 @@ namespace ng {
             switch (event.type) {
                 case sf::Event::Closed:
                     m_window.close();
+                    break;
+
+                case sf::Event::LostFocus:
+                    pause();
+                    break;
+
+                case sf::Event::GainedFocus:
+                    resume();
                     break;
 
                 case sf::Event::MouseButtonPressed:
@@ -82,8 +99,10 @@ namespace ng {
     }
 
     void Application::update() {
-        m_states.top()->update(m_frameTime.asSeconds());
+        if (m_paused)
+            return;
 
+        m_states.update(m_frameTime.asSeconds());
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
             "time: " + std::to_string(m_frameTime.asSeconds())
@@ -91,11 +110,12 @@ namespace ng {
     }
 
     void Application::render() {
+        // clear
         m_window.clear();
+
+        // display
         m_states.render(m_window);
-
         m_window.draw(m_statisticsText);
-
         m_window.display();
     }
 

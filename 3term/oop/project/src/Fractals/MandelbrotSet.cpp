@@ -35,25 +35,18 @@ namespace ng {
         m_threads.resize(32);
 
         // init thread
-        for (std::size_t i = 0; i < m_threads.size(); ++i) {
-            m_threads[i] = new Thread(m_image, m_texture);
-            m_threads[i]->m_thread = std::thread(&Thread::create, m_threads[i]);
+        for (auto & m_thread : m_threads) {
+            m_thread = new Thread(m_image, m_texture);
+            m_thread->m_thread = std::thread(&Thread::create, m_thread);
         }
     }
 
     MandelbrotSet::~MandelbrotSet() {
-        for (int i = 0; i < 4; i++)
-        {
-            m_threads[i]->m_alive = false;		 // Allow thread exit
-            m_threads[i]->m_start.notify_one(); // Fake starting gun
-        }
-
-        // Clean up worker threads
-        for (auto & thread : m_threads) {
+        for (auto&& thread : m_threads) {
+            thread->m_alive = false;
+            thread->m_start.notify_one();
             delete thread;
         }
-
-        std::cout << "a" << std::endl;
     }
 
     // modifiers

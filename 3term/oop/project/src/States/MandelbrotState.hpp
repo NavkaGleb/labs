@@ -9,7 +9,7 @@ namespace ng {
     public:
         // constructor / destructor
         MandelbrotState(float width, float height);
-        ~MandelbrotState() override = default;
+        ~MandelbrotState() override;
 
         // accessors
         [[nodiscard]] inline const MandelbrotSet& getMandelbrotSet() const { return m_mandelbrotSet; }

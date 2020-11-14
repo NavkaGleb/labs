@@ -21,6 +21,8 @@ set(HEADER_FILES
     src/States/State.hpp
     src/States/MandelbrotState.hpp
     src/Fractals/MandelbrotSet.hpp
+    src/StateStack/StackState.hpp
+    src/ThreadPool/ThreadPool.hpp
 )
 
 # source files
@@ -29,7 +31,9 @@ set(SOURCE_FILES
     src/Application/Application.cpp
     src/States/MandelbrotState.cpp
     src/Fractals/MandelbrotSet.cpp
-        src/StateStack/StackState.cpp src/StateStack/StackState.hpp)
+    src/StateStack/StackState.cpp
+    src/ThreadPool/ThreadPool.cpp
+)
 
 include_directories(
     src

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stack>
-#include <memory>
-
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -28,12 +25,16 @@ namespace ng {
         sf::Font m_font;
         sf::Text m_statisticsText;
         StackState m_states;
+        bool m_paused;
 
         // member methods
         void loadFonts();
         void initWindow();
         void initText();
         void initStates();
+
+        void pause();
+        void resume();
 
         void updateFrameTime();
         void pollEvent();

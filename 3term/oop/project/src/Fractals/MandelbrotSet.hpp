@@ -9,6 +9,7 @@
 #include <thread>
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 // sfml lib
 #include <SFML/Graphics/Drawable.hpp>
