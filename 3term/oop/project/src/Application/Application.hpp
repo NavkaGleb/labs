@@ -22,7 +22,6 @@ namespace ng {
     private:
         // member data
         sf::RenderWindow m_window;
-        unsigned m_frameLimit;
         sf::Clock m_clock;
         sf::Time m_frameTime;
         sf::Time m_lastFrameTime;
@@ -31,6 +30,11 @@ namespace ng {
         StackState m_states;
 
         // member methods
+        void loadFonts();
+        void initWindow();
+        void initText();
+        void initStates();
+
         void updateFrameTime();
         void pollEvent();
         void update();

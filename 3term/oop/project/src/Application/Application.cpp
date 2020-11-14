@@ -9,25 +9,13 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close),
-        m_frameLimit(60u) {
+        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close) {
 
-        // window
-        m_window.setFramerateLimit(m_frameLimit);
-        m_window.setVerticalSyncEnabled(true);
+        loadFonts();
 
-        // font
-        if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
-            throw std::invalid_argument("Application::Application: failed to load font");
-
-        // text
-        m_statisticsText.setFont(m_font);
-        m_statisticsText.setPosition(std::floor(5.0f), std::floor(5.0f));
-        m_statisticsText.setCharacterSize(20);
-        m_statisticsText.setFillColor(sf::Color::White);
-
-        // states
-        m_states.push(new MandelbrotState(800.f, 800.f));
+        initWindow();
+        initText();
+        initStates();
     }
 
     // public methods
@@ -41,6 +29,27 @@ namespace ng {
     }
 
     // member methods
+    void Application::loadFonts() {
+        if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
+            throw std::invalid_argument("Application::Application: failed to load font");
+    }
+
+    void Application::initWindow() {
+        m_window.setFramerateLimit(60u);
+        m_window.setVerticalSyncEnabled(true);
+    }
+
+    void Application::initText() {
+        m_statisticsText.setFont(m_font);
+        m_statisticsText.setPosition(std::floor(5.0f), std::floor(5.0f));
+        m_statisticsText.setCharacterSize(20);
+        m_statisticsText.setFillColor(sf::Color::White);
+    }
+
+    void Application::initStates() {
+        m_states.push(new MandelbrotState(800.f, 800.f));
+    }
+
     void Application::updateFrameTime() {
         m_lastFrameTime = m_frameTime;
         m_frameTime = m_clock.restart();
