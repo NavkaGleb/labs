@@ -99,8 +99,24 @@ int main() {
     if (CheckMultiplication())
         std::cout << Ng::Console::Color::Magenta << "Multiplication is OK" << Ng::Console::Color::Reset << std::endl;
 
-    std::cout << std::endl;
-    std::cout << CreateTable(11).to_string() << std::endl;
+//    std::cout << std::endl;
+//    std::cout << CreateTable(11).to_string() << std::endl;
+
+    Ng::Matrix<int> m1 = {
+        {  -8, 1, 1},
+        {2, 1, 0},
+        {9, -1, -1  }
+    };
+    Ng::Matrix<int> m2 = {
+        { -2 },
+        { 5 },
+        { -3 }
+    };
+
+    auto result = (m1 * m2);
+    result.Clean();
+
+    std::cout << result << std::endl;
 
     return 0;
 }

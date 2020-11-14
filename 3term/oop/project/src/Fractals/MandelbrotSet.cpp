@@ -52,6 +52,8 @@ namespace ng {
         for (auto & thread : m_threads) {
             delete thread;
         }
+
+        std::cout << "a" << std::endl;
     }
 
     // modifiers

@@ -27,7 +27,7 @@ namespace ng {
         m_statisticsText.setFillColor(sf::Color::White);
 
         // states
-        m_states.emplace(std::make_unique<MandelbrotState>(800.f, 800.f));
+        m_states.push(new MandelbrotState(800.f, 800.f));
     }
 
     // public methods
@@ -54,18 +54,18 @@ namespace ng {
                 case sf::Event::Closed:
                     m_window.close();
                     break;
+
                 case sf::Event::MouseButtonPressed:
-                    if (!m_states.empty())
-                        m_states.top()->mouseButtonPressed(event);
+                    m_states.mouseButtonPressed(event);
                     break;
+
                 case sf::Event::MouseWheelMoved:
-                    if (!m_states.empty())
-                        m_states.top()->mouseWheelMoved(event);
+                    m_states.mouseWheelMoved(event);
                     break;
                 case sf::Event::KeyPressed:
-                    if (!m_states.empty())
-                        m_states.top()->keyPressed(event);
+                    m_states.keyPressed(event);
                     break;
+
                 default:
                     break;
             }
@@ -73,8 +73,7 @@ namespace ng {
     }
 
     void Application::update() {
-        if (!m_states.empty())
-            m_states.top()->update(m_frameTime.asSeconds());
+        m_states.top()->update(m_frameTime.asSeconds());
 
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
@@ -84,9 +83,7 @@ namespace ng {
 
     void Application::render() {
         m_window.clear();
-
-        if (!m_states.empty())
-            m_states.top()->render(m_window);
+        m_states.render(m_window);
 
         m_window.draw(m_statisticsText);
 

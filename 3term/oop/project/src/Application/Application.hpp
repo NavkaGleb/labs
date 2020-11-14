@@ -6,7 +6,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "States/State.hpp"
+#include "StateStack/StackState.hpp"
 
 namespace ng {
 
@@ -28,7 +28,7 @@ namespace ng {
         sf::Time m_lastFrameTime;
         sf::Font m_font;
         sf::Text m_statisticsText;
-        std::stack<std::unique_ptr<State>> m_states;
+        StackState m_states;
 
         // member methods
         void updateFrameTime();
