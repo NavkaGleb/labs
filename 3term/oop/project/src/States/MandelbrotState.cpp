@@ -50,10 +50,7 @@ namespace ng {
 
     // public methods
     void MandelbrotState::mouseWheelMoved(const sf::Event& event) {
-        if (event.mouseWheel.delta == -1)
-            m_mandelbrotSet.decreaseIterations();
-        if (event.mouseWheel.delta == 1)
-            m_mandelbrotSet.increaseIterations();
+
     }
 
     void MandelbrotState::keyPressed(const sf::Event& event) {
@@ -77,6 +74,12 @@ namespace ng {
     }
 
     void MandelbrotState::updateInput(const float& ftime) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+            m_mandelbrotSet.decreaseIterations();
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+            m_mandelbrotSet.increaseIterations();
+
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             m_mandelbrotSet.zoom(300.0f * ftime);
 

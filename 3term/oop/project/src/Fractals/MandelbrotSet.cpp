@@ -93,7 +93,7 @@ namespace ng {
                 break;
 
             case 4:
-                implementation5();
+                implementation5(0, m_image.getSize().x);
                 break;
 
             default:
@@ -115,16 +115,7 @@ namespace ng {
                 for (iteration = 0; std::abs(z) < 2.0 && iteration < m_iterations; ++iteration)
                     z = z * z + c;
 
-                sf::Color color;
-
-                if (iteration == m_iterations) {
-                    color = sf::Color(255, 0, 0, 255);
-                } else {
-                    int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
-                    color = sf::Color(factor, factor, factor);
-                }
-
-                m_image.setPixel(i, j, color);
+                m_image.setPixel(i, j, getColor(iteration));
             }
         }
 
@@ -147,16 +138,7 @@ namespace ng {
                     realZ = temp;
                 }
 
-                sf::Color color;
-
-                if (iteration == m_iterations) {
-                    color = sf::Color(255, 0, 0, 255);
-                } else {
-                    int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
-                    color = sf::Color(factor, factor, factor);
-                }
-
-                m_image.setPixel(i, j, color);
+                m_image.setPixel(i, j, getColor(iteration));
             }
         }
 
@@ -169,9 +151,9 @@ namespace ng {
         size_t offset = m_image.getSize().x / threads.size();
 
         for (std::size_t i = 0; i < threads.size(); ++i)
-            threads[i] = std::thread(&MandelbrotSet::implementation2, this, i * offset, (i + 1) * offset, false);
+            threads[i] = std::thread(&MandelbrotSet::implementation5, this, i * offset, (i + 1) * offset, false);
 
-        for (auto& thread : threads)
+        for (auto&& thread : threads)
             thread.join();
 
         m_texture.loadFromImage(m_image);
@@ -184,7 +166,7 @@ namespace ng {
 
         for (std::size_t i = 0; i < m_threadPool.getThreadsCount(); ++i)
             futures.emplace_back(m_threadPool.enqueue([this, capture1 = i * offset, capture2 = (i + 1) * offset] {
-                implementation2(capture1, capture2, false);
+                implementation5(capture1, capture2, false);
             }));
 
         for (auto&& future : futures)
@@ -193,7 +175,7 @@ namespace ng {
         m_texture.loadFromImage(m_image);
     }
 
-    void MandelbrotSet::implementation5() {
+    void MandelbrotSet::implementation5(std::size_t si, std::size_t ei, bool setImage) {
         double x_scale = (m_bottomRight.x - m_topLeft.x) / 800.0;
         double y_scale = (m_bottomRight.y - m_topLeft.y) / 800.0;
 
@@ -219,16 +201,15 @@ namespace ng {
         _x_pos_offsets = _mm256_set_pd(0, 1, 2, 3);
         _x_pos_offsets = _mm256_mul_pd(_x_pos_offsets, _x_scale);
 
-
         for (y = 0; y < m_image.getSize().y; y++)
         {
             // Reset x_position
-            _a = _mm256_set1_pd(m_topLeft.x);
+            _a = _mm256_set1_pd(m_topLeft.x + x_scale * si);
             _x_pos = _mm256_add_pd(_a, _x_pos_offsets);
 
             _ci = _mm256_set1_pd(y_pos);
 
-            for (x = 0; x < m_image.getSize().x; x += 4)
+            for (x = si; x < ei; x += 4)
             {
                 _cr = _x_pos;
                 _zr = _mm256_setzero_pd();
@@ -255,17 +236,8 @@ namespace ng {
 
                 for (int i = 0; i < 4; ++i) {
 
-                    int iteration = _n[i];
-                    sf::Color color;
-
-                    if (iteration == m_iterations) {
-                        color = sf::Color(255, 0, 0, 255);
-                    } else {
-                        int factor = int(std::sqrt(double(iteration) / double(m_iterations)) * double(m_iterations));
-                        color = sf::Color(factor, factor, factor);
-                    }
-
-                    m_image.setPixel(x + i, y_offset / row_size, color);
+                    int iteration = _n[3 - i];
+                    m_image.setPixel(x + i, y_offset / row_size, getColor(iteration));
                 }
 
                 _x_pos = _mm256_add_pd(_x_pos, _x_jump);
@@ -275,10 +247,22 @@ namespace ng {
             y_offset += row_size;
         }
 
-        m_texture.loadFromImage(m_image);
+        if (setImage)
+            m_texture.loadFromImage(m_image);
     }
 
     // member methods
+    sf::Color MandelbrotSet::getColor(int iterations) {
+        if (iterations == m_iterations)
+            return sf::Color::Black;
+
+        double factor1 = (1.0 - std::cos(1.0 * M_PI * (std::log2(iterations) / 10))) / 2.0;
+        double factor2 = (1.0 - std::cos(2.0 * M_PI * (std::log2(iterations) / 10))) / 2.0;
+        double factor3 = (1.0 - std::cos(3.0 * M_PI * (std::log2(iterations) / 10))) / 2.0;
+
+        return sf::Color(255 * factor1, 255 * factor2, 255 * factor3, 255);
+    }
+
     void MandelbrotSet::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(m_sprite, states);
     }

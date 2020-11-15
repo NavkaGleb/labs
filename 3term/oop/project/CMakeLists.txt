@@ -6,11 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 # init SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
-#set(CMAKE_LIBRARY_PATH "lib/SFML")
-#set(SFML_INCLUDE_DIR "lib/SFML/include")
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
-#message(STATUS ${Boost_INCLUDE_DIR})
+#find_package(Boost 1.74.0 COMPONENTS system REQUIRED)
 
 # multi threading
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
@@ -41,16 +39,20 @@ include_directories(
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
-if (SFML_FOUND)
+if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES})
-elseif ()
+elseif()
     message(ERROR SFML_NOT_FOUND)
-endif ()
+endif()
 
-#if (Boost_FOUND)
-#    include_directories(${Boost_INCLUDE_DIRS})
-#    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
-#elseif ()
-#    message(ERROR Boost_NOT_FOUND)
-#endif ()
+if (Boost_FOUND)
+    message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
+    message(STATUS "Boost_VERSION: ${Boost_VERSION}")
+
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
+elseif()
+    message(ERROR Boost_NOT_FOUND)
+endif()

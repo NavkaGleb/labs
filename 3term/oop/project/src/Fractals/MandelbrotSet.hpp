@@ -60,7 +60,7 @@ namespace ng {
         void implementation2(std::size_t si, std::size_t ei, bool setImage = true);
         void implementation3();
         void implementation4();
-        void implementation5();
+        void implementation5(std::size_t si, std::size_t ei, bool setImage = true);
 
     private:
         // inner structs
@@ -84,6 +84,7 @@ namespace ng {
         ThreadPool m_threadPool;
 
         // member methods
+        sf::Color getColor(int iterations);
         void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
 
     }; // class MandelbrotSet
