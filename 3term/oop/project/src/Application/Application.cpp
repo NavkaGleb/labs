@@ -48,7 +48,7 @@ namespace ng {
     }
 
     void Application::initStates() {
-        m_states.push(new MainMenuState);
+        m_states.push(new MainMenuState(m_window));
     }
 
     void Application::pause() {

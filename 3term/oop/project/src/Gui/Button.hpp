@@ -23,8 +23,8 @@ namespace ng::gui {
         // accessors
         [[nodiscard]] inline const sf::Vector2f& getSize() const { return m_rect.getSize(); }
         [[nodiscard]] inline const sf::String& getText() const { return m_text.getString(); }
-        [[nodiscard]] inline bool isClicked() const;
-        [[nodiscard]] inline bool isHovered() const;
+        [[nodiscard]] inline bool isPressed() const { return m_status == Status::Active; };
+        [[nodiscard]] inline bool isHovered() const { return m_status == Status::Hover; }
 
         // modifiers
         void setPosition(float x, float y);
@@ -35,19 +35,27 @@ namespace ng::gui {
         void setTextHorizontalAlign(const HorizontalAlign& align);
         void setTextVerticalAlign(const VerticalAlign& align);
         void setCharacterSize(unsigned size);
-        void setBackgroundColor(const sf::Color& color);
+        void setBackgroundIdleColor(const sf::Color& color);
+        void setBackgroundHoverColor(const sf::Color& color);
+        void setBackgroundActiveColor(const sf::Color& color);
         void setTextColor(const sf::Color& color);
 
         // public methods
-        void update(const float& ftime);
+        void update(const sf::Vector2i& mousePosition);
 
     private:
+        // member enums
+        enum class Status { Idle = 0, Hover, Active };
+
         // member data
         sf::RectangleShape m_rect;
         sf::Text           m_text;
-        sf::Color          m_backgroundColor;
+        sf::Color          m_backgroundIdleColor;
+        sf::Color          m_backgroundHoverColor;
+        sf::Color          m_backgroundActiveColor;
         HorizontalAlign    m_horizontalAlign;
         VerticalAlign      m_verticalAlign;
+        Status             m_status;
 
         // member methods
         void updateHorizontalAlign();

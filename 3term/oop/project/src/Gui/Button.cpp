@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+#include <SFML/Window/Mouse.hpp>
+
 namespace ng::gui {
 
     // constructor / destructor
@@ -53,9 +55,16 @@ namespace ng::gui {
         updateLocalBounds();
     }
 
-    void Button::setBackgroundColor(const sf::Color& color) {
-        m_backgroundColor = color;
-        m_rect.setFillColor(m_backgroundColor);
+    void Button::setBackgroundIdleColor(const sf::Color& color) {
+        m_backgroundIdleColor = color;
+    }
+
+    void Button::setBackgroundHoverColor(const sf::Color& color) {
+        m_backgroundHoverColor = color;
+    }
+
+    void Button::setBackgroundActiveColor(const sf::Color &color) {
+        m_backgroundActiveColor = color;
     }
 
     void Button::setTextColor(const sf::Color& color) {
@@ -63,8 +72,29 @@ namespace ng::gui {
     }
 
     // public methods
-    void Button::update(const float& ftime) {
+    void Button::update(const sf::Vector2i& mousePosition) {
+        m_status = Status::Idle;
 
+        if (m_rect.getGlobalBounds().contains(mousePosition.x, mousePosition.y)) {
+            m_status = Status::Hover;
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                m_status = Status::Active;
+        }
+
+        switch (m_status) {
+            case Status::Idle:
+                m_rect.setFillColor(m_backgroundIdleColor);
+                break;
+
+            case Status::Hover:
+                m_rect.setFillColor(m_backgroundHoverColor);
+                break;
+
+            case Status::Active:
+                m_rect.setFillColor(m_backgroundActiveColor);
+                break;
+        }
     }
 
     // member methods
