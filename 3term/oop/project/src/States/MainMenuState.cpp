@@ -27,6 +27,11 @@ namespace ng {
     }
 
     // public methods
+    void MainMenuState::mouseButtonPressed(const sf::Event& event) {
+        if (m_buttons["Mandelbrot Set"]->isPressed())
+            int a;
+    }
+
     void MainMenuState::update(const float& ftime) {
         for (auto&& [name, button] : m_buttons)
             button->update(sf::Mouse::getPosition(m_window));

@@ -9,11 +9,11 @@
 
 namespace ng {
 
-    class StackState {
+    class StateStack {
     public:
         // constructor / destructor
-        StackState() = default;
-        virtual ~StackState() = default;
+        StateStack() = default;
+        virtual ~StateStack() = default;
 
         // accessors
         [[nodiscard]] inline State* top() const { return m_states.top().get(); }

@@ -18,6 +18,8 @@ namespace ng {
         ~MainMenuState() override = default;
 
         // public methods
+        void mouseButtonPressed(const sf::Event& event) override;
+
         void update(const float& ftime) override;
         void render(sf::RenderTarget& target) override;
 

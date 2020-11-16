@@ -3,7 +3,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "StateStack/StackState.hpp"
+#include "StateStack/StateStack.hpp"
 
 namespace ng {
 
@@ -24,7 +24,7 @@ namespace ng {
         sf::Time m_lastFrameTime;
         sf::Font m_font;
         sf::Text m_statisticsText;
-        StackState m_states;
+        StateStack m_states;
         bool m_paused;
 
         // member methods

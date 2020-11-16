@@ -2,12 +2,15 @@
 
 #include <SFML/Graphics.hpp>
 
+
 namespace ng {
+
+    class StateStack;
 
     class State {
     public:
         // constructor / destructor
-        State() = default;
+        explicit State(StateStack& states);
         virtual ~State() = default;
 
         // public methods
@@ -17,6 +20,10 @@ namespace ng {
 
         virtual void update(const float& ftime) = 0;
         virtual void render(sf::RenderTarget& target) = 0;
+
+    private:
+        // member data
+        ng::StateStack& m_states;
 
     }; // class State
 
