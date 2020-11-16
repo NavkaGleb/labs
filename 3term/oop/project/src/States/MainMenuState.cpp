@@ -12,11 +12,14 @@ namespace ng {
         std::unique_ptr<gui::Button> button = std::make_unique<gui::Button>();
 
         button->setFont(m_font);
-        button->setCharacterSize(12);
-        button->setText("Mandelbrot set");
-        button->setSize(sf::Vector2f(100.0f, 40.0f));
-        button->setPosition(40.0f, 40.0f);
-        button->setBackgroundColor(sf::Color::Magenta);
+        button->setCharacterSize(20);
+        button->setText("Mandelbrot Set");
+        button->setTextHorizontalAlign(gui::Button::HorizontalAlign::Center);
+        button->setTextVerticalAlign(gui::Button::VerticalAlign::Center);
+        button->setTextColor(sf::Color::White);
+        button->setSize(sf::Vector2f(200.0f, 40.0f));
+        button->setPosition(400.0f, 400.0f);
+        button->setBackgroundColor(sf::Color(30, 50, 150, 200));
 
         m_buttons["Mandelbrot Set"] = std::move(button);
     }
