@@ -44,10 +44,12 @@ namespace ng {
         [[nodiscard]] inline const std::string& getImplementationName() const {
             return m_implementations.at(m_implementation).name;
         }
+        [[nodiscard]] inline bool getColoring() const { return m_coloring; }
 
         // modifiers
         void setSize(const sf::Vector2<PointType>& size);
         void setImplementation(int implementation);
+        void setColoring(bool coloring);
 
         // public methods
         void move(const sf::Vector2f& offset);
@@ -82,6 +84,7 @@ namespace ng {
         int m_implementation;
         std::unordered_map<int, Implementation> m_implementations;
         ThreadPool m_threadPool;
+        bool m_coloring;
 
         // member methods
         sf::Color getColor(int iterations);

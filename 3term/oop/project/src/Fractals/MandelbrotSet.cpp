@@ -14,7 +14,8 @@ namespace ng {
           m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
           m_sizeX(0.0), m_sizeY(0.0),
           m_implementation(4),
-          m_threadPool(32) {
+          m_threadPool(32),
+          m_coloring(true) {
 
         // sfml
         m_image.create(800.0, 800.0);
@@ -40,7 +41,13 @@ namespace ng {
         m_sizeY = (m_bottomRight.y - m_topLeft.y) / m_size.y;
     }
 
-    void MandelbrotSet::setImplementation(int implementation) { m_implementation = implementation; }
+    void MandelbrotSet::setImplementation(int implementation) {
+        m_implementation = implementation;
+    }
+
+    void MandelbrotSet::setColoring(bool coloring) {
+        m_coloring = coloring;
+    }
 
     // public methods
     void MandelbrotSet::move(const sf::Vector2f& offset) {
@@ -253,6 +260,18 @@ namespace ng {
 
     // member methods
     sf::Color MandelbrotSet::getColor(int iterations) {
+        if (!m_coloring) {
+            if (iterations == m_iterations)
+                return sf::Color::Black;
+
+            int factor = 255 * iterations / m_iterations / 2;
+
+            if (factor < 20)
+                factor = 20;
+
+            return sf::Color(factor, factor, factor * 2);
+        }
+
         if (iterations == m_iterations)
             return sf::Color::Black;
 

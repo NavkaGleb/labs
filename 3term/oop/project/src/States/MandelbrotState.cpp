@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <cmath>
 
-//#include <boost/lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace ng {
 
@@ -56,6 +56,9 @@ namespace ng {
     void MandelbrotState::keyPressed(const sf::Event& event) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
             m_showCoordinates = !m_showCoordinates;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+            m_mandelbrotSet.setColoring(!m_mandelbrotSet.getColoring());
 
         if (event.key.code == sf::Keyboard::Num1)
             m_mandelbrotSet.setImplementation(0);
@@ -109,32 +112,32 @@ namespace ng {
             return;
 
         // left text
-//        m_left.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
-//        m_left.setPosition(
-//            std::floor(0.f),
-//            std::floor((m_windowSize.y + m_left.getGlobalBounds().height) / 2.0f)
-//        );
-//
-//         right text
-//        m_right.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getRight()));
-//        m_right.setPosition(
-//            std::floor(m_windowSize.x - m_right.getGlobalBounds().width * 2.f),
-//            std::floor((m_windowSize.y + m_right.getGlobalBounds().height) / 2.0f)
-//        );
-//
-//         bottom text
-//        m_bottom.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getBottom()));
-//        m_bottom.setPosition(
-//            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
-//            std::floor(m_windowSize.y - m_bottom.getGlobalBounds().height * 2.0f)
-//        );
-//
-//         top text
-//        m_top.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getTop()));
-//        m_top.setPosition(
-//            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
-//            std::floor(0.0f)
-//        );
+        m_left.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
+        m_left.setPosition(
+            std::floor(0.f),
+            std::floor((m_windowSize.y + m_left.getGlobalBounds().height) / 2.0f)
+        );
+
+        // right text
+        m_right.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getRight()));
+        m_right.setPosition(
+            std::floor(m_windowSize.x - m_right.getGlobalBounds().width * 2.f),
+            std::floor((m_windowSize.y + m_right.getGlobalBounds().height) / 2.0f)
+        );
+
+        // bottom text
+        m_bottom.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getBottom()));
+        m_bottom.setPosition(
+            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
+            std::floor(m_windowSize.y - m_bottom.getGlobalBounds().height * 2.0f)
+        );
+
+        // top text
+        m_top.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getTop()));
+        m_top.setPosition(
+            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
+            std::floor(0.0f)
+        );
     }
 
     void MandelbrotState::update(const float& ftime) {
