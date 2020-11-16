@@ -36,6 +36,11 @@ namespace ng {
         sf::Text m_top;
         bool m_showCoordinates;
 
+        // member methods
+        void loadFonts();
+        void initText();
+        void initMandelbrotSet();
+
     }; // class MandelbrotState
 
 } // namespace ng

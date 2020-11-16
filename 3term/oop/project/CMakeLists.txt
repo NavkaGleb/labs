@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
-#find_package(Boost 1.74.0 COMPONENTS system REQUIRED)
+#find_package(Boost 1.74.0 COMPONENTS  REQUIRED)
 
 # multi threading
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
@@ -21,6 +21,8 @@ set(HEADER_FILES
     src/Fractals/MandelbrotSet.hpp
     src/StateStack/StackState.hpp
     src/ThreadPool/ThreadPool.hpp
+    src/States/MainMenuState.hpp
+    src/Gui/Button.cpp
 )
 
 # source files
@@ -31,6 +33,8 @@ set(SOURCE_FILES
     src/Fractals/MandelbrotSet.cpp
     src/StateStack/StackState.cpp
     src/ThreadPool/ThreadPool.cpp
+    src/States/MainMenuState.cpp
+    src/Gui/Button.hpp
 )
 
 include_directories(

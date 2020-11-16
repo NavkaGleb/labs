@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-#include "States/MandelbrotState.hpp"
+#include "States/MainMenuState.hpp"
 
 namespace ng {
 
@@ -48,7 +48,7 @@ namespace ng {
     }
 
     void Application::initStates() {
-        m_states.push(new MandelbrotState(800.f, 800.f));
+        m_states.push(new MainMenuState);
     }
 
     void Application::pause() {

@@ -14,34 +14,10 @@ namespace ng {
         : m_windowSize(width, height),
           m_showCoordinates(true) {
 
-        if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
-            throw std::invalid_argument("ng::MandelbrotState::MandelbrotState: failed to load font");
+        loadFonts();
 
-        // mandelbrot set
-        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(m_windowSize));
-
-        // text
-        m_text.setFont(m_font);
-        m_text.setCharacterSize(20);
-        m_text.setPosition(5.f, 70.f);
-
-        // left text
-        m_left.rotate(-90.0f);
-        m_left.setFont(m_font);
-        m_left.setCharacterSize(12);
-
-        // right text
-        m_right.rotate(-90.0f);
-        m_right.setFont(m_font);
-        m_right.setCharacterSize(12);
-
-        // bottom text
-        m_bottom.setFont(m_font);
-        m_bottom.setCharacterSize(12);
-
-        // top text
-        m_top.setFont(m_font);
-        m_top.setCharacterSize(12);
+        initMandelbrotSet();
+        initText();
     }
 
     MandelbrotState::~MandelbrotState() {
@@ -157,6 +133,41 @@ namespace ng {
         target.draw(m_right);
         target.draw(m_bottom);
         target.draw(m_top);
+    }
+
+    // member methods
+    void MandelbrotState::loadFonts() {
+        if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
+            throw std::invalid_argument("ng::MandelbrotState::MandelbrotState: failed to load font");
+    }
+
+    void MandelbrotState::initText() {
+        // text
+        m_text.setFont(m_font);
+        m_text.setCharacterSize(20);
+        m_text.setPosition(5.f, 70.f);
+
+        // left text
+        m_left.rotate(-90.0f);
+        m_left.setFont(m_font);
+        m_left.setCharacterSize(12);
+
+        // right text
+        m_right.rotate(-90.0f);
+        m_right.setFont(m_font);
+        m_right.setCharacterSize(12);
+
+        // bottom text
+        m_bottom.setFont(m_font);
+        m_bottom.setCharacterSize(12);
+
+        // top text
+        m_top.setFont(m_font);
+        m_top.setCharacterSize(12);
+    }
+
+    void MandelbrotState::initMandelbrotSet() {
+        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(m_windowSize));
     }
 
 } // namespace ng
