@@ -36,8 +36,14 @@ namespace ng {
     }
 
     void Application::initWindow() {
-        m_window.setFramerateLimit(60u);
-        m_window.setVerticalSyncEnabled(true);
+        State::Context& context = State::getContext();
+
+        context.framerateLimit = 60u;
+        context.verticalSyncEnabled = true;
+        context.window = &m_window;
+
+        m_window.setFramerateLimit(context.framerateLimit);
+        m_window.setVerticalSyncEnabled(context.verticalSyncEnabled);
     }
 
     void Application::initText() {

@@ -13,9 +13,9 @@ namespace ng {
         : m_iterations(40),
           m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
           m_sizeX(0.0), m_sizeY(0.0),
-          m_implementation(4),
+          m_implementation(0),
           m_threadPool(32),
-          m_coloring(true) {
+          m_coloring(false) {
 
         // sfml
         m_image.create(800.0, 800.0);

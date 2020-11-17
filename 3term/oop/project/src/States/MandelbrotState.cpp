@@ -1,8 +1,6 @@
 #include "MandelbrotState.hpp"
 
 #include <iostream>
-#include <sstream>
-#include <iomanip>
 #include <cmath>
 
 #include <boost/lexical_cast.hpp>
@@ -10,9 +8,8 @@
 namespace ng {
 
     // constructor / destructor
-    MandelbrotState::MandelbrotState(float width, float height)
-        : m_windowSize(width, height),
-          m_showCoordinates(true) {
+    MandelbrotState::MandelbrotState()
+        : m_showCoordinates(true) {
 
         loadFonts();
 
@@ -82,7 +79,9 @@ namespace ng {
     }
 
     void MandelbrotState::updateText() {
-        m_text.setString(
+        static sf::Vector2u windowSize = State::getContext().window->getSize();
+
+        m_text[TextRole::Statistic].setString(
             "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
             "Implementation: " + m_mandelbrotSet.getImplementationName()
         );
@@ -91,31 +90,31 @@ namespace ng {
             return;
 
         // left text
-        m_left.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
-        m_left.setPosition(
+        m_text[TextRole::Left].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
+        m_text[TextRole::Left].setPosition(
             std::floor(0.f),
-            std::floor((m_windowSize.y + m_left.getGlobalBounds().height) / 2.0f)
+            std::floor((windowSize.y + m_text[TextRole::Left].getGlobalBounds().height) / 2.0f)
         );
 
         // right text
-        m_right.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getRight()));
-        m_right.setPosition(
-            std::floor(m_windowSize.x - m_right.getGlobalBounds().width * 2.f),
-            std::floor((m_windowSize.y + m_right.getGlobalBounds().height) / 2.0f)
-        );
-
-        // bottom text
-        m_bottom.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getBottom()));
-        m_bottom.setPosition(
-            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
-            std::floor(m_windowSize.y - m_bottom.getGlobalBounds().height * 2.0f)
+        m_text[TextRole::Right].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getRight()));
+        m_text[TextRole::Right].setPosition(
+            std::floor(windowSize.x - m_text[TextRole::Right].getGlobalBounds().width * 2.f),
+            std::floor((windowSize.y + m_text[TextRole::Right].getGlobalBounds().height) / 2.0f)
         );
 
         // top text
-        m_top.setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getTop()));
-        m_top.setPosition(
-            std::floor((m_windowSize.x - m_bottom.getGlobalBounds().width) / 2.0f),
+        m_text[TextRole::Top].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getTop()));
+        m_text[TextRole::Top].setPosition(
+            std::floor((windowSize.x - m_text[TextRole::Top].getGlobalBounds().width) / 2.0f),
             std::floor(0.0f)
+        );
+
+        // bottom text
+        m_text[TextRole::Bottom].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getBottom()));
+        m_text[TextRole::Bottom].setPosition(
+            std::floor((windowSize.x - m_text[TextRole::Bottom].getGlobalBounds().width) / 2.0f),
+            std::floor(windowSize.y - m_text[TextRole::Bottom].getGlobalBounds().height * 2.0f)
         );
     }
 
@@ -127,15 +126,15 @@ namespace ng {
 
     void MandelbrotState::render(sf::RenderTarget& target) {
         target.draw(m_mandelbrotSet);
-        target.draw(m_text);
+        target.draw(m_text[TextRole::Statistic]);
 
         if (!m_showCoordinates)
             return;
 
-        target.draw(m_left);
-        target.draw(m_right);
-        target.draw(m_bottom);
-        target.draw(m_top);
+        target.draw(m_text[TextRole::Left]);
+        target.draw(m_text[TextRole::Right]);
+        target.draw(m_text[TextRole::Top]);
+        target.draw(m_text[TextRole::Bottom]);
     }
 
     // member methods
@@ -145,32 +144,35 @@ namespace ng {
     }
 
     void MandelbrotState::initText() {
-        // text
-        m_text.setFont(m_font);
-        m_text.setCharacterSize(20);
-        m_text.setPosition(5.f, 70.f);
+        unsigned statisticTextCharacterSize = 20;
+        unsigned coordinatesTextCharacterSize = 12;
+
+        // statistic text
+        m_text[TextRole::Statistic].setFont(m_font);
+        m_text[TextRole::Statistic].setCharacterSize(statisticTextCharacterSize);
+        m_text[TextRole::Statistic].setPosition(5.f, 70.f);
 
         // left text
-        m_left.rotate(-90.0f);
-        m_left.setFont(m_font);
-        m_left.setCharacterSize(12);
+        m_text[TextRole::Left].rotate(-90.0f);
+        m_text[TextRole::Left].setFont(m_font);
+        m_text[TextRole::Left].setCharacterSize(coordinatesTextCharacterSize);
 
         // right text
-        m_right.rotate(-90.0f);
-        m_right.setFont(m_font);
-        m_right.setCharacterSize(12);
-
-        // bottom text
-        m_bottom.setFont(m_font);
-        m_bottom.setCharacterSize(12);
+        m_text[TextRole::Right].rotate(-90.0f);
+        m_text[TextRole::Right].setFont(m_font);
+        m_text[TextRole::Right].setCharacterSize(coordinatesTextCharacterSize);
 
         // top text
-        m_top.setFont(m_font);
-        m_top.setCharacterSize(12);
+        m_text[TextRole::Top].setFont(m_font);
+        m_text[TextRole::Top].setCharacterSize(coordinatesTextCharacterSize);
+
+        // bottom text
+        m_text[TextRole::Bottom].setFont(m_font);
+        m_text[TextRole::Bottom].setCharacterSize(coordinatesTextCharacterSize);
     }
 
     void MandelbrotState::initMandelbrotSet() {
-        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(m_windowSize));
+        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(State::getContext().window->getSize()));
     }
 
 } // namespace ng

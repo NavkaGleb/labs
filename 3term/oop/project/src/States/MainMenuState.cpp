@@ -21,7 +21,7 @@ namespace ng {
     void MainMenuState::mouseButtonPressed(const sf::Event& event) {
         if (event.mouseButton.button == sf::Mouse::Left && m_buttons["Mandelbrot Set"]->isHovered()) {
             std::cout << "a" << std::endl;
-            State::getStateStack().push(new MandelbrotState(m_window.getSize().x, m_window.getSize().y));
+            State::getStateStack().push(new MandelbrotState);
         }
     }
 

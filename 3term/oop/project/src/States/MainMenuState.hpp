@@ -11,7 +11,7 @@
 
 namespace ng {
 
-    class MainMenuState final : public State {
+    class MainMenuState : public State {
     public:
         // constructor / destructor
         explicit MainMenuState(sf::RenderWindow& window);
@@ -24,10 +24,13 @@ namespace ng {
         void render(sf::RenderTarget& target) override;
 
     private:
+        // aliases
+        using ButtonPtr = std::unique_ptr<gui::Button>;
+
         // member data
-        std::unordered_map<std::string, std::unique_ptr<gui::Button>> m_buttons;
-        sf::Font m_font;
-        sf::RenderWindow& m_window;
+        std::unordered_map<std::string, ButtonPtr> m_buttons;
+        sf::Font                                   m_font;
+        sf::RenderWindow&                          m_window;
 
         // member methods
         void loadFonts();

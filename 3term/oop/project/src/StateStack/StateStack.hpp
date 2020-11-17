@@ -16,9 +16,6 @@ namespace ng {
         StateStack() = default;
         virtual ~StateStack() = default;
 
-        // accessors
-        [[nodiscard]] inline State* top() const { return m_states.top().get(); }
-
         // public methods
         void push(State*);
         void pop();
@@ -31,8 +28,11 @@ namespace ng {
         void render(sf::RenderTarget& target);
 
     private:
+        // alias
+        using StatePtr = std::unique_ptr<State>;
+
         // member data
-        std::stack<std::unique_ptr<State>> m_states;
+        std::stack<StatePtr> m_states;
 
     }; // class StackState
 
