@@ -1,5 +1,7 @@
 #include "StateStack.hpp"
 
+#include <States/State.hpp>
+
 namespace ng {
 
     // public methods

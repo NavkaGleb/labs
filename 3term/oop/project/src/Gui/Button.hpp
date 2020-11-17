@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -10,7 +12,7 @@
 
 namespace ng::gui {
 
-    class Button final : public sf::Drawable {
+    class Button : public sf::Drawable {
     public:
         // enums
         enum class HorizontalAlign { Left = 0, Center, Right };

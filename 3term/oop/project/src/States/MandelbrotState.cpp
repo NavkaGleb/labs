@@ -30,10 +30,13 @@ namespace ng {
     }
 
     void MandelbrotState::keyPressed(const sf::Event& event) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
+        if (event.key.code == sf::Keyboard::Escape)
+            State::getStateStack().pop();
+
+        if (event.key.code == sf::Keyboard::C)
             m_showCoordinates = !m_showCoordinates;
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+        if (event.key.code == sf::Keyboard::F)
             m_mandelbrotSet.setColoring(!m_mandelbrotSet.getColoring());
 
         if (event.key.code == sf::Keyboard::Num1)

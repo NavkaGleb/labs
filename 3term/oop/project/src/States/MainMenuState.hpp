@@ -14,7 +14,7 @@ namespace ng {
     class MainMenuState final : public State {
     public:
         // constructor / destructor
-        MainMenuState(sf::RenderWindow& window);
+        explicit MainMenuState(sf::RenderWindow& window);
         ~MainMenuState() override = default;
 
         // public methods
@@ -28,6 +28,10 @@ namespace ng {
         std::unordered_map<std::string, std::unique_ptr<gui::Button>> m_buttons;
         sf::Font m_font;
         sf::RenderWindow& m_window;
+
+        // member methods
+        void loadFonts();
+        void initButtons();
 
     };
 

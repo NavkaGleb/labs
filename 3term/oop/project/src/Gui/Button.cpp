@@ -7,10 +7,11 @@
 
 namespace ng::gui {
 
-    // constructor / destructor
-    Button::Button() {
-
-    }
+    // constructor
+    Button::Button() :
+        m_horizontalAlign(HorizontalAlign::Left),
+        m_verticalAlign(VerticalAlign::Top),
+        m_status(Status::Idle) {}
 
     // modifiers
     void Button::setPosition(float x, float y) {

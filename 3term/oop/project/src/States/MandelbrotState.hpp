@@ -26,15 +26,15 @@ namespace ng {
 
     private:
         // member data
-        sf::Vector2f m_windowSize;
+        sf::Vector2f  m_windowSize;
         MandelbrotSet m_mandelbrotSet;
-        sf::Font m_font;
-        sf::Text m_text;
-        sf::Text m_left;
-        sf::Text m_right;
-        sf::Text m_bottom;
-        sf::Text m_top;
-        bool m_showCoordinates;
+        sf::Font      m_font;
+        sf::Text      m_text;
+        sf::Text      m_left;
+        sf::Text      m_right;
+        sf::Text      m_bottom;
+        sf::Text      m_top;
+        bool          m_showCoordinates;
 
         // member methods
         void loadFonts();

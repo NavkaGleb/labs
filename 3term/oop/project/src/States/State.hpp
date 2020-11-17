@@ -2,16 +2,18 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <StateStack/StateStack.hpp>
 
 namespace ng {
-
-    class StateStack;
 
     class State {
     public:
         // constructor / destructor
-        explicit State(StateStack& states);
+        State() = default;
         virtual ~State() = default;
+
+        // static accessors
+        [[nodiscard]] static StateStack& getStateStack();
 
         // public methods
         virtual void mouseButtonPressed(const sf::Event& event) {};
@@ -20,10 +22,6 @@ namespace ng {
 
         virtual void update(const float& ftime) = 0;
         virtual void render(sf::RenderTarget& target) = 0;
-
-    private:
-        // member data
-        ng::StateStack& m_states;
 
     }; // class State
 

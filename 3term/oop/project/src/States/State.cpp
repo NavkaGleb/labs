@@ -2,7 +2,9 @@
 
 namespace ng {
 
-    // constructor
-    State::State(StateStack& states) : m_states(states) {}
+    StateStack& State::getStateStack() {
+        static StateStack states;
+        return states;
+    }
 
 } // namespace ng

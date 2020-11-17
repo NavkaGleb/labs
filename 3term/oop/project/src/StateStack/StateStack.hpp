@@ -3,11 +3,12 @@
 #include <stack>
 #include <memory>
 
+#include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
-#include "States/State.hpp"
-
 namespace ng {
+
+    class State;
 
     class StateStack {
     public:

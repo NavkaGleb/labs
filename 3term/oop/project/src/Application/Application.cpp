@@ -48,7 +48,7 @@ namespace ng {
     }
 
     void Application::initStates() {
-        m_states.push(new MainMenuState(m_window));
+        State::getStateStack().push(new MainMenuState(m_window));
     }
 
     void Application::pause() {
@@ -82,14 +82,14 @@ namespace ng {
                     break;
 
                 case sf::Event::MouseButtonPressed:
-                    m_states.mouseButtonPressed(event);
+                    State::getStateStack().mouseButtonPressed(event);
                     break;
 
                 case sf::Event::MouseWheelMoved:
-                    m_states.mouseWheelMoved(event);
+                    State::getStateStack().mouseWheelMoved(event);
                     break;
                 case sf::Event::KeyPressed:
-                    m_states.keyPressed(event);
+                    State::getStateStack().keyPressed(event);
                     break;
 
                 default:
@@ -102,7 +102,7 @@ namespace ng {
         if (m_paused)
             return;
 
-        m_states.update(m_frameTime.asSeconds());
+        State::getStateStack().update(m_frameTime.asSeconds());
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
             "time: " + std::to_string(m_frameTime.asSeconds())
@@ -114,7 +114,7 @@ namespace ng {
         m_window.clear();
 
         // display
-        m_states.render(m_window);
+        State::getStateStack().render(m_window);
         m_window.draw(m_statisticsText);
         m_window.display();
     }

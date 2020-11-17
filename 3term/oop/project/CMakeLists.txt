@@ -19,7 +19,7 @@ set(HEADER_FILES
     src/States/State.hpp
     src/States/MandelbrotState.hpp
     src/Fractals/MandelbrotSet.hpp
-        src/StateStack/StateStack.hpp
+    src/StateStack/StateStack.hpp
     src/ThreadPool/ThreadPool.hpp
     src/States/MainMenuState.hpp
     src/Gui/Button.cpp
@@ -29,13 +29,14 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/main.cpp
     src/Application/Application.cpp
+    src/States/State.cpp
     src/States/MandelbrotState.cpp
     src/Fractals/MandelbrotSet.cpp
-        src/StateStack/StateStack.cpp
+    src/StateStack/StateStack.cpp
     src/ThreadPool/ThreadPool.cpp
     src/States/MainMenuState.cpp
     src/Gui/Button.hpp
-        src/States/State.cpp)
+)
 
 include_directories(
     src

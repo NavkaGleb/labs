@@ -3,8 +3,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "StateStack/StateStack.hpp"
-
 namespace ng {
 
     class Application {
@@ -24,7 +22,6 @@ namespace ng {
         sf::Time m_lastFrameTime;
         sf::Font m_font;
         sf::Text m_statisticsText;
-        StateStack m_states;
         bool m_paused;
 
         // member methods
