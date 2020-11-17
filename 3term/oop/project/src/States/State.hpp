@@ -26,6 +26,7 @@ namespace ng {
     private:
         // inner structs
         struct Context {
+            // data
             sf::RenderWindow* window              = nullptr;
             unsigned          framerateLimit      = 60;
             bool              verticalSyncEnabled = true;

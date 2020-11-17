@@ -1,17 +1,13 @@
 #pragma once
 
-// std lib
 #include <string>
 #include <unordered_map>
 #include <functional>
-#include <condition_variable>
-#include <mutex>
 #include <thread>
 #include <cmath>
 #include <vector>
 #include <iostream>
 
-// sfml lib
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -25,12 +21,21 @@ namespace ng {
 
     class MandelbrotSet : public sf::Drawable {
     public:
-        // usings
+        // aliases
         // TODO: implement long arithmetic for doubles
-        using PointType = long double;
+        using PointType = double;
+
+        // enums
+        enum class ImplementationType : short {
+            Pseudocode = 0,
+            ByHand,
+            AVX2,
+            Threads,
+            ThreadPool
+        };
 
         // constructor / destructor
-        MandelbrotSet();
+        explicit MandelbrotSet(const sf::Vector2u& size);
         ~MandelbrotSet() override;
 
         // accessors
@@ -40,15 +45,14 @@ namespace ng {
         [[nodiscard]] inline PointType getBottom() const { return m_bottomRight.y; }
         [[nodiscard]] inline PointType getTop() const { return m_topLeft.y; }
         [[nodiscard]] inline const sf::Vector2<PointType>& getSize() const { return m_size; }
-        [[nodiscard]] inline int getImplementation() const { return m_implementation; }
+        [[nodiscard]] inline ImplementationType getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
             return m_implementations.at(m_implementation).name;
         }
         [[nodiscard]] inline bool getColoring() const { return m_coloring; }
 
         // modifiers
-        void setSize(const sf::Vector2<PointType>& size);
-        void setImplementation(int implementation);
+        void setImplementation(const ImplementationType& type);
         void setColoring(bool coloring);
 
         // public methods
@@ -69,7 +73,17 @@ namespace ng {
         struct Implementation {
             // data
             std::string name;
+            std::function<void(std::size_t, std::size_t, bool)> func;
+
+            // operators
+            void operator()(std::size_t start, std::size_t end, bool setImage) const {
+                return func(start, end, setImage);
+            }
+
         }; // struct Implementation
+
+        // aliases
+        using ImplementationContainer = std::unordered_map<ImplementationType, Implementation>;
 
         // member data
         sf::Image m_image;
@@ -79,12 +93,11 @@ namespace ng {
         int m_iterations;
         sf::Vector2<PointType> m_topLeft;
         sf::Vector2<PointType> m_bottomRight;
-        PointType m_sizeX;
-        PointType m_sizeY;
-        int m_implementation;
-        std::unordered_map<int, Implementation> m_implementations;
-        ThreadPool m_threadPool;
-        bool m_coloring;
+        sf::Vector2<PointType> m_scale;
+        ImplementationType      m_implementation;
+        ImplementationContainer m_implementations;
+        ThreadPool              m_threadPool;
+        bool                    m_coloring;
 
         // member methods
         sf::Color getColor(int iterations);

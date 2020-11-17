@@ -37,7 +37,6 @@ namespace ng {
         // member methods
         void loadFonts();
         void initText();
-        void initMandelbrotSet();
 
     }; // class MandelbrotState
 

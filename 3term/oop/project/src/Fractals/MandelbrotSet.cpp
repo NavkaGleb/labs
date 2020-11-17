@@ -9,24 +9,31 @@
 namespace ng {
 
     // constructor / destructor
-    MandelbrotSet::MandelbrotSet()
+    MandelbrotSet::MandelbrotSet(const sf::Vector2u& size)
         : m_iterations(40),
           m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
-          m_sizeX(0.0), m_sizeY(0.0),
-          m_implementation(0),
+          m_implementation(ImplementationType::Pseudocode),
           m_threadPool(32),
           m_coloring(false) {
 
         // sfml
-        m_image.create(800.0, 800.0);
+        m_image.create(size.x, size.y);
         m_texture.loadFromImage(m_image);
         m_sprite.setTexture(m_texture);
 
-        m_implementations[0].name = "Pseudo code";
-        m_implementations[1].name = "Own implementation";
-        m_implementations[2].name = "Threads";
-        m_implementations[3].name = "Thread pool";
-        m_implementations[4].name = "AVX2";
+        m_size = static_cast<sf::Vector2<PointType>>(size);
+
+        m_scale.x = (m_bottomRight.x - m_topLeft.x) / m_size.x;
+        m_scale.y = (m_bottomRight.y - m_topLeft.y) / m_size.y;
+
+        std::cout << "x = " << m_scale.x << std::endl;
+        std::cout << "y = " << m_scale.y << std::endl;
+
+        m_implementations[ImplementationType::Pseudocode].name = "Pseudo code";
+        m_implementations[ImplementationType::ByHand].name     = "Own implementation";
+        m_implementations[ImplementationType::AVX2].name       = "AVX2";
+        m_implementations[ImplementationType::Threads].name    = "Threads";
+        m_implementations[ImplementationType::ThreadPool].name = "Thread pool";
     }
 
     MandelbrotSet::~MandelbrotSet() {
@@ -34,15 +41,8 @@ namespace ng {
     }
 
     // modifiers
-    void MandelbrotSet::setSize(const sf::Vector2<PointType>& size) {
-        m_size = size;
-        m_image.create(m_size.x, m_size.y);
-        m_sizeX = (m_bottomRight.x - m_topLeft.x) / m_size.x;
-        m_sizeY = (m_bottomRight.y - m_topLeft.y) / m_size.y;
-    }
-
-    void MandelbrotSet::setImplementation(int implementation) {
-        m_implementation = implementation;
+    void MandelbrotSet::setImplementation(const ImplementationType& type) {
+        m_implementation = type;
     }
 
     void MandelbrotSet::setColoring(bool coloring) {
@@ -51,27 +51,27 @@ namespace ng {
 
     // public methods
     void MandelbrotSet::move(const sf::Vector2f& offset) {
-        m_topLeft.x -= offset.x * m_sizeX;
-        m_bottomRight.x -= offset.x * m_sizeX;
-        m_topLeft.y -= offset.y * m_sizeY;
-        m_bottomRight.y -= offset.y * m_sizeY;
+        m_topLeft.x     -= offset.x * m_scale.x;
+        m_bottomRight.x -= offset.x * m_scale.x;
+        m_topLeft.y     -= offset.y * m_scale.y;
+        m_bottomRight.y -= offset.y * m_scale.y;
     }
 
     void MandelbrotSet::move(float offsetX, float offsetY) {
-        m_topLeft.x -= offsetX * m_sizeX;
-        m_bottomRight.x -= offsetX * m_sizeX;
-        m_topLeft.y -= offsetY * m_sizeY;
-        m_bottomRight.y -= offsetY * m_sizeY;
+        m_topLeft.x     -= offsetX * m_scale.x;
+        m_bottomRight.x -= offsetX * m_scale.x;
+        m_topLeft.y     -= offsetY * m_scale.y;
+        m_bottomRight.y -= offsetY * m_scale.y;
     }
 
     void MandelbrotSet::zoom(float factor) {
-        m_topLeft.x += m_sizeX * factor;
-        m_bottomRight.x -= m_sizeX * factor;
-        m_topLeft.y += m_sizeY * factor;
-        m_bottomRight.y -= m_sizeY * factor;
+        m_topLeft.x     += factor * m_scale.x;
+        m_bottomRight.x -= factor * m_scale.x;
+        m_topLeft.y     += factor * m_scale.y;
+        m_bottomRight.y -= factor * m_scale.y;
 
-        m_sizeX = (m_bottomRight.x - m_topLeft.x) / m_size.x;
-        m_sizeY = (m_bottomRight.y - m_topLeft.y) / m_size.y;
+        m_scale.x = (m_bottomRight.x - m_topLeft.x) / m_size.x;
+        m_scale.y = (m_bottomRight.y - m_topLeft.y) / m_size.y;
     }
 
     void MandelbrotSet::increaseIterations() { m_iterations += 5; }
@@ -83,27 +83,24 @@ namespace ng {
 
     void MandelbrotSet::update(const float& ftime) {
         switch (m_implementation) {
-            case 0:
+            case ImplementationType::Pseudocode:
                 implementation1();
                 break;
 
-            case 1:
+            case ImplementationType::ByHand:
                 implementation2(0, m_image.getSize().x);
                 break;
 
-            case 2:
-                implementation3();
-                break;
-
-            case 3:
-                implementation4();
-                break;
-
-            case 4:
+            case ImplementationType::AVX2:
                 implementation5(0, m_image.getSize().x);
                 break;
 
-            default:
+            case ImplementationType::Threads:
+                implementation3();
+                break;
+
+            case ImplementationType::ThreadPool:
+                implementation4();
                 break;
         }
     }

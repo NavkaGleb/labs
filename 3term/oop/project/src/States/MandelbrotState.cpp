@@ -9,11 +9,10 @@ namespace ng {
 
     // constructor / destructor
     MandelbrotState::MandelbrotState()
-        : m_showCoordinates(true) {
+        : m_mandelbrotSet(State::getContext().window->getSize()),
+        m_showCoordinates(true) {
 
         loadFonts();
-
-        initMandelbrotSet();
         initText();
     }
 
@@ -37,19 +36,19 @@ namespace ng {
             m_mandelbrotSet.setColoring(!m_mandelbrotSet.getColoring());
 
         if (event.key.code == sf::Keyboard::Num1)
-            m_mandelbrotSet.setImplementation(0);
+            m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::Pseudocode);
 
         if (event.key.code == sf::Keyboard::Num2)
-            m_mandelbrotSet.setImplementation(1);
+            m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::ByHand);
 
         if (event.key.code == sf::Keyboard::Num3)
-            m_mandelbrotSet.setImplementation(2);
+            m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::AVX2);
 
         if (event.key.code == sf::Keyboard::Num4)
-            m_mandelbrotSet.setImplementation(3);
+            m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::Threads);
 
         if (event.key.code == sf::Keyboard::Num5)
-            m_mandelbrotSet.setImplementation(4);
+            m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::ThreadPool);
     }
 
     void MandelbrotState::updateInput(const float& ftime) {
@@ -169,10 +168,6 @@ namespace ng {
         // bottom text
         m_text[TextRole::Bottom].setFont(m_font);
         m_text[TextRole::Bottom].setCharacterSize(coordinatesTextCharacterSize);
-    }
-
-    void MandelbrotState::initMandelbrotSet() {
-        m_mandelbrotSet.setSize(sf::Vector2<MandelbrotSet::PointType>(State::getContext().window->getSize()));
     }
 
 } // namespace ng
