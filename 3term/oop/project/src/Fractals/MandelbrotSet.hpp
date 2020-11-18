@@ -21,11 +21,8 @@ namespace ng {
 
     class MandelbrotSet : public sf::Drawable {
     public:
-        // aliases
-        // TODO: implement long arithmetic for doubles
-        using PointType = double;
-
         // enums
+        enum class Bounds : short { MinX = 0, MaxX, MinY, MaxY };
         enum class ImplementationType : short {
             Pseudocode = 0,
             ByHand,
@@ -34,16 +31,17 @@ namespace ng {
             ThreadPool
         };
 
+        // aliases
+        using PointType       = double;
+        using BoundsContainer = std::unordered_map<Bounds, PointType>;
+
         // constructor / destructor
         explicit MandelbrotSet(const sf::Vector2u& size);
         ~MandelbrotSet() override;
 
         // accessors
         [[nodiscard]] inline int getIterations() const { return m_iterations; }
-        [[nodiscard]] inline PointType getLeft() const { return m_topLeft.x; }
-        [[nodiscard]] inline PointType getRight() const { return m_bottomRight.x; }
-        [[nodiscard]] inline PointType getBottom() const { return m_bottomRight.y; }
-        [[nodiscard]] inline PointType getTop() const { return m_topLeft.y; }
+        [[nodiscard]] inline BoundsContainer getLocalBounds() const { return m_bounds; }
         [[nodiscard]] inline const sf::Vector2<PointType>& getSize() const { return m_size; }
         [[nodiscard]] inline ImplementationType getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
@@ -85,18 +83,19 @@ namespace ng {
         // aliases
         using ImplementationContainer = std::unordered_map<ImplementationType, Implementation>;
 
+        // TODO: zoom!
         // member data
-        sf::Image m_image;
-        sf::Texture m_texture;
-        sf::Sprite m_sprite;
-        sf::Vector2<PointType> m_size;
-        int m_iterations;
-        sf::Vector2<PointType> m_topLeft;
-        sf::Vector2<PointType> m_bottomRight;
-        sf::Vector2<PointType> m_scale;
+        sf::Image               m_image;
+        sf::Texture             m_texture;
+        sf::Sprite              m_sprite;
+        sf::Vector2<PointType>  m_size;
+        sf::Vector2<PointType>  m_scale;
+        BoundsContainer         m_bounds;
+        PointType               m_zoom;
         ImplementationType      m_implementation;
         ImplementationContainer m_implementations;
         ThreadPool              m_threadPool;
+        unsigned                m_iterations;
         bool                    m_coloring;
 
         // member methods

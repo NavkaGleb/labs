@@ -79,6 +79,9 @@ namespace ng {
 
     void MandelbrotState::updateText() {
         static sf::Vector2u windowSize = State::getContext().window->getSize();
+        static std::function<std::string(MandelbrotSet::PointType)> toString = [](MandelbrotSet::PointType point) {
+            return boost::lexical_cast<std::string>(point);
+        };
 
         m_text[TextRole::Statistic].setString(
             "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
@@ -89,31 +92,31 @@ namespace ng {
             return;
 
         // left text
-        m_text[TextRole::Left].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getLeft()));
+        m_text[TextRole::Left].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MinX)));
         m_text[TextRole::Left].setPosition(
             std::floor(0.f),
             std::floor((windowSize.y + m_text[TextRole::Left].getGlobalBounds().height) / 2.0f)
         );
 
         // right text
-        m_text[TextRole::Right].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getRight()));
+        m_text[TextRole::Right].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MaxX)));
         m_text[TextRole::Right].setPosition(
             std::floor(windowSize.x - m_text[TextRole::Right].getGlobalBounds().width * 2.f),
             std::floor((windowSize.y + m_text[TextRole::Right].getGlobalBounds().height) / 2.0f)
         );
 
-        // top text
-        m_text[TextRole::Top].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getTop()));
-        m_text[TextRole::Top].setPosition(
-            std::floor((windowSize.x - m_text[TextRole::Top].getGlobalBounds().width) / 2.0f),
-            std::floor(0.0f)
-        );
-
         // bottom text
-        m_text[TextRole::Bottom].setString(boost::lexical_cast<std::string>(m_mandelbrotSet.getBottom()));
+        m_text[TextRole::Bottom].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MinY)));
         m_text[TextRole::Bottom].setPosition(
             std::floor((windowSize.x - m_text[TextRole::Bottom].getGlobalBounds().width) / 2.0f),
             std::floor(windowSize.y - m_text[TextRole::Bottom].getGlobalBounds().height * 2.0f)
+        );
+
+        // top text
+        m_text[TextRole::Top].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MaxY)));
+        m_text[TextRole::Top].setPosition(
+            std::floor((windowSize.x - m_text[TextRole::Top].getGlobalBounds().width) / 2.0f),
+            std::floor(0.0f)
         );
     }
 

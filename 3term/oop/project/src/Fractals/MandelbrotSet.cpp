@@ -10,10 +10,10 @@ namespace ng {
 
     // constructor / destructor
     MandelbrotSet::MandelbrotSet(const sf::Vector2u& size)
-        : m_iterations(40),
-          m_topLeft(-2.5, 2.0), m_bottomRight(1.5, -2.0),
+        : m_bounds(4),
           m_implementation(ImplementationType::Pseudocode),
           m_threadPool(32),
+          m_iterations(40),
           m_coloring(false) {
 
         // sfml
@@ -21,13 +21,14 @@ namespace ng {
         m_texture.loadFromImage(m_image);
         m_sprite.setTexture(m_texture);
 
+        // size of image
         m_size = static_cast<sf::Vector2<PointType>>(size);
 
-        m_scale.x = (m_bottomRight.x - m_topLeft.x) / m_size.x;
-        m_scale.y = (m_bottomRight.y - m_topLeft.y) / m_size.y;
-
-        std::cout << "x = " << m_scale.x << std::endl;
-        std::cout << "y = " << m_scale.y << std::endl;
+        // bounds
+        m_bounds[Bounds::MinX] = -2.5;
+        m_bounds[Bounds::MaxX] =  1.5;
+        m_bounds[Bounds::MinY] = -2.0;
+        m_bounds[Bounds::MaxY] =  2.0;
 
         m_implementations[ImplementationType::Pseudocode].name = "Pseudo code";
         m_implementations[ImplementationType::ByHand].name     = "Own implementation";
@@ -51,27 +52,28 @@ namespace ng {
 
     // public methods
     void MandelbrotSet::move(const sf::Vector2f& offset) {
-        m_topLeft.x     -= offset.x * m_scale.x;
-        m_bottomRight.x -= offset.x * m_scale.x;
-        m_topLeft.y     -= offset.y * m_scale.y;
-        m_bottomRight.y -= offset.y * m_scale.y;
+        m_bounds[Bounds::MinX] -= offset.x * m_scale.x;
+        m_bounds[Bounds::MaxX] -= offset.x * m_scale.x;
+        m_bounds[Bounds::MinY] -= offset.y * m_scale.y;
+        m_bounds[Bounds::MaxY] -= offset.y * m_scale.y;
     }
 
     void MandelbrotSet::move(float offsetX, float offsetY) {
-        m_topLeft.x     -= offsetX * m_scale.x;
-        m_bottomRight.x -= offsetX * m_scale.x;
-        m_topLeft.y     -= offsetY * m_scale.y;
-        m_bottomRight.y -= offsetY * m_scale.y;
+        m_bounds[Bounds::MinX] -= offsetX * m_scale.x;
+        m_bounds[Bounds::MaxX] -= offsetX * m_scale.x;
+        m_bounds[Bounds::MinY] -= offsetY * m_scale.y;
+        m_bounds[Bounds::MaxY] -= offsetY * m_scale.y;
     }
 
     void MandelbrotSet::zoom(float factor) {
-        m_topLeft.x     += factor * m_scale.x;
-        m_bottomRight.x -= factor * m_scale.x;
-        m_topLeft.y     += factor * m_scale.y;
-        m_bottomRight.y -= factor * m_scale.y;
+        m_bounds[Bounds::MinX] += factor * m_scale.x;
+        m_bounds[Bounds::MaxX] -= factor * m_scale.x;
+        m_bounds[Bounds::MinY] += factor * m_scale.y;
+        m_bounds[Bounds::MaxY] -= factor * m_scale.y;
 
-        m_scale.x = (m_bottomRight.x - m_topLeft.x) / m_size.x;
-        m_scale.y = (m_bottomRight.y - m_topLeft.y) / m_size.y;
+        // update scale
+        m_scale.x = (m_bounds[Bounds::MaxX] - m_bounds[Bounds::MinX]) / m_size.x;
+        m_scale.y = (m_bounds[Bounds::MaxY] - m_bounds[Bounds::MinY]) / m_size.y;
     }
 
     void MandelbrotSet::increaseIterations() { m_iterations += 5; }
@@ -108,10 +110,10 @@ namespace ng {
     void MandelbrotSet::implementation1() {
         for (std::size_t i = 0; i < m_image.getSize().x; i += 1) {
             for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
-                std::complex<PointType> z = 0;
+                std::complex<PointType> z(0.0, 0.0);
                 std::complex<PointType> c(
-                    m_topLeft.x + i / m_size.x * (m_bottomRight.x - m_topLeft.x),
-                    m_topLeft.y + j / m_size.y * (m_bottomRight.y - m_topLeft.y)
+                    m_bounds[Bounds::MinX] + i / m_size.x * (m_bounds[Bounds::MaxX] - m_bounds[Bounds::MinX]),
+                    m_bounds[Bounds::MinY] + j / m_size.y * (m_bounds[Bounds::MaxY] - m_bounds[Bounds::MinY])
                 );
 
                 int iteration;
@@ -130,15 +132,15 @@ namespace ng {
         for (std::size_t i = si; i < ei; i += 1) {
             for (std::size_t j = 0; j < m_image.getSize().y; j += 1) {
                 PointType realZ = 0.0;
-                PointType imagineZ = 0.0;
-                PointType realC = m_topLeft.x + i / m_size.x * (m_bottomRight.x - m_topLeft.x);
-                PointType imagineC = m_topLeft.y + j / m_size.y * (m_bottomRight.y - m_topLeft.y);
+                PointType imagZ = 0.0;
+                PointType realC = m_bounds[Bounds::MinX] + i / m_size.x * (m_bounds[Bounds::MaxX] - m_bounds[Bounds::MinX]);
+                PointType imagC = m_bounds[Bounds::MinY] + j / m_size.y * (m_bounds[Bounds::MaxY] - m_bounds[Bounds::MinY]);
 
                 int iteration;
 
-                for (iteration = 0; iteration < m_iterations && realZ * realZ + imagineZ * imagineZ < 4.0; ++iteration) {
-                    PointType temp = realZ * realZ - imagineZ * imagineZ + realC;
-                    imagineZ = 2 * realZ * imagineZ + imagineC;
+                for (iteration = 0; iteration < m_iterations && realZ * realZ + imagZ * imagZ < 4.0; ++iteration) {
+                    PointType temp = realZ * realZ - imagZ * imagZ + realC;
+                    imagZ = 2 * realZ * imagZ + imagC;
                     realZ = temp;
                 }
 
@@ -180,10 +182,7 @@ namespace ng {
     }
 
     void MandelbrotSet::implementation5(std::size_t si, std::size_t ei, bool setImage) {
-        double x_scale = (m_bottomRight.x - m_topLeft.x) / 800.0;
-        double y_scale = (m_bottomRight.y - m_topLeft.y) / 800.0;
-
-        double y_pos = m_topLeft.y;
+        PointType y_pos = m_bounds[Bounds::MinY];
 
         int y_offset = 0;
         int row_size = 800;
@@ -200,15 +199,15 @@ namespace ng {
         _four = _mm256_set1_pd(4.0);
         _iterations = _mm256_set1_epi64x(m_iterations);
 
-        _x_scale = _mm256_set1_pd(x_scale);
-        _x_jump = _mm256_set1_pd(x_scale * 4);
+        _x_scale = _mm256_set1_pd(m_scale.x);
+        _x_jump = _mm256_set1_pd(m_scale.x * 4);
         _x_pos_offsets = _mm256_set_pd(0, 1, 2, 3);
         _x_pos_offsets = _mm256_mul_pd(_x_pos_offsets, _x_scale);
 
         for (y = 0; y < m_image.getSize().y; y++)
         {
             // Reset x_position
-            _a = _mm256_set1_pd(m_topLeft.x + x_scale * si);
+            _a = _mm256_set1_pd(m_bounds[Bounds::MinX] + m_scale.x * si);
             _x_pos = _mm256_add_pd(_a, _x_pos_offsets);
 
             _ci = _mm256_set1_pd(y_pos);
@@ -247,7 +246,7 @@ namespace ng {
                 _x_pos = _mm256_add_pd(_x_pos, _x_jump);
             }
 
-            y_pos += y_scale;
+            y_pos += m_scale.y;
             y_offset += row_size;
         }
 
