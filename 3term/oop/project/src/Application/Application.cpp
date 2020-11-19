@@ -91,6 +91,9 @@ namespace ng {
                     State::getStateStack().mouseButtonPressed(event);
                     break;
 
+                case sf::Event::MouseButtonReleased:
+                    State::getStateStack().mouseButtonReleased(event);
+
                 case sf::Event::MouseWheelMoved:
                     State::getStateStack().mouseWheelMoved(event);
                     break;

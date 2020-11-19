@@ -26,7 +26,7 @@ namespace ng {
 
     private:
         // enums
-        enum class TextRole : short { Statistic = 0, Left, Right, Top, Bottom };
+        enum class TextRole : short { Statistic = 0, MinX, MaxX, MinY, MaxY };
 
         // member data
         MandelbrotSet                          m_mandelbrotSet;

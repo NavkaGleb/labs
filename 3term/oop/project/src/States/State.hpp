@@ -14,6 +14,7 @@ namespace ng {
 
         // public methods
         virtual void mouseButtonPressed(const sf::Event& event) {};
+        virtual void mouseButtonReleased(const sf::Event& event) {};
         virtual void mouseWheelMoved(const sf::Event& event) {};
         virtual void keyPressed(const sf::Event& event) {};
 

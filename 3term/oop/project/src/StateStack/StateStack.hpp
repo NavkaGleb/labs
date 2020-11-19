@@ -10,6 +10,8 @@ namespace ng {
 
     class State;
 
+    // TODO: State interface
+
     class StateStack {
     public:
         // constructor / destructor
@@ -21,6 +23,7 @@ namespace ng {
         void pop();
 
         void mouseButtonPressed(const sf::Event& event);
+        void mouseButtonReleased(const sf::Event& event);
         void mouseWheelMoved(const sf::Event& event);
         void keyPressed(const sf::Event& event);
 

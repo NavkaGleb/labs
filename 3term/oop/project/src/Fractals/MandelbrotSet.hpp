@@ -40,9 +40,10 @@ namespace ng {
         ~MandelbrotSet() override;
 
         // accessors
-        [[nodiscard]] inline int getIterations() const { return m_iterations; }
+        [[nodiscard]] inline unsigned getIterations() const { return m_iterations; }
         [[nodiscard]] inline BoundsContainer getLocalBounds() const { return m_bounds; }
         [[nodiscard]] inline const sf::Vector2<PointType>& getSize() const { return m_size; }
+        [[nodiscard]] inline PointType getZoom() const { return m_zoom; }
         [[nodiscard]] inline ImplementationType getImplementation() const { return m_implementation; }
         [[nodiscard]] inline const std::string& getImplementationName() const {
             return m_implementations.at(m_implementation).name;
@@ -59,12 +60,7 @@ namespace ng {
         void zoom(float factor);
         void increaseIterations();
         void decreaseIterations();
-        void update(const float& ftime);
-        void implementation1();
-        void implementation2(std::size_t si, std::size_t ei, bool setImage = true);
-        void implementation3();
-        void implementation4();
-        void implementation5(std::size_t si, std::size_t ei, bool setImage = true);
+        void update();
 
     private:
         // inner structs
@@ -74,8 +70,8 @@ namespace ng {
             std::function<void(std::size_t, std::size_t, bool)> func;
 
             // operators
-            void operator()(std::size_t start, std::size_t end, bool setImage) const {
-                return func(start, end, setImage);
+            void operator()(std::size_t start, std::size_t end, bool loadFromImage) const {
+                return func(start, end, loadFromImage);
             }
 
         }; // struct Implementation
@@ -99,8 +95,8 @@ namespace ng {
         bool                    m_coloring;
 
         // member methods
-        sf::Color getColor(int iterations);
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
+        sf::Color getColor(int iterations) const;
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     }; // class MandelbrotSet
 
