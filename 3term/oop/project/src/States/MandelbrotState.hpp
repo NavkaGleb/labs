@@ -22,7 +22,7 @@ namespace ng {
         void updateText();
 
         void update(const float& ftime) override;
-        void render(sf::RenderTarget& target) override;
+        void render(sf::RenderTarget& target) const override;
 
     private:
         // enums

@@ -19,7 +19,7 @@ namespace ng {
         virtual void keyPressed(const sf::Event& event) {};
 
         virtual void update(const float& ftime) = 0;
-        virtual void render(sf::RenderTarget& target) = 0;
+        virtual void render(sf::RenderTarget& target) const = 0;
 
         // friends
         friend class Application;

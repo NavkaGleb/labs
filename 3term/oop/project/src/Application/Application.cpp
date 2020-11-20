@@ -16,7 +16,7 @@ namespace ng {
 
         initWindow();
         initText();
-        initStates();
+        State::getStateStack().push(std::make_unique<MainMenuState>());
     }
 
     // public methods
@@ -51,10 +51,6 @@ namespace ng {
         m_statisticsText.setPosition(std::floor(5.0f), std::floor(5.0f));
         m_statisticsText.setCharacterSize(20);
         m_statisticsText.setFillColor(sf::Color::White);
-    }
-
-    void Application::initStates() {
-        State::getStateStack().push(new MainMenuState(m_window));
     }
 
     void Application::pause() {

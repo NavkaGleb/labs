@@ -127,17 +127,17 @@ namespace ng {
         updateText();
     }
 
-    void MandelbrotState::render(sf::RenderTarget& target) {
+    void MandelbrotState::render(sf::RenderTarget& target) const {
         target.draw(m_mandelbrotSet);
-        target.draw(m_text[TextRole::Statistic]);
+        target.draw(m_text.at(TextRole::Statistic));
 
         if (!m_showCoordinates)
             return;
 
-        target.draw(m_text[TextRole::MinX]);
-        target.draw(m_text[TextRole::MaxX]);
-        target.draw(m_text[TextRole::MinY]);
-        target.draw(m_text[TextRole::MaxY]);
+        target.draw(m_text.at(TextRole::MinX));
+        target.draw(m_text.at(TextRole::MaxX));
+        target.draw(m_text.at(TextRole::MinY));
+        target.draw(m_text.at(TextRole::MaxY));
     }
 
     // member methods

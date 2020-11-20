@@ -28,7 +28,6 @@ namespace ng {
         void loadFonts();
         void initWindow();
         void initText();
-        void initStates();
 
         void pause();
         void resume();

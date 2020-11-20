@@ -5,12 +5,12 @@
 #include <vector>
 
 #include "MandelbrotState.hpp"
+#include "FluidState.hpp"
 
 namespace ng {
 
     // constructor / destructor
-    MainMenuState::MainMenuState(sf::RenderWindow& window)
-        : m_window(window) {
+    MainMenuState::MainMenuState() {
 
         // TODO: video background
         loadFonts();
@@ -23,16 +23,21 @@ namespace ng {
     }
 
     void MainMenuState::mouseButtonReleased(const sf::Event& event) {
-        if (event.mouseButton.button == sf::Mouse::Left && m_buttons["Mandelbrot Set"]->isPressed())
-            State::getStateStack().push(new MandelbrotState);
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            if (m_buttons["Mandelbrot Set"]->isPressed())
+                State::getStateStack().push(std::make_unique<MandelbrotState>());
+
+            if (m_buttons["Fluid Simulation"]->isPressed())
+                State::getStateStack().push(std::make_unique<FluidState>());
+        }
     }
 
     void MainMenuState::update(const float& ftime) {
         for (auto& [name, button] : m_buttons)
-            button->update(sf::Mouse::getPosition(m_window));
+            button->update(sf::Mouse::getPosition(*State::getContext().window));
     }
 
-    void MainMenuState::render(sf::RenderTarget& target) {
+    void MainMenuState::render(sf::RenderTarget& target) const {
         for (const auto& [name, button] : m_buttons)
             target.draw(*button);
     }
@@ -67,7 +72,7 @@ namespace ng {
             button->setTextColor(sf::Color::White);
             button->setSize(sf::Vector2f(400.0f, 50.0f));
             button->setPosition(
-                (m_window.getSize().x - button->getSize().x) / 2.0f,
+                (State::getContext().window->getSize().x - button->getSize().x) / 2.0f,
                 static_cast<float>(i + 1) * 80.0f + 100.0f
             );
             button->setBackgroundIdleColor(backgroundIdleColor);

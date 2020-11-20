@@ -37,7 +37,7 @@ set(SOURCE_FILES
     src/States/MainMenuState.cpp
     src/Gui/Button.hpp
     src/Simulations/Fluid.cpp
-)
+        src/States/FluidState.cpp src/States/FluidState.hpp)
 
 include_directories(
     src

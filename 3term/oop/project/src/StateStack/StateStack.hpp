@@ -14,12 +14,15 @@ namespace ng {
 
     class StateStack {
     public:
+        // alias
+        using StatePtr = std::unique_ptr<State>;
+
         // constructor / destructor
         StateStack() = default;
         virtual ~StateStack() = default;
 
         // public methods
-        void push(State*);
+        void push(StatePtr&& state);
         void pop();
 
         void mouseButtonPressed(const sf::Event& event);
@@ -28,12 +31,9 @@ namespace ng {
         void keyPressed(const sf::Event& event);
 
         void update(const float& ftime);
-        void render(sf::RenderTarget& target);
+        void render(sf::RenderTarget& target) const;
 
     private:
-        // alias
-        using StatePtr = std::unique_ptr<State>;
-
         // member data
         std::stack<StatePtr> m_states;
 

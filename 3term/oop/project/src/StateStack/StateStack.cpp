@@ -5,8 +5,8 @@
 namespace ng {
 
     // public methods
-    void StateStack::push(State* state) {
-        m_states.push(std::unique_ptr<State>(state));
+    void StateStack::push(StatePtr&& state) {
+        m_states.push(std::move(state));
     }
 
     void StateStack::pop() {
@@ -38,7 +38,7 @@ namespace ng {
             m_states.top()->update(ftime);
     }
 
-    void StateStack::render(sf::RenderTarget& target) {
+    void StateStack::render(sf::RenderTarget& target) const {
         if (!m_states.empty())
             m_states.top()->render(target);
     }

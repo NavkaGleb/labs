@@ -14,7 +14,7 @@ namespace ng {
     class MainMenuState : public State {
     public:
         // constructor / destructor
-        explicit MainMenuState(sf::RenderWindow& window);
+        MainMenuState();
         ~MainMenuState() override = default;
 
         // public methods
@@ -22,7 +22,7 @@ namespace ng {
         void mouseButtonReleased(const sf::Event& event) override;
 
         void update(const float& ftime) override;
-        void render(sf::RenderTarget& target) override;
+        void render(sf::RenderTarget& target) const override;
 
     private:
         // aliases
@@ -31,7 +31,6 @@ namespace ng {
         // member data
         std::unordered_map<std::string, ButtonPtr> m_buttons;
         sf::Font                                   m_font;
-        sf::RenderWindow&                          m_window;
 
         // member methods
         void loadFonts();
