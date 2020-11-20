@@ -93,7 +93,7 @@ namespace ng {
                 PointType y_pos = m_bounds[Bounds::MinY];
 
                 int y_offset = 0;
-                int row_size = 800;
+                int row_size = m_image.getSize().y;
 
                 int x, y;
 
@@ -170,7 +170,12 @@ namespace ng {
                 size_t offset = m_image.getSize().x / threads.size();
 
                 for (std::size_t i = 0; i < threads.size(); ++i)
-                    threads[i] = std::thread(m_implementations[ImplementationType::AVX2], i * offset, (i + 1) * offset, false);
+                    threads[i] = std::thread(
+                        m_implementations[ImplementationType::AVX2],
+                        i * offset,
+                        (i + 1) * offset,
+                        false
+                    );
 
                 for (auto&& thread : threads)
                     thread.join();

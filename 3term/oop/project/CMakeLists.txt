@@ -36,6 +36,7 @@ set(SOURCE_FILES
     src/ThreadPool/ThreadPool.cpp
     src/States/MainMenuState.cpp
     src/Gui/Button.hpp
+    src/Simulations/Fluid.cpp
 )
 
 include_directories(

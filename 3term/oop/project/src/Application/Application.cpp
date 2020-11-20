@@ -9,7 +9,7 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(800, 800), "SFML", sf::Style::Close),
+        m_window(sf::VideoMode(768, 768), "SFML", sf::Style::Close),
         m_paused(false) {
 
         loadFonts();
