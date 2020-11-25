@@ -8,12 +8,12 @@
 
 namespace ng {
 
-    class Fluid : public sf::Drawable {
+    class FluidPlane : public sf::Drawable {
     public:
         // constructor / destructor
-        Fluid() = default;
-        Fluid(int size, float deltaTime, float diffusion, float viscosity);
-        ~Fluid() override = default;
+        FluidPlane() = default;
+        FluidPlane(int size, float deltaTime, float diffusion, float viscosity);
+        ~FluidPlane() override = default;
 
         // public methods
         void addDensity(std::size_t x, std::size_t y, float amount);

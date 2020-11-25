@@ -1,7 +1,7 @@
 #pragma once
 
 #include "States/State.hpp"
-#include "Simulations/Fluid.hpp"
+#include "Simulations/FluidSimulation/FluidPlane.hpp"
 
 namespace ng {
 
@@ -17,7 +17,7 @@ namespace ng {
 
     private:
         // member data
-        Fluid m_fluid;
+        FluidPlane m_fluid;
 
     }; // class FluidState
 

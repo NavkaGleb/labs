@@ -1,9 +1,9 @@
-#include "Fluid.hpp"
+#include "FluidPlane.hpp"
 
 namespace ng {
 
     // constructor / destructor
-    Fluid::Fluid(int size, float deltaTime, float diffusion, float viscosity)
+    FluidPlane::FluidPlane(int size, float deltaTime, float diffusion, float viscosity)
         : m_size(size),
           m_deltaTime(deltaTime),
           m_diffusion(diffusion),
@@ -20,11 +20,11 @@ namespace ng {
     }
 
     // public methods
-    void Fluid::addDensity(std::size_t x, std::size_t y, float amount) {
+    void FluidPlane::addDensity(std::size_t x, std::size_t y, float amount) {
         m_density[toLine(x, y)] += amount;
     }
 
-    void Fluid::addVelocity(std::size_t x, std::size_t y, const std::vector<float>& amount) {
+    void FluidPlane::addVelocity(std::size_t x, std::size_t y, const std::vector<float>& amount) {
         std::size_t index = toLine(x, y);
 
         m_velocity[Dimension::X][index] += amount[0];
@@ -32,11 +32,11 @@ namespace ng {
     }
 
     // member methods
-    void Fluid::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    void FluidPlane::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
     }
 
-    std::size_t Fluid::toLine(std::size_t x, std::size_t y) const {
+    std::size_t FluidPlane::toLine(std::size_t x, std::size_t y) const {
         return x * m_size + y;
     }
 
