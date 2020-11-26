@@ -1,10 +1,25 @@
 #include <iostream>
 
-#include "Algorithms/RabinKarp.hpp"
+#include "RabinKarp/StringRabinKarp.hpp"
+#include "RabinKarp/MatrixRabinKarp.hpp"
 
 int main() {
-    Ng::RabinKarp rabinKarp("Hello");
+    Ng::Matrix<char> pattern = {
+        { 'c', 'a' },
+        { 'a', 'b' }
+    };
 
-    std::cout << rabinKarp.Search(" Hello, world!Hello") << std::endl;
+    Ng::Matrix<char> text = {
+        { 'a', 'b', 'c' },
+        { 'b', 'c', 'a' },
+        { 'd', 'a', 'b' }
+    };
+
+    Ng::MatrixRabinKarp rabinKarp(pattern);
+
+    std::pair<std::size_t, std::size_t> p = rabinKarp.Search(text);
+
+    std::cout << "--i = " << p.first << ", j = " << p.second << std::endl;
+
     return 0;
 }

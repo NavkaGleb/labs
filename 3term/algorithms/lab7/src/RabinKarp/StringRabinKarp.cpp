@@ -1,25 +1,27 @@
-#include "RabinKarp.hpp"
-
-#include <utility>
-#include <iostream>
+#include "StringRabinKarp.hpp"
 
 namespace Ng {
 
     // constructor / destructor
-    RabinKarp::RabinKarp(std::string&& pattern)
+    StringRabinKarp::StringRabinKarp(std::string&& pattern)
         : m_Pattern(std::move(pattern)),
           m_Prime(15487469),
           m_AlphabetSize(256),
-          m_RM(1) {
+          m_PolynomialOrder(1) {
 
         for (std::size_t i = 0; i < m_Pattern.size() - 1; ++i)
-            m_RM = (m_AlphabetSize * m_RM) % m_Prime;
+            m_PolynomialOrder = (m_AlphabetSize * m_PolynomialOrder) % m_Prime;
 
         m_PatternHash = Hash(m_Pattern, m_Pattern.size());
     }
 
+    // modifiers
+    void StringRabinKarp::setPattern(const std::string& pattern) {
+        m_Pattern = pattern;
+    }
+
     // public methods
-    std::size_t RabinKarp::Search(const std::string& text) {
+    std::size_t StringRabinKarp::Search(const std::string& text) const {
         if (text.size() < m_Pattern.size())
             return std::string::npos;
 
@@ -29,7 +31,7 @@ namespace Ng {
             return 0;
 
         for (std::size_t i = m_Pattern.size(); i < text.size(); ++i) {
-            textHash = (textHash + m_Prime - m_RM * text[i - m_Pattern.size()] % m_Prime) % m_Prime;
+            textHash = (textHash + m_Prime - m_PolynomialOrder * text[i - m_Pattern.size()] % m_Prime) % m_Prime;
             textHash = (textHash * m_AlphabetSize + text[i]) % m_Prime;
 
             if (textHash == m_PatternHash)
@@ -40,8 +42,8 @@ namespace Ng {
     }
 
     // member methods
-    std::int64_t RabinKarp::Hash(const std::string& key, std::size_t length) const {
-        std::int64_t hash = 0;
+    StringRabinKarp::HashType StringRabinKarp::Hash(const std::string& key, std::size_t length) const {
+        HashType hash = 0;
 
         for (std::size_t i = 0; i < length; ++i)
             hash = (m_AlphabetSize * hash + key[i]) % m_Prime;

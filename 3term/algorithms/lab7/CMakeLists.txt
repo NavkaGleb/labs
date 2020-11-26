@@ -5,12 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(HEADER_FILES
     src/Matrix/Matrix.hpp
-    src/Algorithms/RabinKarp.hpp
+        src/RabinKarp/StringRabinKarp.hpp
+    src/RabinKarp/MatrixRabinKarp.hpp
 )
 
 set(SOURCE_FILES
     src/main.cpp
-        src/Algorithms/RabinKarp.cpp)
+    src/RabinKarp/StringRabinKarp.cpp
+)
 
 include_directories(src)
 
