@@ -1,6 +1,10 @@
 #include <iostream>
 
+#include "Algorithms/RabinKarp.hpp"
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Ng::RabinKarp rabinKarp("Hello");
+
+    std::cout << rabinKarp.Search(" Hello, world!Hello") << std::endl;
     return 0;
 }
