@@ -17,8 +17,14 @@ namespace Ng {
         // constructor / destructor
         explicit MatrixRabinKarp(const Matrix<T>& pattern);
 
+        // accessors
+        [[nodiscard]] inline const Matrix<T>& GetPattern() const { return m_Pattern; }
+
+        // modifiers
+        void SetPattern(const Matrix<T>& pattern);
+
         // public methods
-        std::pair<std::size_t, std::size_t> Search(const Matrix<T>& text) const;
+        std::vector<std::pair<std::size_t, std::size_t>> Search(const Matrix<T>& text) const;
 
     private:
         // aliases
@@ -34,6 +40,7 @@ namespace Ng {
 
         // member methods
         MatrixHashType Hash(const Matrix<T>& matrix, std::size_t startRow = 0, std::size_t startColumn = 0) const;
+        void UpdateHash();
 
     }; // class MatrixRabinKarp
 
@@ -49,24 +56,32 @@ namespace Ng {
           m_AlphabetSize(256),
           m_PolynomialOrder(1) {
 
-        for (std::size_t i = 0; i < m_Pattern.Columns() - 1; ++i)
-            m_PolynomialOrder = (m_AlphabetSize * m_PolynomialOrder) % m_Prime;
+        UpdateHash();
+    }
 
-        m_PatternHash = Hash(m_Pattern);
+    // modifiers
+    template <typename T>
+    void MatrixRabinKarp<T>::SetPattern(const Matrix<T>& pattern) {
+        m_Pattern = pattern;
+        UpdateHash();
     }
 
     // public methods
     template <typename T>
-    std::pair<std::size_t, std::size_t> MatrixRabinKarp<T>::Search(const Matrix<T>& text) const {
+    std::vector<std::pair<std::size_t, std::size_t>> MatrixRabinKarp<T>::Search(const Matrix<T>& text) const {
         if (text.Rows() < m_Pattern.Rows() || text.Columns() < m_Pattern.Columns())
-            return { -1, -1 };
+            return { };
+
+        bool match;
+        std::vector<std::pair<std::size_t, std::size_t>> result;
 
         for (std::size_t i = 0; i <= text.Rows() - m_Pattern.Rows(); ++i) {
             MatrixHashType textHash = Hash(text, i, 0);
+            match = false;
 
             for (std::size_t j = 0; j <= text.Columns() - m_Pattern.Columns(); ++j) {
-                if (textHash == m_PatternHash)
-                    return { i, j };
+                if (match)
+                    result.emplace_back(i, j);
 
                 if (j == text.Columns() - m_Pattern.Columns())
                     break;
@@ -74,11 +89,19 @@ namespace Ng {
                 for (int k = 0; k < textHash.size(); ++k) {
                     textHash[k] = (textHash[k] + m_Prime - m_PolynomialOrder * text.At(i + k, j) % m_Prime) % m_Prime;
                     textHash[k] = (textHash[k] * m_AlphabetSize + text.At(i + k, j + m_Pattern.Columns())) % m_Prime;
+
+                    if (textHash[k] != m_PatternHash[k]) {
+                        match = false;
+                        break;
+                    }
+
+                    if (k + 1 == textHash.size())
+                        match = true;
                 }
             }
         }
 
-        return { -1, -1 };
+        return result;
     }
 
     // member methods
@@ -93,6 +116,14 @@ namespace Ng {
                 hash[i] = (m_AlphabetSize * hash[i] + matrix.At(i + startRow, j + startColumn)) % m_Prime;
 
         return hash;
+    }
+
+    template <typename T>
+    void MatrixRabinKarp<T>::UpdateHash() {
+        for (std::size_t i = 0; i < m_Pattern.Columns() - 1; ++i)
+            m_PolynomialOrder = (m_AlphabetSize * m_PolynomialOrder) % m_Prime;
+
+        m_PatternHash = Hash(m_Pattern);
     }
 
 } // namespace Ng
