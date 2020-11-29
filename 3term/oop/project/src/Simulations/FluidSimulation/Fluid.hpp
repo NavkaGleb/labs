@@ -1,33 +1,46 @@
 #pragma once
 
-#include "FluidPlane.hpp"
+#include <vector>
+
+#include <SFML/Graphics.hpp>
 
 namespace ng {
 
     class Fluid {
     public:
         // constructor / destructor
-        Fluid();
-        virtual ~Fluid() = default;
+        Fluid(int size, float diffusion, float viscosity);
+        virtual ~Fluid();
 
         // public methods
+        void addDensity(int x, int y, float amount);
+        void addVelocity(int x, int y, float amountX, float amountY);
+
         void update(const float& ftime);
         void render(sf::RenderTarget& target) const;
 
     private:
-        // member data
-        FluidPlane m_plane;
-        unsigned m_size;
-        unsigned m_iterations;
+        int size;
+        float diff;
+        float visc;
 
-        // member methods
-        std::size_t toLine(std::size_t x, std::size_t y) const;
-        void linearSolve(int b, std::vector<float>& x, std::vector<float>& x0, float a, float);
-        void diffuse(int b, std::vector<float>& x,std::vector<float>& x0, float diffusion, float deltaTime);
-        void project(std::vector<float>& velocX, std::vector<float>& velocY, std::vector<float>& p, std::vector<float>& div);
-        void advect(int b, std::vector<float>& d, std::vector<float>& d0, std::vector<float>& velocX, std::vector<float>& velocY, std::vector<float>& velocZ, float dt);
-        void setBounds(int b, std::vector<float>& x);
+        float *s;
+        float *density;
+
+        float *Vx;
+        float *Vy;
+
+        float *Vx0;
+        float *Vy0;
+
+        std::vector<sf::RectangleShape> rect;
 
     }; // class Fluid
+
+    static void diffuse (int b, float *x, float *x0, float diff, float dt, int iter, int N);
+    static void lin_solve(int b, float *x, const float *x0, float a, float c, int iter, int N);
+    static void project(float *velocX, float *velocY, float *p, float *div, int iter, int N);
+    static void advect(int b, float *d, const float *d0,  const float *velocX, const float *velocY, float dt, int N);
+    static void set_bnd(int b, float *x, int N);
 
 } // namespace ng

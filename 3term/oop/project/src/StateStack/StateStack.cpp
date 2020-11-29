@@ -13,6 +13,11 @@ namespace ng {
         m_states.pop();
     }
 
+    void StateStack::mouseMoved(const sf::Event& event) {
+        if (!m_states.empty())
+            m_states.top()->mouseMoved(event);
+    }
+
     void StateStack::mouseButtonPressed(const sf::Event& event) {
         if (!m_states.empty())
             m_states.top()->mouseButtonPressed(event);

@@ -25,6 +25,7 @@ namespace ng {
         void push(StatePtr&& state);
         void pop();
 
+        void mouseMoved(const sf::Event& event);
         void mouseButtonPressed(const sf::Event& event);
         void mouseButtonReleased(const sf::Event& event);
         void mouseWheelMoved(const sf::Event& event);

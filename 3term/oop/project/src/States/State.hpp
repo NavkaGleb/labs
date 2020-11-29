@@ -13,6 +13,7 @@ namespace ng {
         virtual ~State() = default;
 
         // public methods
+        virtual void mouseMoved(const sf::Event& event) {};
         virtual void mouseButtonPressed(const sf::Event& event) {};
         virtual void mouseButtonReleased(const sf::Event& event) {};
         virtual void mouseWheelMoved(const sf::Event& event) {};

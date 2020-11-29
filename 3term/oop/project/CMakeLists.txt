@@ -36,7 +36,6 @@ set(SOURCE_FILES
     src/ThreadPool/ThreadPool.cpp
     src/States/MainMenuState.cpp
     src/Gui/Button.hpp
-        src/Simulations/FluidSimulation/FluidPlane.cpp
         src/States/FluidState.cpp src/States/FluidState.hpp src/Simulations/FluidSimulation/Fluid.cpp src/Simulations/FluidSimulation/Fluid.hpp)
 
 include_directories(

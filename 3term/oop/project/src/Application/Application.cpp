@@ -83,6 +83,9 @@ namespace ng {
                     resume();
                     break;
 
+                case sf::Event::MouseMoved:
+                    State::getStateStack().mouseMoved(event);
+
                 case sf::Event::MouseButtonPressed:
                     State::getStateStack().mouseButtonPressed(event);
                     break;
