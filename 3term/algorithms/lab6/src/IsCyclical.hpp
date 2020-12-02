@@ -1,9 +1,22 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Ng {
 
-    bool IsCyclical(const std::string& left, const std::string& right);
+    class IsCyclical {
+    public:
+        // operators
+        std::size_t operator()(const std::string& text, const std::string& pattern) const;
+
+    private:
+        // aliases
+        using PrefixType = std::vector<std::size_t>;
+
+        // static member methods
+        static PrefixType Prefix(const std::string& pattern);
+
+    };
 
 } // namespace Ng

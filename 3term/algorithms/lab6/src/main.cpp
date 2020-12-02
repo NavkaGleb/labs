@@ -17,12 +17,14 @@ std::string ShiftRight(const std::string& str, std::size_t offset) {
     return result;
 }
 
+bool Check(const std::string& left, const std::string& right, const Ng::IsCyclical& isCyclical = Ng::IsCyclical()) {
+    return isCyclical(left, right) != std::string::npos;
+}
+
 int main() {
-
-
     int a = 0;
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10'000; ++i) {
         std::string text;
         int size = Ng::Random::Irand(50, 100);
 
@@ -31,7 +33,7 @@ int main() {
 
         std::string s = ShiftRight(text, Ng::Random::Irand<std::size_t>(1, text.size() - 1));
 
-        a += Ng::IsCyclical(text, s);
+        a += Check(text, s);
     }
 
     std::cout << a << std::endl;
