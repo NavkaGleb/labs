@@ -9,7 +9,7 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/main.cpp
-        src/IsCyclical.cpp src/IsCyclical.hpp src/Random.hpp)
+        src/IsCyclical.cpp src/IsCyclical.hpp src/Random.hpp src/Random.hpp)
 
 # include directories
 include_directories(src)

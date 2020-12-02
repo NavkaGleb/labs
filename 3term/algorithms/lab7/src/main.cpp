@@ -5,7 +5,6 @@
 int main() {
     Ng::Matrix<char> pattern = {
         { '3', 'd' },
-        { 'g', 'k' }
     };
 
     Ng::Matrix<char> text = {
@@ -17,10 +16,13 @@ int main() {
 
     Ng::MatrixRabinKarp rabinKarp(pattern);
 
-    auto a = rabinKarp.Search(text);
+    auto positions = rabinKarp.Search(text);
 
-    for (const auto& p : a)
-        std::cout << "--i = " << p.first << ", j = " << p.second << std::endl;
+    if (positions.empty())
+        std::cout << "Nothing found" << std::endl;
+
+    for (const auto& position : positions)
+        std::cout << "i = " << position.first << ", j = " << position.second << std::endl;
 
     return 0;
 }

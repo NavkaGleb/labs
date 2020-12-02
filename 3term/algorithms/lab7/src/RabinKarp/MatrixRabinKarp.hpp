@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tuple>
 #include <cstdint>
 
 #include "Matrix/Matrix.hpp"
@@ -43,6 +42,7 @@ namespace Ng {
         [[nodiscard]] bool HashEquality(const MatrixHashType& matrixHash) const;
         void UpdatePatternHash();
 
+
     }; // class MatrixRabinKarp
 
     ////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,6 @@ namespace Ng {
         if (text.Rows() < m_Pattern.Rows() || text.Columns() < m_Pattern.Columns())
             return { };
 
-        bool match;
         std::vector<std::pair<std::size_t, std::size_t>> result;
 
         for (std::size_t i = 0; i <= text.Rows() - m_Pattern.Rows(); ++i) {
