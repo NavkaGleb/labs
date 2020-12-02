@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
 
-#find_package(Boost 1.74.0 COMPONENTS  REQUIRED)
+find_package(Boost 1.74.0 COMPONENTS  REQUIRED)
 
 # multi threading
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
@@ -57,7 +57,7 @@ if (Boost_FOUND)
     message(STATUS "Boost_VERSION: ${Boost_VERSION}")
 
     include_directories(${Boost_INCLUDE_DIRS})
-    target_link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 elseif()
     message(ERROR Boost_NOT_FOUND)
 endif()

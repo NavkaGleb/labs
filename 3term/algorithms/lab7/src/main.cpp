@@ -1,17 +1,18 @@
 #include <iostream>
 
-#include "RabinKarp/StringRabinKarp.hpp"
 #include "RabinKarp/MatrixRabinKarp.hpp"
 
 int main() {
     Ng::Matrix<char> pattern = {
-        { 'b', 'c' }
+        { '3', 'd' },
+        { 'g', 'k' }
     };
 
     Ng::Matrix<char> text = {
-        { 'a', 'b', 'c' },
-        { 'a', 'b', 'c' },
-        { 'a', 'b', 'c' }
+        { 'a', 'b', 'c', 't' },
+        { '1', '2', '3', 'd' },
+        { 'd', 'f', 'g', 'k' },
+        { 'a', 'b', 'c', 'i' },
     };
 
     Ng::MatrixRabinKarp rabinKarp(pattern);

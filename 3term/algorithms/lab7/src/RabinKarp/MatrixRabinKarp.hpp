@@ -39,8 +39,9 @@ namespace Ng {
         HashType       m_PolynomialOrder;
 
         // member methods
-        MatrixHashType Hash(const Matrix<T>& matrix, std::size_t startRow = 0, std::size_t startColumn = 0) const;
-        void UpdateHash();
+        [[nodiscard]] MatrixHashType Hash(const Matrix<T>& matrix, std::size_t startRow, std::size_t startColumn) const;
+        [[nodiscard]] bool HashEquality(const MatrixHashType& matrixHash) const;
+        void UpdatePatternHash();
 
     }; // class MatrixRabinKarp
 
@@ -56,14 +57,14 @@ namespace Ng {
           m_AlphabetSize(256),
           m_PolynomialOrder(1) {
 
-        UpdateHash();
+        UpdatePatternHash();
     }
 
     // modifiers
     template <typename T>
     void MatrixRabinKarp<T>::SetPattern(const Matrix<T>& pattern) {
         m_Pattern = pattern;
-        UpdateHash();
+        UpdatePatternHash();
     }
 
     // public methods
@@ -77,10 +78,9 @@ namespace Ng {
 
         for (std::size_t i = 0; i <= text.Rows() - m_Pattern.Rows(); ++i) {
             MatrixHashType textHash = Hash(text, i, 0);
-            match = false;
 
             for (std::size_t j = 0; j <= text.Columns() - m_Pattern.Columns(); ++j) {
-                if (match)
+                if (HashEquality(textHash))
                     result.emplace_back(i, j);
 
                 if (j == text.Columns() - m_Pattern.Columns())
@@ -89,14 +89,6 @@ namespace Ng {
                 for (int k = 0; k < textHash.size(); ++k) {
                     textHash[k] = (textHash[k] + m_Prime - m_PolynomialOrder * text.At(i + k, j) % m_Prime) % m_Prime;
                     textHash[k] = (textHash[k] * m_AlphabetSize + text.At(i + k, j + m_Pattern.Columns())) % m_Prime;
-
-                    if (textHash[k] != m_PatternHash[k]) {
-                        match = false;
-                        break;
-                    }
-
-                    if (k + 1 == textHash.size())
-                        match = true;
                 }
             }
         }
@@ -119,11 +111,20 @@ namespace Ng {
     }
 
     template <typename T>
-    void MatrixRabinKarp<T>::UpdateHash() {
+    bool MatrixRabinKarp<T>::HashEquality(const MatrixHashType& matrixHash) const {
+        for (std::size_t i = 0; i < matrixHash.size(); ++i)
+            if (matrixHash[i] != m_PatternHash[i])
+                return false;
+
+        return true;
+    }
+
+    template <typename T>
+    void MatrixRabinKarp<T>::UpdatePatternHash() {
         for (std::size_t i = 0; i < m_Pattern.Columns() - 1; ++i)
             m_PolynomialOrder = (m_AlphabetSize * m_PolynomialOrder) % m_Prime;
 
-        m_PatternHash = Hash(m_Pattern);
+        m_PatternHash = Hash(m_Pattern, 0, 0);
     }
 
 } // namespace Ng

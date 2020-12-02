@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(HEADER_FILES
     src/Matrix/Matrix.hpp
-        src/RabinKarp/StringRabinKarp.hpp
+    src/RabinKarp/StringRabinKarp.hpp
     src/RabinKarp/MatrixRabinKarp.hpp
 )
 
