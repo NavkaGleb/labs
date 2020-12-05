@@ -70,39 +70,29 @@ namespace ng {
         sf::Event event{};
 
         while (m_window.pollEvent(event)) {
-            switch (event.type) {
-                case sf::Event::Closed:
-                    m_window.close();
-                    break;
+            if (event.type == sf::Event::Closed)
+                m_window.close();
 
-                case sf::Event::LostFocus:
-                    pause();
-                    break;
+            if (event.type == sf::Event::LostFocus)
+                pause();
 
-                case sf::Event::GainedFocus:
-                    resume();
-                    break;
+            if (event.type == sf::Event::GainedFocus)
+                resume();
 
-                case sf::Event::MouseMoved:
-                    State::getStateStack().mouseMoved(event);
+            if (event.type == sf::Event::MouseMoved)
+                State::getStateStack().mouseMoved(event);
 
-                case sf::Event::MouseButtonPressed:
-                    State::getStateStack().mouseButtonPressed(event);
-                    break;
+            if (event.type == sf::Event::MouseButtonPressed)
+                State::getStateStack().mouseButtonPressed(event);
 
-                case sf::Event::MouseButtonReleased:
-                    State::getStateStack().mouseButtonReleased(event);
+            if (event.type == sf::Event::MouseButtonReleased)
+                State::getStateStack().mouseButtonReleased(event);
 
-                case sf::Event::MouseWheelMoved:
-                    State::getStateStack().mouseWheelMoved(event);
-                    break;
-                case sf::Event::KeyPressed:
-                    State::getStateStack().keyPressed(event);
-                    break;
+            if (event.type == sf::Event::MouseWheelMoved)
+                State::getStateStack().mouseWheelMoved(event);
 
-                default:
-                    break;
-            }
+            if (event.type == sf::Event::KeyPressed)
+                State::getStateStack().keyPressed(event);
         }
     }
 
@@ -111,6 +101,8 @@ namespace ng {
             return;
 
         State::getStateStack().update(m_frameTime.asSeconds());
+        m_window.setTitle("FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
+
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
             "time: " + std::to_string(m_frameTime.asSeconds())

@@ -146,8 +146,8 @@ namespace ng {
                             goto repeat;
 
                         for (int i = 0; i < 4; ++i) {
-
-                            int iteration = _n[3 - i];
+                            int* a = (int*)(&_n);
+                            int iteration = a[3 - i];
                             m_image.setPixel(x + i, y_offset / row_size, getColor(iteration));
                         }
 
@@ -276,6 +276,8 @@ namespace ng {
 
         if (iterations == m_iterations)
             return sf::Color::Black;
+
+        double M_PI = 3.14;
 
         double factor1 = (1.0 - std::cos(1.0 * M_PI * (std::log2(iterations) / 10))) / 2.0;
         double factor2 = (1.0 - std::cos(2.0 * M_PI * (std::log2(iterations) / 10))) / 2.0;

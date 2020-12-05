@@ -22,7 +22,7 @@ bool Check(const std::string& left, const std::string& right, const Ng::IsCyclic
 }
 
 int main() {
-    int a = 0;
+    int count = 0;
 
     for (int i = 0; i < 10'000; ++i) {
         std::string text;
@@ -33,8 +33,8 @@ int main() {
 
         std::string s = ShiftRight(text, Ng::Random::Irand<std::size_t>(1, text.size() - 1));
 
-        a += Check(text, s);
+        count += Check(text, s);
     }
 
-    std::cout << a << std::endl;
+    std::cout << count << std::endl;
 }

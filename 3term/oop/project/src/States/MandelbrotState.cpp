@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
 
 namespace ng {
 
@@ -80,7 +80,8 @@ namespace ng {
     void MandelbrotState::updateText() {
         static sf::Vector2u windowSize = State::getContext().window->getSize();
         static std::function<std::string(MandelbrotSet::PointType)> toString = [](MandelbrotSet::PointType point) {
-            return boost::lexical_cast<std::string>(point);
+//            return boost::lexical_cast<std::string>(point);
+            return std::to_string(point);
         };
 
         m_text[TextRole::Statistic].setString(

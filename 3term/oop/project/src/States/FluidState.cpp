@@ -2,25 +2,54 @@
 
 #include <iostream>
 
+#include <Simulations/FluidSimulation/FluidPlane.hpp>
+
 namespace ng {
 
     // constructor / destructor
     FluidState::FluidState()
-        : m_fluid(48, 0.0, 0.000001) {
+        : m_scale(2),
+          m_active(false),
+          m_paused(false) {
 
+        const sf::Vector2u& windowSize = State::getContext().window->getSize();
+
+        cudaInit(windowSize.x / m_scale, windowSize.y / m_scale);
+
+        m_pixelBuffer.resize(windowSize.x * windowSize.y);
+        m_texture.create(windowSize.x / m_scale, windowSize.y / m_scale);
+
+        m_pos1 = { -1, -1 };
+        m_pos2 = { -1, -1 };
+    }
+
+    FluidState::~FluidState() {
+        cudaExit();
     }
 
     // public methods
     void FluidState::mouseMoved(const sf::Event& event) {
-//        std::cout << "mouse moved" << std::endl;
-//        m_fluid.addDensity(event.mouseButton.x / 4, event.mouseButton.y / 4, 100);
+        std::swap(m_pos1, m_pos2);
+
+        m_pos2 = { event.mouseMove.x, event.mouseMove.y };
+        m_pos2.x /= m_scale;
+        m_pos2.y /= m_scale;
     }
 
     void FluidState::mouseButtonPressed(const sf::Event& event) {
-//        if (event.mouseButton.button == sf::Mouse::Left) {
-//            std::cout << "clicked" << std::endl;
-//            m_fluid.addDensity(event.mouseButton.x / 4, event.mouseButton.y / 4, 100);
-//        }
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            m_pos1 = { event.mouseButton.x, event.mouseButton.y };
+            m_pos1.x /= m_scale;
+            m_pos1.y /= m_scale;
+            m_active = true;
+        }
+
+        if (event.mouseButton.button == sf::Mouse::Right)
+            m_paused = !m_paused;
+    }
+
+    void FluidState::mouseButtonReleased(const sf::Event& event) {
+        m_active = false;
     }
 
     void FluidState::keyPressed(const sf::Event& event) {
@@ -29,35 +58,18 @@ namespace ng {
     }
 
     void FluidState::update(const float& ftime) {
-        updateMousePosition();
+        if (!m_paused)
+            m_fluidPlane.update(ftime, m_pixelBuffer.data(), m_pos1.x, m_pos1.y, m_pos2.x, m_pos2.y, m_active);
 
-        const auto& pos = sf::Mouse::getPosition(*State::getContext().window);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            int posX = std::min(std::max(pos.x / 16, 0), 48);
-            int posY = std::min(std::max(pos.y / 16, 0), 48);
-
-            m_fluid.addDensity(posX, posY, 255);
-            auto p = m_currentMousePosition - m_previousMousePosition;
-
-            std::cout << "-------------------------------- " << pos.x / 16 << " " << pos.y / 16 << std::endl;
-            std::cout << "-------------------------------- " << posX << " " << posY << std::endl;
-            std::cout << "-------------------------------- " << p.x << " " << p.y << std::endl;
-            std::cout << std::endl;
-
-            m_fluid.addVelocity(posX, posY, static_cast<int>(pos.x) % 10, static_cast<int>(p.y) % 10);
-        }
-
-        m_fluid.update(ftime);
+        m_texture.update(m_pixelBuffer.data());
+        m_sprite.setTexture(m_texture);
+        m_sprite.setScale({ static_cast<float>(m_scale), static_cast<float>(m_scale) });
     }
 
     void FluidState::render(sf::RenderTarget& target) const {
-        m_fluid.render(target);
+        target.draw(m_sprite);
     }
 
     // member methods
-    void FluidState::updateMousePosition() {
-        m_previousMousePosition = m_currentMousePosition;
-        m_currentMousePosition = sf::Vector2f(sf::Mouse::getPosition(*State::getContext().window));
-    }
 
 } // namespace ng
