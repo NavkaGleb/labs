@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include "States/State.hpp"
-#include "Simulations/FluidSimulation/FluidPlane.hpp"
+#include "Simulations/FluidSimulation/Fluid.cuh"
 
 namespace ng {
 
@@ -26,19 +26,12 @@ namespace ng {
         void render(sf::RenderTarget& target) const override;
 
     private:
-        // aliases
-        using PixelBuffer = std::vector<uint8_t>;
-
         // member data
-        FluidPlane m_fluidPlane;
-        int m_scale;
+        ng::Fluid m_fluid;
         sf::Vector2i m_pos1;
         sf::Vector2i m_pos2;
-        bool m_active;
-        bool m_paused;
-        PixelBuffer m_pixelBuffer;
-        sf::Texture m_texture;
-        sf::Sprite m_sprite;
+        bool m_isPressed;
+        bool m_isPaused;
 
         // member methods
 
