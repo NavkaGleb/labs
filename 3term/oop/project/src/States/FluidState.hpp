@@ -34,6 +34,7 @@ namespace ng {
         bool m_isPaused;
 
         // member methods
+        void updateMousePosition();
 
     }; // class FluidState
 

@@ -18,7 +18,7 @@ namespace ng {
     class Fluid : public sf::Drawable {
     public:
         // constructor / destructor
-        __host__ explicit Fluid(const sf::Vector2u& size, unsigned int scale);
+        __host__ explicit Fluid(unsigned int width, unsigned int height, unsigned int scale);
         __host__ ~Fluid() override;
 
         // accessors
@@ -32,13 +32,13 @@ namespace ng {
         struct Config {
             float pressure          = 1.5f;
             float vorticity         = 50.0f;
-            float velocityDiffusion = 0.8f;
+            float velocityDiffusion = 0.3f;
             float colorDiffusion    = 0.8f;
             float densityDiffusion  = 1.2f;
             float forceScale        = 5000.0f;
             float bloomIntense      = 0.1f;
-            int radius              = 400;
-            bool bloomEnabled       = true;
+            int   radius            = 400;
+            bool  bloomEnabled      = true;
         } m_config; // struct Config
 
         struct SystemConfig {
@@ -76,7 +76,7 @@ namespace ng {
         __host__ static void errorCheck();
         __host__ void updateVorticity(float dt);
         __host__ void updateDiffusion(float dt);
-        __host__ void updateForce(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isPressed);
+        __host__ void updateForce(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isActive);
         __host__ void updatePressure(float dt);
         __host__ void updateProjection();
         __host__ void updateAdvection(float dt);

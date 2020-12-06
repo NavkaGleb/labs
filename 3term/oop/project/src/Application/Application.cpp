@@ -38,7 +38,7 @@ namespace ng {
     void Application::initWindow() {
         State::Context& context = State::getContext();
 
-        context.framerateLimit = 60u;
+        context.framerateLimit = 120u;
         context.verticalSyncEnabled = true;
         context.window = &m_window;
 

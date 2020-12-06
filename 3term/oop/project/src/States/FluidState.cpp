@@ -2,18 +2,13 @@
 
 #include <iostream>
 
-//#include <Simulations/FluidSimulation/FluidPlane.hpp>
-
 namespace ng {
 
     // constructor / destructor
     FluidState::FluidState()
-        : m_fluid(State::getContext().window->getSize(), 2),
+        : m_fluid(State::getContext().window->getSize().x / 2, State::getContext().window->getSize().y / 2, 2),
           m_isPressed(false),
           m_isPaused(false) {
-
-        m_pos1 = { -1, -1 };
-        m_pos2 = { -1, -1 };
     }
 
     FluidState::~FluidState() {
@@ -22,11 +17,11 @@ namespace ng {
 
     // public methods
     void FluidState::mouseMoved(const sf::Event& event) {
-        std::swap(m_pos1, m_pos2);
+        int x = std::min<int>(State::getContext().window->getSize().x, std::max(0, event.mouseMove.x));
+        int y = std::min<int>(State::getContext().window->getSize().y, std::max(0, event.mouseMove.y));
 
-        m_pos2 = { event.mouseMove.x, event.mouseMove.y };
-        m_pos2.x /= m_fluid.getScale();
-        m_pos2.y /= m_fluid.getScale();
+        std::swap(m_pos1, m_pos2);
+        m_pos2 = { static_cast<int>(x / m_fluid.getScale()), static_cast<int>(y / m_fluid.getScale()) };
     }
 
     void FluidState::mouseButtonPressed(const sf::Event& event) {
@@ -51,6 +46,8 @@ namespace ng {
     }
 
     void FluidState::update(const float& ftime) {
+        updateMousePosition();
+
         if (!m_isPaused)
             m_fluid.update(ftime, m_pos1, m_pos2, m_isPressed);
     }
@@ -60,5 +57,9 @@ namespace ng {
     }
 
     // member methods
+    void FluidState::updateMousePosition() {
+        if (std::abs(m_pos1.x - m_pos2.x) == 1 || std::abs(m_pos1.y - m_pos2.y) == 1)
+            m_pos2 = m_pos1;
+    }
 
 } // namespace ng

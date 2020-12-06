@@ -51,7 +51,7 @@ set(CUDA_HEADER_FILES
 SET(CUDA_SOURCE_FILES
     src/Simulations/FluidSimulation/Fluid.cu
     src/Simulations/FluidSimulation/Kernel.cu
-)
+        src/Gui/Slider.cpp src/Gui/Slider.hpp)
 
 set_source_files_properties(src/Simulations/FluidSimulation/FluidPlane.cu PROPERTIES LANGUAGE "CUDA")
 

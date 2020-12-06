@@ -15,8 +15,8 @@ namespace ng {
                      } x
 
     // constructor / destructor
-    __host__ Fluid::Fluid(const sf::Vector2u& size, unsigned int scale)
-            : m_size(size),
+    __host__ Fluid::Fluid(unsigned int width, unsigned int height, unsigned int scale)
+            : m_size(width, height),
               m_scale(scale),
               m_elapsedTime(0.0f),
               m_timeSincePress(0.0f) {
@@ -33,7 +33,7 @@ namespace ng {
         m_color = m_colors[ng::Random::Irand<std::size_t>(0, m_colors.size() - 1)];
 
         // device memory
-        const unsigned int fieldArea = size.x * size.y;
+        const unsigned int fieldArea = m_size.x * m_size.y;
         CUDA_CALL(cudaSetDevice(0));
         cudaMalloc(&m_newField,    fieldArea * sizeof(kernel::Particle));
         cudaMalloc(&m_oldField,    fieldArea * sizeof(kernel::Particle));
@@ -59,14 +59,14 @@ namespace ng {
     }
 
     // public methods
-    __host__ void Fluid::update(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isPressed) {
+    __host__ void Fluid::update(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isActive) {
         // main function, calls vorticity -> diffusion -> force -> pressure -> project -> advect -> bloom -> paint
         m_threadCount = { m_systemConfig.xThreads, m_systemConfig.yThreads };
         m_blockCount = { m_size.x / m_threadCount.x, m_size.y / m_threadCount.y };
 
         updateVorticity(dt);
         updateDiffusion(dt);
-        updateForce(dt, pos1, pos2, isPressed);
+        updateForce(dt, pos1, pos2, isActive);
         updatePressure(dt);
         updateProjection();
         updateAdvection(dt);
@@ -114,9 +114,9 @@ namespace ng {
         }
     }
 
-    __host__ void Fluid::updateForce(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isPressed) {
+    __host__ void Fluid::updateForce(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isActive) {
         // apply force
-        if (!isPressed) {
+        if (!isActive) {
             m_timeSincePress += dt;
         } else {
             m_timeSincePress = 0.0f;
