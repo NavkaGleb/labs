@@ -38,10 +38,6 @@ namespace ng::gui {
             m_pointer.getPosition().y + m_backRect.getSize().y / m_pointer.getRadius() * 4.0f
         );
     }
-    
-    void Slider::setFont(const sf::Font& font) {
-
-    }
 
     void Slider::setBackgroundColor(const sf::Color& color) {
         m_colors[ColorRole::Background] = color;

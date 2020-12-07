@@ -16,7 +16,7 @@ namespace ng::gui {
     class Slider : public sf::Drawable {
     public:
         // constructor / destructor
-        Slider(float minValue, float maxValue, const float step);
+        Slider(float minValue, float maxValue, float step);
         ~Slider() override = default;
 
         // accessors
@@ -32,7 +32,6 @@ namespace ng::gui {
         void setPosition(float x, float y);
         void setSize(const sf::Vector2f& size);
         void setPointerRadius(float radius);
-        void setFont(const sf::Font& font);
         void setBackgroundColor(const sf::Color& color);
         void setForegroundColor(const sf::Color& color);
         void setPointerIdleColor(const sf::Color& color);
@@ -68,10 +67,5 @@ namespace ng::gui {
         void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
     }; // class Slider
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    /// Source
-    ////////////////////////////////////////////////////////////////////////////////////////////
-
 
 } // namespace ng::gui

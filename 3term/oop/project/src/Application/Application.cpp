@@ -88,9 +88,6 @@ namespace ng {
             if (event.type == sf::Event::MouseButtonReleased)
                 State::getStateStack().mouseButtonReleased(event);
 
-            if (event.type == sf::Event::MouseWheelMoved)
-                State::getStateStack().mouseWheelMoved(event);
-
             if (event.type == sf::Event::KeyPressed)
                 State::getStateStack().keyPressed(event);
         }
@@ -101,7 +98,7 @@ namespace ng {
             return;
 
         State::getStateStack().update(m_frameTime.asSeconds());
-        m_window.setTitle("Project\tFPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
+        m_window.setTitle("Project FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
 
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +

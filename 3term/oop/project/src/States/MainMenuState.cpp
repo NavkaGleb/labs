@@ -11,8 +11,6 @@ namespace ng {
 
     // constructor / destructor
     MainMenuState::MainMenuState() {
-
-        // TODO: video background
         loadFonts();
         initButtons();
     }
@@ -24,10 +22,10 @@ namespace ng {
 
     void MainMenuState::mouseButtonReleased(const sf::Event& event) {
         if (event.mouseButton.button == sf::Mouse::Left) {
-            if (m_buttons["Mandelbrot Set"]->isPressed())
+            if (m_buttons[ButtonRole::MandelbrotSet]->isPressed())
                 State::getStateStack().push(std::make_unique<MandelbrotState>());
 
-            if (m_buttons["Fluid Simulation"]->isPressed())
+            if (m_buttons[ButtonRole::FluidSimulation]->isPressed())
                 State::getStateStack().push(std::make_unique<FluidState>());
         }
     }
@@ -49,24 +47,23 @@ namespace ng {
     }
 
     void MainMenuState::initButtons() {
-        sf::Color backgroundIdleColor = sf::Color(30, 50, 150, 200);
-        sf::Color backgroundHoverColor = sf::Color(30, 40, 170, 220);
+        sf::Color backgroundIdleColor   = sf::Color(30, 50, 150, 200);
+        sf::Color backgroundHoverColor  = sf::Color(30, 40, 170, 220);
         sf::Color backgroundActiveColor = sf::Color(30, 40, 200, 230);
-        std::size_t buttonCount = 5;
-        std::vector<std::string> buttonText(buttonCount);
 
-        buttonText[0] = "Mandelbrot Set";
-        buttonText[1] = "Fluid Simulation";
-        buttonText[2] = "Double-Pendulum Simulation";
-        buttonText[3] = "Game of Life";
-        buttonText[4] = "Particle System";
+        std::cout << "init" << std::endl;
 
-        for (std::size_t i = 0; i < buttonCount; ++i) {
-            auto button = std::make_unique<gui::Button>();
+        m_buttons[ButtonRole::MandelbrotSet]   = std::make_unique<gui::Button>();
+        m_buttons[ButtonRole::FluidSimulation] = std::make_unique<gui::Button>();
+
+        auto buttonIterator = m_buttons.begin();
+
+        for (std::size_t i = 0; i < m_buttons.size(); ++i) {
+            auto& [role, button] = *buttonIterator;
 
             button->setFont(m_font);
             button->setCharacterSize(25);
-            button->setText(buttonText[i]);
+
             button->setTextHorizontalAlign(gui::Button::HorizontalAlign::Center);
             button->setTextVerticalAlign(gui::Button::VerticalAlign::Center);
             button->setTextColor(sf::Color::White);
@@ -78,8 +75,21 @@ namespace ng {
             button->setBackgroundIdleColor(backgroundIdleColor);
             button->setBackgroundHoverColor(backgroundHoverColor);
             button->setBackgroundActiveColor(backgroundActiveColor);
-            m_buttons[button->getText()] = std::move(button);
+
+            switch (role) {
+                case ButtonRole::MandelbrotSet:
+                    button->setText("Mandelbrot Set");
+                    break;
+
+                case ButtonRole::FluidSimulation:
+                    button->setText("Fluid Simulation");
+                    break;
+            }
+
+            ++buttonIterator;
         }
+
+
     }
 
 } // namespace ng

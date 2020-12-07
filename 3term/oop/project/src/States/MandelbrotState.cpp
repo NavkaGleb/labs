@@ -10,21 +10,14 @@ namespace ng {
     // constructor / destructor
     MandelbrotState::MandelbrotState()
         : m_mandelbrotSet(State::getContext().window->getSize()),
-        m_showCoordinates(true) {
+          m_showCoordinates(true) {
 
         loadFonts();
         initText();
-    }
-
-    MandelbrotState::~MandelbrotState() {
-        std::cout << "destructor MandelbrotState" << std::endl;
+        initImplementations();
     }
 
     // public methods
-    void MandelbrotState::mouseWheelMoved(const sf::Event& event) {
-
-    }
-
     void MandelbrotState::keyPressed(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::Escape)
             State::getStateStack().pop();
@@ -86,8 +79,7 @@ namespace ng {
 
         m_text[TextRole::Statistic].setString(
             "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
-            "Implementation: " + m_mandelbrotSet.getImplementationName() + "\n" +
-            "Zoom: " + toString(m_mandelbrotSet.getZoom())
+            "Implementation: " + m_implementations[m_mandelbrotSet.getImplementation()] + "\n"
         );
 
         if (!m_showCoordinates)
@@ -173,6 +165,16 @@ namespace ng {
         // bottom text
         m_text[TextRole::MinY].setFont(m_font);
         m_text[TextRole::MinY].setCharacterSize(coordinatesTextCharacterSize);
+    }
+
+    void MandelbrotState::initImplementations() {
+        using Type = MandelbrotSet::ImplementationType;
+
+        m_implementations[Type::Pseudocode] = "Pseudo Code";
+        m_implementations[Type::ByHand]     = "By Hand";
+        m_implementations[Type::AVX2]       = "AVX2";
+        m_implementations[Type::Threads]    = "Threads";
+        m_implementations[Type::ThreadPool] = "ThreadPool";
     }
 
 } // namespace ng

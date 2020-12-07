@@ -28,19 +28,14 @@ namespace ng {
             m_states.top()->mouseButtonReleased(event);
     }
 
-    void StateStack::mouseWheelMoved(const sf::Event& event) {
-        if (!m_states.empty())
-            m_states.top()->mouseWheelMoved(event);
-    }
-
     void StateStack::keyPressed(const sf::Event& event) {
         if (!m_states.empty())
             m_states.top()->keyPressed(event);
     }
 
-    void StateStack::update(const float& ftime) {
+    void StateStack::update(const float& dt) {
         if (!m_states.empty())
-            m_states.top()->update(ftime);
+            m_states.top()->update(dt);
     }
 
     void StateStack::render(sf::RenderTarget& target) const {

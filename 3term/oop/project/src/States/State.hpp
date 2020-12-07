@@ -2,25 +2,25 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include <StateStack/StateStack.hpp>
+#include "StateInterface.hpp"
+#include "StateStack/StateStack.hpp"
 
 namespace ng {
 
-    class State {
+    class State : public StateInterface {
     public:
         // constructor / destructor
         State() = default;
-        virtual ~State() = default;
+        ~State() override = default;
 
         // public methods
-        virtual void mouseMoved(const sf::Event& event) {};
-        virtual void mouseButtonPressed(const sf::Event& event) {};
-        virtual void mouseButtonReleased(const sf::Event& event) {};
-        virtual void mouseWheelMoved(const sf::Event& event) {};
-        virtual void keyPressed(const sf::Event& event) {};
+        void mouseMoved(const sf::Event& event) override {};
+        void mouseButtonPressed(const sf::Event& event) override {};
+        void mouseButtonReleased(const sf::Event& event) override {};
+        void keyPressed(const sf::Event& event) override {};
 
-        virtual void update(const float& ftime) = 0;
-        virtual void render(sf::RenderTarget& target) const = 0;
+        void update(const float& dt) override = 0;
+        void render(sf::RenderTarget& target) const override = 0;
 
         // friends
         friend class Application;

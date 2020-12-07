@@ -27,7 +27,10 @@ set(CXX_HEADER_FILES
     src/States/MainMenuState.hpp
     src/Gui/Button.cpp
     src/States/FluidState.hpp
-        src/Random/Random.hpp)
+    src/Random/Random.hpp
+    src/States/StateInterface.hpp
+    src/Gui/Slider.hpp
+)
 
 # source files
 set(CXX_SOURCE_FILES
@@ -51,7 +54,8 @@ set(CUDA_HEADER_FILES
 SET(CUDA_SOURCE_FILES
     src/Simulations/FluidSimulation/Fluid.cu
     src/Simulations/FluidSimulation/Kernel.cu
-        src/Gui/Slider.cpp src/Gui/Slider.hpp)
+    src/Gui/Slider.cpp
+)
 
 set_source_files_properties(src/Simulations/FluidSimulation/FluidPlane.cu PROPERTIES LANGUAGE "CUDA")
 

@@ -25,12 +25,15 @@ namespace ng {
         void render(sf::RenderTarget& target) const override;
 
     private:
+        // enums
+        enum class ButtonRole : short { MandelbrotSet = 0, FluidSimulation };
+
         // aliases
-        using ButtonPtr = std::unique_ptr<gui::Button>;
+        using ButtonContainer = std::unordered_map<ButtonRole, std::unique_ptr<gui::Button>>;
 
         // member data
-        std::unordered_map<std::string, ButtonPtr> m_buttons;
-        sf::Font                                   m_font;
+        ButtonContainer m_buttons;
+        sf::Font        m_font;
 
         // member methods
         void loadFonts();
