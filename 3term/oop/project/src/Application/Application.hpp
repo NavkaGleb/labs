@@ -2,6 +2,7 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 namespace ng {
 
@@ -21,14 +22,19 @@ namespace ng {
         sf::Time m_frameTime;
         sf::Time m_lastFrameTime;
         sf::Text m_statisticsText;
-        bool m_paused;
+        bool m_isPaused;
+        sf::Music m_music;
+        bool m_playMusic;
+        float m_volume;
 
         // member methods
+        void loadMusic();
         void initWindow();
 
         void pause();
         void resume();
 
+        void updateMusic(const sf::Event& event);
         void updateFrameTime();
         void pollEvent();
         void update();

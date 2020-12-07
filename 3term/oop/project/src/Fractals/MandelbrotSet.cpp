@@ -81,72 +81,61 @@ namespace ng {
         };
 
         m_implementations[ImplementationType::AVX2] = [&](std::size_t start, std::size_t end, bool loadFromImage) {
-            PointType y_pos = m_bounds[Bounds::MinY];
+            PointType positionY = m_bounds[Bounds::MinY];
 
-            int y_offset = 0;
-            int row_size = m_image.getSize().y;
+            __m256d temp;
+            __m256d mask1;
+            __m256d realZ, imagZ, realZ2, imagZ2, realC, imagC;
+            __m256d positionOffsetX, positionX, scaleX, jumpX;
+            __m256i n, mask2;
 
-            int x, y;
+            __m256i _one        = _mm256_set1_epi64x(1);
+            __m256d _two        = _mm256_set1_pd(2.0);
+            __m256d _four       = _mm256_set1_pd(4.0);
+            __m256i _iterations = _mm256_set1_epi64x(m_iterations);
 
-            __m256d _a, _b, _two, _four, _mask1;
-            __m256d _zr, _zi, _zr2, _zi2, _cr, _ci;
-            __m256d _x_pos_offsets, _x_pos, _x_scale, _x_jump;
-            __m256i _one, _c, _n, _iterations, _mask2;
+            scaleX          = _mm256_set1_pd(m_scale.x);
+            jumpX           = _mm256_set1_pd(m_scale.x * 4);
+            positionOffsetX = _mm256_set_pd(0, 1, 2, 3);
+            positionOffsetX = _mm256_mul_pd(positionOffsetX, scaleX);
 
-            _one = _mm256_set1_epi64x(1);
-            _two = _mm256_set1_pd(2.0);
-            _four = _mm256_set1_pd(4.0);
-            _iterations = _mm256_set1_epi64x(m_iterations);
+            for (int y = 0; y < m_image.getSize().y; ++y) {
+                // Reset positionX
+                positionX = _mm256_add_pd(_mm256_set1_pd(m_bounds[Bounds::MinX] + m_scale.x * start), positionOffsetX);
 
-            _x_scale = _mm256_set1_pd(m_scale.x);
-            _x_jump = _mm256_set1_pd(m_scale.x * 4);
-            _x_pos_offsets = _mm256_set_pd(0, 1, 2, 3);
-            _x_pos_offsets = _mm256_mul_pd(_x_pos_offsets, _x_scale);
+                imagC = _mm256_set1_pd(positionY);
 
-            for (y = 0; y < m_image.getSize().y; y++)
-            {
-                // Reset x_position
-                _a = _mm256_set1_pd(m_bounds[Bounds::MinX] + m_scale.x * start);
-                _x_pos = _mm256_add_pd(_a, _x_pos_offsets);
+                for (int x = start; x < end; x += 4) {
+                    realC = positionX;
+                    realZ = _mm256_setzero_pd();
+                    imagZ = _mm256_setzero_pd();
+                    n = _mm256_setzero_si256();
 
-                _ci = _mm256_set1_pd(y_pos);
+                    do {
+                        realZ2 = _mm256_mul_pd(realZ, realZ);
+                        imagZ2 = _mm256_mul_pd(imagZ, imagZ);
 
-                for (x = start; x < end; x += 4)
-                {
-                    _cr = _x_pos;
-                    _zr = _mm256_setzero_pd();
-                    _zi = _mm256_setzero_pd();
-                    _n = _mm256_setzero_si256();
+                        temp = _mm256_add_pd(_mm256_sub_pd(realZ2, imagZ2), realC);
+                        imagZ = _mm256_fmadd_pd(_mm256_mul_pd(realZ, imagZ), _two, imagC);
+                        realZ = temp;
 
-                    repeat:
-                    _zr2 = _mm256_mul_pd(_zr, _zr);
-                    _zi2 = _mm256_mul_pd(_zi, _zi);
-                    _a = _mm256_sub_pd(_zr2, _zi2);
-                    _a = _mm256_add_pd(_a, _cr);
-                    _b = _mm256_mul_pd(_zr, _zi);
-                    _b = _mm256_fmadd_pd(_b, _two, _ci);
-                    _zr = _a;
-                    _zi = _b;
-                    _a = _mm256_add_pd(_zr2, _zi2);
-                    _mask1 = _mm256_cmp_pd(_a, _four, _CMP_LT_OQ);
-                    _mask2 = _mm256_cmpgt_epi64(_iterations, _n);
-                    _mask2 = _mm256_and_si256(_mask2, _mm256_castpd_si256(_mask1));
-                    _c = _mm256_and_si256(_one, _mask2); // Zero out ones where n < iterations
-                    _n = _mm256_add_epi64(_n, _c); // n++ Increase all n
-                    if (_mm256_movemask_pd(_mm256_castsi256_pd(_mask2)) > 0)
-                        goto repeat;
+                        mask1 = _mm256_cmp_pd(_mm256_add_pd(realZ2, imagZ2), _four, _CMP_LT_OQ);
+                        mask2 = _mm256_and_si256(_mm256_cmpgt_epi64(_iterations, n), _mm256_castpd_si256(mask1));
 
+                        // Zero out ones where n < iterations && n++ Increase all n
+                        n = _mm256_add_epi64(n, _mm256_and_si256(_one, mask2));
+                    } while (_mm256_movemask_pd(_mm256_castsi256_pd(mask2)) > 0);
+
+                    positionX = _mm256_add_pd(positionX, jumpX);
+
+                    // set pixel
                     for (int i = 0; i < 4; ++i) {
-                        int* a = (int*)(&_n);
-                        int iteration = a[3 - i];
-                        m_image.setPixel(x + i, y_offset / row_size, getColor(iteration));
+                        auto* a = (int64_t*)(&n);
+                        m_image.setPixel(x + i, y, getColor(a[3 - i]));
                     }
-
-                    _x_pos = _mm256_add_pd(_x_pos, _x_jump);
                 }
 
-                y_pos += m_scale.y;
-                y_offset += row_size;
+                positionY += m_scale.y;
             }
 
             if (loadFromImage)
@@ -200,13 +189,6 @@ namespace ng {
     }
 
     // public methods
-    void MandelbrotSet::move(const sf::Vector2f& offset) {
-        m_bounds[Bounds::MinX] -= offset.x * m_scale.x;
-        m_bounds[Bounds::MaxX] -= offset.x * m_scale.x;
-        m_bounds[Bounds::MinY] -= offset.y * m_scale.y;
-        m_bounds[Bounds::MaxY] -= offset.y * m_scale.y;
-    }
-
     void MandelbrotSet::move(float offsetX, float offsetY) {
         m_bounds[Bounds::MinX] -= offsetX * m_scale.x;
         m_bounds[Bounds::MaxX] -= offsetX * m_scale.x;
@@ -240,20 +222,17 @@ namespace ng {
 
     // member methods
     sf::Color MandelbrotSet::getColor(int iterations) const {
-        if (!m_coloring) {
-            if (iterations == m_iterations)
-                return sf::Color::Black;
+        if (iterations == m_iterations)
+            return sf::Color::Black;
 
-            int factor = 255 * iterations / static_cast<int>(m_iterations) / 2;
+        if (!m_coloring) {
+           int factor = 255 * iterations / static_cast<int>(m_iterations) / 2;
 
             if (factor < 20)
                 factor = 20;
 
             return sf::Color(factor, factor, factor * 2);
         }
-
-        if (iterations == m_iterations)
-            return sf::Color::Black;
 
         double M_PI = 3.14;
 

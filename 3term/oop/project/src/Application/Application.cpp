@@ -11,8 +11,11 @@ namespace ng {
     // constructor / destructor
     Application::Application() :
         m_window(sf::VideoMode(768, 768), "Default :)", sf::Style::Close),
-        m_paused(false) {
+        m_isPaused(false),
+        m_playMusic(true),
+        m_volume(100.0f) {
 
+        loadMusic();
         initWindow();
         State::getStateStack().push(std::make_unique<MainMenuState>());
     }
@@ -28,6 +31,14 @@ namespace ng {
     }
 
     // member methods
+    void Application::loadMusic() {
+        if (!m_music.openFromFile("../media/Music/Toccata - En Re Mineur.ogg"))
+            throw std::invalid_argument("Application::loadMusic: failed to open the file");
+
+        m_music.setLoop(true);
+        m_music.play();
+    }
+
     void Application::initWindow() {
         State::Context& context = State::getContext();
 
@@ -40,11 +51,33 @@ namespace ng {
     }
 
     void Application::pause() {
-        m_paused = true;
+        m_isPaused = true;
     }
 
     void Application::resume() {
-        m_paused = false;
+        m_isPaused = false;
+    }
+
+    void Application::updateMusic(const sf::Event& event) {
+        switch (event.key.code) {
+            case sf::Keyboard::M:
+                m_playMusic = !m_playMusic;
+
+                if (m_playMusic) m_music.play();
+                else             m_music.pause();
+                break;
+
+            case sf::Keyboard::Up:
+                m_music.setVolume(m_volume += 1.0f);
+                break;
+
+            case sf::Keyboard::Down:
+                m_music.setVolume(m_volume -= 1.0f);
+                break;
+
+            default:
+                break;
+        }
     }
 
     void Application::updateFrameTime() {
@@ -74,13 +107,15 @@ namespace ng {
             if (event.type == sf::Event::MouseButtonReleased)
                 State::getStateStack().mouseButtonReleased(event);
 
-            if (event.type == sf::Event::KeyPressed)
+            if (event.type == sf::Event::KeyPressed) {
+                updateMusic(event);
                 State::getStateStack().keyPressed(event);
+            }
         }
     }
 
     void Application::update() {
-        if (m_paused)
+        if (m_isPaused)
             return;
 
         State::getStateStack().update(m_frameTime.asSeconds());

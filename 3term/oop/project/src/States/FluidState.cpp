@@ -121,7 +121,7 @@ namespace ng {
     // member methods
     void FluidState::loadFonts() {
         if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
-            throw std::invalid_argument("Application::Application: failed to load font");
+            throw std::invalid_argument("FluidState::loadFonts: failed to load font");
     }
 
     void FluidState::initSliders() {

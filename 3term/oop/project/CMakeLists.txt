@@ -7,7 +7,7 @@ set(CMAKE_CUDA_STANDARD 14)
 
 # init SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
-find_package(SFML 2.5.1 COMPONENTS network window graphics system REQUIRED)
+find_package(SFML 2.5.1 COMPONENTS audio window graphics system REQUIRED)
 
 find_package(CUDAToolkit REQUIRED)
 

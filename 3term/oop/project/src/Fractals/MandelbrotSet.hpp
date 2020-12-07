@@ -51,7 +51,6 @@ namespace ng {
         void setColoring(bool coloring);
 
         // public methods
-        void move(const sf::Vector2f& offset);
         void move(float offsetX, float offsetY);
         void zoom(float factor);
         void increaseIterations();
