@@ -11,8 +11,6 @@ find_package(SFML 2.5.1 COMPONENTS audio window graphics system REQUIRED)
 
 find_package(CUDAToolkit REQUIRED)
 
-#find_package(Boost 1.74.0 COMPONENTS  REQUIRED)
-
 # multi threading
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -march=native")
 
@@ -69,14 +67,3 @@ set_target_properties(
     PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
 )
-
-#if (Boost_FOUND)
-#    message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-#    message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-#    message(STATUS "Boost_VERSION: ${Boost_VERSION}")
-#
-#    include_directories(${Boost_INCLUDE_DIRS})
-#    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
-#elseif()
-#    message(ERROR Boost_NOT_FOUND)
-#endif()
