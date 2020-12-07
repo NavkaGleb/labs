@@ -4,8 +4,10 @@
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 
 #include "States/State.hpp"
+#include "Gui/Slider.hpp"
 #include "Simulations/FluidSimulation/Fluid.cuh"
 
 namespace ng {
@@ -32,6 +34,7 @@ namespace ng {
         sf::Vector2i m_pos2;
         bool m_isPressed;
         bool m_isPaused;
+        gui::Slider<int, sf::RectangleShape> m_slider;
 
         // member methods
         void updateMousePosition();

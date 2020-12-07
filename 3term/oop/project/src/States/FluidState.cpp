@@ -8,7 +8,14 @@ namespace ng {
     FluidState::FluidState()
         : m_fluid(State::getContext().window->getSize().x / 2, State::getContext().window->getSize().y / 2, 2),
           m_isPressed(false),
-          m_isPaused(false) {
+          m_isPaused(false),
+          m_slider(0, 25) {
+
+        m_slider.setValue(10);
+        m_slider.setPosition(400, 50);
+        m_slider.setSize(sf::Vector2f(200, 30));
+        m_slider.setBackgroundColor(sf::Color::Blue);
+        m_slider.setForegroundColor(sf::Color::Green);
     }
 
     FluidState::~FluidState() {
@@ -34,6 +41,9 @@ namespace ng {
 
         if (event.mouseButton.button == sf::Mouse::Right)
             m_isPaused = !m_isPaused;
+
+        if (event.mouseButton.button == sf::Mouse::Left && m_slider.isHovered())
+            std::cout << "fuck this shit" << std::endl;
     }
 
     void FluidState::mouseButtonReleased(const sf::Event& event) {
@@ -46,6 +56,7 @@ namespace ng {
     }
 
     void FluidState::update(const float& ftime) {
+        m_slider.update(sf::Mouse::getPosition(*State::getContext().window));
         updateMousePosition();
 
         if (!m_isPaused)
@@ -54,6 +65,7 @@ namespace ng {
 
     void FluidState::render(sf::RenderTarget& target) const {
         target.draw(m_fluid);
+        target.draw(m_slider);
     }
 
     // member methods
