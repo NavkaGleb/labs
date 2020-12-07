@@ -101,7 +101,7 @@ namespace ng {
             return;
 
         State::getStateStack().update(m_frameTime.asSeconds());
-        m_window.setTitle("FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
+        m_window.setTitle("Project\tFPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
 
         m_statisticsText.setString(
             "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +

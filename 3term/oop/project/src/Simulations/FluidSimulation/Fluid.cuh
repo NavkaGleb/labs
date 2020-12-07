@@ -17,17 +17,6 @@ namespace ng {
 
     class Fluid : public sf::Drawable {
     public:
-        // constructor / destructor
-        __host__ explicit Fluid(unsigned int width, unsigned int height, unsigned int scale);
-        __host__ ~Fluid() override;
-
-        // accessors
-        __host__ inline unsigned int getScale() const { return m_scale; }
-
-        // public methods
-        __host__ void update(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isPressed);
-
-    private:
         // inner structs
         struct Config {
             float pressure          = 1.5f;
@@ -39,8 +28,22 @@ namespace ng {
             float bloomIntense      = 0.1f;
             int   radius            = 400;
             bool  bloomEnabled      = true;
-        } m_config; // struct Config
+        }; // struct Config
 
+        // constructor / destructor
+        __host__ explicit Fluid(unsigned int width, unsigned int height, unsigned int scale);
+        __host__ ~Fluid() override;
+
+        // accessors
+        __host__ inline unsigned int getScale() const { return m_scale; }
+        __host__ inline const Config& getConfig() const { return m_config; }
+        __host__ inline Config& getConfig() { return m_config; }
+
+        // public methods
+        __host__ void update(float dt, const sf::Vector2i& pos1, const sf::Vector2i& pos2, bool isPressed);
+
+    private:
+        // inner structs
         struct SystemConfig {
             int velocityIterations = 20;
             int pressureIterations = 40;
@@ -49,6 +52,8 @@ namespace ng {
         } m_systemConfig; // struct SystemConfig
 
         // member data
+        Config m_config;
+
         sf::Vector2u m_size;
         unsigned int m_scale;
 
