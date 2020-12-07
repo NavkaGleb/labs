@@ -70,7 +70,7 @@ namespace ng {
             button->setSize(sf::Vector2f(400.0f, 50.0f));
             button->setPosition(
                 (State::getContext().window->getSize().x - button->getSize().x) / 2.0f,
-                static_cast<float>(i + 1) * 80.0f + 100.0f
+                static_cast<float>(i + 1) * 80.0f + 230.0f
             );
             button->setBackgroundIdleColor(backgroundIdleColor);
             button->setBackgroundHoverColor(backgroundHoverColor);
