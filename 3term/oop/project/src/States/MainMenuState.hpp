@@ -21,7 +21,7 @@ namespace ng {
         void mouseButtonPressed(const sf::Event& event) override;
         void mouseButtonReleased(const sf::Event& event) override;
 
-        void update(const float& ftime) override;
+        void update(const float& dt) override;
         void render(sf::RenderTarget& target) const override;
 
     private:

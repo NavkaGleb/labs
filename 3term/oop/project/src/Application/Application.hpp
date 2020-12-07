@@ -20,14 +20,11 @@ namespace ng {
         sf::Clock m_clock;
         sf::Time m_frameTime;
         sf::Time m_lastFrameTime;
-        sf::Font m_font;
         sf::Text m_statisticsText;
         bool m_paused;
 
         // member methods
-        void loadFonts();
         void initWindow();
-        void initText();
 
         void pause();
         void resume();

@@ -25,7 +25,7 @@ namespace ng {
 
     private:
         // enums
-        enum class TextRole : short { Statistic = 0, MinX, MaxX, MinY, MaxY };
+        enum class TextRole : short { Statistic = 0 };
 
         // aliases
         using ImplementationContainer = std::unordered_map<MandelbrotSet::ImplementationType, std::string>;

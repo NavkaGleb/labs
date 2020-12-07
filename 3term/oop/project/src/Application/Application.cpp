@@ -1,7 +1,8 @@
 #include "Application.hpp"
 
 #include <iostream>
-#include <cmath>
+#include <sstream>
+#include <iomanip>
 
 #include "States/MainMenuState.hpp"
 
@@ -9,13 +10,10 @@ namespace ng {
 
     // constructor / destructor
     Application::Application() :
-        m_window(sf::VideoMode(768, 768), "SFML", sf::Style::Close),
+        m_window(sf::VideoMode(768, 768), "Default :)", sf::Style::Close),
         m_paused(false) {
 
-        loadFonts();
-
         initWindow();
-        initText();
         State::getStateStack().push(std::make_unique<MainMenuState>());
     }
 
@@ -30,11 +28,6 @@ namespace ng {
     }
 
     // member methods
-    void Application::loadFonts() {
-        if (!m_font.loadFromFile("../media/Fonts/Baloo2-Medium.ttf"))
-            throw std::invalid_argument("Application::Application: failed to load font");
-    }
-
     void Application::initWindow() {
         State::Context& context = State::getContext();
 
@@ -44,13 +37,6 @@ namespace ng {
 
         m_window.setFramerateLimit(context.framerateLimit);
         m_window.setVerticalSyncEnabled(context.verticalSyncEnabled);
-    }
-
-    void Application::initText() {
-        m_statisticsText.setFont(m_font);
-        m_statisticsText.setPosition(std::floor(5.0f), std::floor(5.0f));
-        m_statisticsText.setCharacterSize(20);
-        m_statisticsText.setFillColor(sf::Color::White);
     }
 
     void Application::pause() {
@@ -98,12 +84,11 @@ namespace ng {
             return;
 
         State::getStateStack().update(m_frameTime.asSeconds());
-        m_window.setTitle("Project FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())));
 
-        m_statisticsText.setString(
-            "FPS: " + std::to_string((1.0f / m_frameTime.asSeconds())) + "\n" +
-            "time: " + std::to_string(m_frameTime.asSeconds())
-        );
+        std::ostringstream oss;
+        oss << std::setprecision(3) << "Project FPS: " << 1.0f / m_frameTime.asSeconds() << " "
+                                    << "Time taken: " << m_frameTime.asSeconds();
+        m_window.setTitle(oss.str());
     }
 
     void Application::render() {
@@ -112,7 +97,7 @@ namespace ng {
 
         // display
         State::getStateStack().render(m_window);
-        m_window.draw(m_statisticsText);
+
         m_window.display();
     }
 

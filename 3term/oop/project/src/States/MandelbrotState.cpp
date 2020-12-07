@@ -1,9 +1,6 @@
 #include "MandelbrotState.hpp"
 
 #include <iostream>
-#include <cmath>
-
-//#include <boost/lexical_cast.hpp>
 
 namespace ng {
 
@@ -44,7 +41,7 @@ namespace ng {
             m_mandelbrotSet.setImplementation(MandelbrotSet::ImplementationType::ThreadPool);
     }
 
-    void MandelbrotState::updateInput(const float& ftime) {
+    void MandelbrotState::updateInput(const float& dt) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
             m_mandelbrotSet.decreaseIterations();
 
@@ -52,70 +49,33 @@ namespace ng {
             m_mandelbrotSet.increaseIterations();
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            m_mandelbrotSet.zoom(300.0f * ftime);
+            m_mandelbrotSet.zoom(300.0f * dt);
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-            m_mandelbrotSet.zoom(-300.0f * ftime);
+            m_mandelbrotSet.zoom(-300.0f * dt);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            m_mandelbrotSet.move(0.f, -200.f * ftime);
+            m_mandelbrotSet.move(0.f, -200.f * dt);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            m_mandelbrotSet.move(0.f, 200.f * ftime);
+            m_mandelbrotSet.move(0.f, 200.f * dt);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            m_mandelbrotSet.move(200.f * ftime, 0.f);
+            m_mandelbrotSet.move(200.f * dt, 0.f);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            m_mandelbrotSet.move(-200.f * ftime, 0.f);
+            m_mandelbrotSet.move(-200.f * dt, 0.f);
     }
 
     void MandelbrotState::updateText() {
-        static sf::Vector2u windowSize = State::getContext().window->getSize();
-        static std::function<std::string(MandelbrotSet::PointType)> toString = [](MandelbrotSet::PointType point) {
-//            return boost::lexical_cast<std::string>(point);
-            return std::to_string(point);
-        };
-
         m_text[TextRole::Statistic].setString(
             "Iterations: " + std::to_string(m_mandelbrotSet.getIterations()) + "\n" +
             "Implementation: " + m_implementations[m_mandelbrotSet.getImplementation()] + "\n"
         );
-
-        if (!m_showCoordinates)
-            return;
-
-        // left text
-        m_text[TextRole::MinX].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MinX)));
-        m_text[TextRole::MinX].setPosition(
-            std::floor(0.f),
-            std::floor((windowSize.y + m_text[TextRole::MinX].getGlobalBounds().height) / 2.0f)
-        );
-
-        // right text
-        m_text[TextRole::MaxX].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MaxX)));
-        m_text[TextRole::MaxX].setPosition(
-            std::floor(windowSize.x - m_text[TextRole::MaxX].getGlobalBounds().width * 2.f),
-            std::floor((windowSize.y + m_text[TextRole::MaxX].getGlobalBounds().height) / 2.0f)
-        );
-
-        // top text
-        m_text[TextRole::MaxY].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MaxY)));
-        m_text[TextRole::MaxY].setPosition(
-            std::floor((windowSize.x - m_text[TextRole::MaxY].getGlobalBounds().width) / 2.0f),
-            std::floor(0.0f)
-        );
-
-        // bottom text
-        m_text[TextRole::MinY].setString(toString(m_mandelbrotSet.getLocalBounds().at(MandelbrotSet::Bounds::MinY)));
-        m_text[TextRole::MinY].setPosition(
-            std::floor((windowSize.x - m_text[TextRole::MinY].getGlobalBounds().width) / 2.0f),
-            std::floor(windowSize.y - m_text[TextRole::MinY].getGlobalBounds().height * 2.0f)
-        );
     }
 
-    void MandelbrotState::update(const float& ftime) {
-        updateInput(ftime);
+    void MandelbrotState::update(const float& dt) {
+        updateInput(dt);
         m_mandelbrotSet.update();
         updateText();
     }
@@ -123,14 +83,6 @@ namespace ng {
     void MandelbrotState::render(sf::RenderTarget& target) const {
         target.draw(m_mandelbrotSet);
         target.draw(m_text.at(TextRole::Statistic));
-
-        if (!m_showCoordinates)
-            return;
-
-        target.draw(m_text.at(TextRole::MinX));
-        target.draw(m_text.at(TextRole::MaxX));
-        target.draw(m_text.at(TextRole::MinY));
-        target.draw(m_text.at(TextRole::MaxY));
     }
 
     // member methods
@@ -140,31 +92,12 @@ namespace ng {
     }
 
     void MandelbrotState::initText() {
-        unsigned statisticTextCharacterSize = 20;
-        unsigned coordinatesTextCharacterSize = 12;
+        unsigned statisticTextCharacterSize = 18;
 
         // statistic text
         m_text[TextRole::Statistic].setFont(m_font);
         m_text[TextRole::Statistic].setCharacterSize(statisticTextCharacterSize);
-        m_text[TextRole::Statistic].setPosition(5.f, 70.f);
-
-        // left text
-        m_text[TextRole::MinX].rotate(-90.0f);
-        m_text[TextRole::MinX].setFont(m_font);
-        m_text[TextRole::MinX].setCharacterSize(coordinatesTextCharacterSize);
-
-        // right text
-        m_text[TextRole::MaxX].rotate(-90.0f);
-        m_text[TextRole::MaxX].setFont(m_font);
-        m_text[TextRole::MaxX].setCharacterSize(coordinatesTextCharacterSize);
-
-        // top text
-        m_text[TextRole::MaxY].setFont(m_font);
-        m_text[TextRole::MaxY].setCharacterSize(coordinatesTextCharacterSize);
-
-        // bottom text
-        m_text[TextRole::MinY].setFont(m_font);
-        m_text[TextRole::MinY].setCharacterSize(coordinatesTextCharacterSize);
+        m_text[TextRole::Statistic].setPosition(5.0f, 5.0f);
     }
 
     void MandelbrotState::initImplementations() {

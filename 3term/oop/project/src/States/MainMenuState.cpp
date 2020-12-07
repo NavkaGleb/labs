@@ -30,7 +30,7 @@ namespace ng {
         }
     }
 
-    void MainMenuState::update(const float& ftime) {
+    void MainMenuState::update(const float& dt) {
         for (auto& [name, button] : m_buttons)
             button->update(sf::Mouse::getPosition(*State::getContext().window));
     }
