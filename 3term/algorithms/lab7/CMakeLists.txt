@@ -12,7 +12,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/main.cpp
     src/RabinKarp/StringRabinKarp.cpp
-        src/Random/Random.hpp)
+)
 
 include_directories(src)
 
