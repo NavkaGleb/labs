@@ -1,3 +1,6 @@
 [submodule "3term/algorithms/lab5/lib/libfort"]
 	path = 3term/algorithms/lab5/lib/libfort
 	url = https://github.com/NavkaGleb/libfort
+[submodule "3term/Algorithms/lab7/lib/Random"]
+	path = 3term/Algorithms/lab7/lib/Random
+	url = https://github.com/NavkaGleb/Random
