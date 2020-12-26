@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <Random/Random.hpp>
+
 #include "RabinKarp/MatrixRabinKarp.hpp"
 
 int main() {
@@ -11,13 +13,13 @@ int main() {
 
     for (std::size_t i = 0; i < sizeText; ++i) {
         for (std::size_t j = 0; j < sizeText; ++j) {
-            text1[i][j] = static_cast<char>(Ng::Random::Irand(0, 1) + '0');
+            text1[i][j] = static_cast<char>(Ng::Random::Get(0, 1) + '0');
         }
     }
 
     for (std::size_t i = 0; i < sizePattern; ++i) {
         for (std::size_t j = 0; j < sizePattern; ++j) {
-            pattern1[i][j] = static_cast<char>(Ng::Random::Irand(0, 1) + '0');
+            pattern1[i][j] = static_cast<char>(Ng::Random::Get(0, 1) + '0');
         }
     }
 

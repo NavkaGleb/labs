@@ -14,6 +14,10 @@ set(SOURCE_FILES
     src/RabinKarp/StringRabinKarp.cpp
 )
 
+add_subdirectory(lib/Random)
+
 include_directories(src)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE NgRandom)
