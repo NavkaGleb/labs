@@ -3,6 +3,8 @@
 #include <array>
 #include <vector>
 
+#include <Random/Random.hpp>
+
 #include "UniversalHash.hpp"
 
 namespace Ng {
