@@ -93,9 +93,12 @@ namespace Ng {
             void Update(std::size_t size);
 
             DataIterator begin() { return m_Data.begin(); }
-            DataConstIterator cbegin() const { return m_Data.cbegin(); }
+            DataConstIterator begin() const { return m_Data.cbegin(); }
+            DataConstIterator cbegin() const noexcept { return m_Data.cbegin(); }
+
             DataIterator end() { return m_Data.end(); }
-            DataConstIterator cend() const { return m_Data.cend(); }
+            DataConstIterator end() const { return m_Data.cend(); }
+            DataConstIterator cend() const noexcept { return m_Data.cend(); }
 
             Pair*& operator [](const std::size_t index) { return m_Data[index]; }
             const Pair* operator [](const std::size_t index) const { return m_Data[index]; }
@@ -259,6 +262,8 @@ namespace Ng {
         if (IsExists(key))
             return Find(key);
 
+        ++m_Size;
+
         auto  nodeHash    = GetHash(key);
         auto& currentNode = m_Nodes[nodeHash];
 
@@ -316,7 +321,7 @@ namespace Ng {
 
             std::cout << i << ": ";
 
-            for (const auto& pair : m_Nodes[i].GetData()) {
+            for (const auto& pair : m_Nodes[i]) {
                 if (pair)
                     std::cout << pair->first << " -> " << pair->second;
                 else

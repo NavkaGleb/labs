@@ -26,9 +26,8 @@ int main() {
         auto& [key, value] = *hashTable.Push(rand, std::to_string(Ng::Random::Get(0, 10)));
     }
 
-    std::cout << std::endl;
     hashTable.Print();
-//
+
 //    for (int i = 0; i < 10; ++i) {
 //        int rand = Ng::Random::Get(0, 100);
 //
