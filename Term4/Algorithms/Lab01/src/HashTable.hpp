@@ -13,17 +13,18 @@ namespace Ng {
     template <typename Key, typename Value, std::size_t Size, typename HashFunc = UniversalHash<Key>>
     class StaticHashTable {
     private:
-        struct Node;
         struct UniversalHashParams;
+        struct Node;
 
     public:
         using NodeContainer     = std::array<Node, Size>;
         using NodeIterator      = typename NodeContainer::iterator;
         using NodeConstIterator = typename NodeContainer::const_iterator;
 
-        using KeyContainer      = std::vector<Key*>;
-        using KeyIterator       = typename KeyContainer::iterator;
-        using KeyConstIterator  = typename KeyContainer::const_iterator;
+        using Pair              = std::pair<Key, Value>;
+        using DataContainer     = std::vector<Pair*>;
+        using DataIterator      = typename DataContainer::iterator;
+        using DataConstIterator = typename DataContainer::const_iterator;
 
         class Iterator {
         public:
@@ -51,8 +52,9 @@ namespace Ng {
         [[nodiscard]] inline std::size_t GetMaxSize() const { return Size; }
         [[nodiscard]] inline std::size_t GetSize() const { return m_Size; }
 
-        [[nodiscard]] std::optional<Key> Find(const Key& key) const;
-        Iterator Push(const Key& key);
+        [[nodiscard]] bool IsExists(const Key& key) const;
+        [[nodiscard]] std::optional<Value> Find(const Key& key) const;
+        Iterator Push(const Key& key, const Value& value);
         void Pop(const Key& key);
 
         void Print() const;
@@ -73,27 +75,27 @@ namespace Ng {
             Node() = default;
             virtual ~Node() = default;
 
-            [[nodiscard]] inline bool IsEmpty() const { return m_Keys.empty(); }
-            [[nodiscard]] inline std::size_t GetSize() const { return std::sqrt(m_Keys.size()); }
-            [[nodiscard]] inline std::size_t GetActualSize() const { return m_Keys.size(); }
-            [[nodiscard]] inline KeyContainer& GetKeys() { return m_Keys; };
-            [[nodiscard]] inline const KeyContainer& GetKeys() const { return m_Keys; };
+            [[nodiscard]] inline bool IsEmpty() const { return m_Data.empty(); }
+            [[nodiscard]] inline std::size_t GetSize() const { return std::sqrt(m_Data.size()); }
+            [[nodiscard]] inline std::size_t GetActualSize() const { return m_Data.size(); }
+            [[nodiscard]] inline DataContainer& GetData() { return m_Data; };
+            [[nodiscard]] inline const DataContainer& GetData() const { return m_Data; };
 
             std::size_t GetHash(const Key& key) const;
 
-            void PushBack(const Key& key);
+            void PushBack(const Key& key, const Value& value);
             void Update(std::size_t size);
 
-            KeyIterator begin() { return m_Keys.begin(); }
-            KeyConstIterator cbegin() const { return m_Keys.cbegin(); }
-            KeyIterator end() { return m_Keys.end(); }
-            KeyConstIterator cend() const { return m_Keys.cend(); }
+            DataIterator begin() { return m_Data.begin(); }
+            DataConstIterator cbegin() const { return m_Data.cbegin(); }
+            DataIterator end() { return m_Data.end(); }
+            DataConstIterator cend() const { return m_Data.cend(); }
 
-            Key*& operator [](const std::size_t index) { return m_Keys[index]; }
-            const Key* operator [](const std::size_t index) const { return m_Keys[index]; }
+            Pair*& operator [](const std::size_t index) { return m_Data[index]; }
+            const Pair* operator [](const std::size_t index) const { return m_Data[index]; }
 
         private:
-            KeyContainer        m_Keys;
+            DataContainer       m_Data;
             HashFunc            m_Hash;
             UniversalHashParams m_HashParams;
 
@@ -160,18 +162,18 @@ namespace Ng {
     ///////////////////////////////////////////////////////////////////////
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     std::size_t StaticHashTable<Key, Value, Size, HashFunc>::Node::GetHash(const Key& key) const {
-        return m_Hash(key, m_HashParams.A, m_HashParams.B, m_HashParams.Prime, m_Keys.size());
+        return m_Hash(key, m_HashParams.A, m_HashParams.B, m_HashParams.Prime, m_Data.size());
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    void StaticHashTable<Key, Value, Size, HashFunc>::Node::PushBack(const Key& key) {
-        m_Keys.emplace_back(new Key(key));
+    void StaticHashTable<Key, Value, Size, HashFunc>::Node::PushBack(const Key& key, const Value& value) {
+        m_Data.emplace_back(new Pair(key, value));
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     void StaticHashTable<Key, Value, Size, HashFunc>::Node::Update(std::size_t size) {
-        m_Keys.clear();
-        m_Keys.resize(size, nullptr);
+        m_Data.clear();
+        m_Data.resize(size, nullptr);
         m_HashParams = UniversalHashParams();
     }
 
@@ -190,51 +192,70 @@ namespace Ng {
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    std::optional<Key> StaticHashTable<Key, Value, Size, HashFunc>::Find(const Key& key) const {
+    bool StaticHashTable<Key, Value, Size, HashFunc>::IsExists(const Key& key) const {
         auto& node = m_Nodes[GetHash(key)];
 
-        if (node.GetActualSize() == 1 && *node[0] == key)
-            return key;
+        if (node.GetActualSize() == 1 && node[0]->first == key)
+            return true;
 
-        for (std::size_t i = 0; i < m_Nodes[hash].GetActualSize(); ++i)
-            if (m_Nodes[hash][i] && *m_Nodes[hash][i] == key)
-                return { m_Nodes, hash, i };
+        for (std::size_t i = 0; i < node.GetActualSize(); ++i)
+            if (node[i] && node[i]->first == key)
+                return true;
+
+        return false;
+    }
+
+    template <typename Key, typename Value, std::size_t Size, typename HashFunc>
+    std::optional<Value> StaticHashTable<Key, Value, Size, HashFunc>::Find(const Key& key) const {
+        auto& node = m_Nodes[GetHash(key)];
+
+        if (node.GetActualSize() == 1 && node[0] == key)
+            return node[0]->second;
+
+        for (std::size_t i = 0; i < node.GetActualSize(); ++i)
+            if (node[i] && node[i]->first == key)
+                return node[i]->second;
 
         return std::nullopt;
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator StaticHashTable<Key, Value, Size, HashFunc>::Push(const Key& key) {
+    typename StaticHashTable<
+        Key,
+        Value,
+        Size,
+        HashFunc
+    >::Iterator StaticHashTable<Key, Value, Size, HashFunc>::Push(const Key& key, const Value& value) {
         auto  nodeHash    = GetHash(key);
         auto& currentNode = m_Nodes[nodeHash];
 
         if (currentNode.IsEmpty()) {
-            currentNode.PushBack(key);
+            currentNode.PushBack(key, value);
             return { m_Nodes, nodeHash, 0 };
         }
 
         std::size_t  size     = currentNode.GetSize() + 1;
-        KeyContainer temp     = currentNode.GetKeys();
+        DataContainer temp    = currentNode.GetData();
         bool         inserted = false;
 
-        temp.emplace_back(new Key(key));
+        temp.emplace_back(new std::pair<Key, Value>(key, value));
 
         while (!inserted) {
             currentNode.Update(size * size);
             inserted = true;
 
-            for (const auto& k : temp) {
-                if (!k)
+            for (const auto& pair : temp) {
+                if (!pair)
                     continue;
 
-                auto hash = currentNode.GetHash(*k);
+                auto hash = currentNode.GetHash(pair->first);
 
                 if (currentNode[hash]) {
                     inserted = false;
                     break;
                 }
 
-                currentNode[hash] = k;
+                currentNode[hash] = pair;
             }
         }
 
@@ -258,9 +279,9 @@ namespace Ng {
 
             std::cout << i << ": ";
 
-            for (const auto& e : m_Nodes[i].GetKeys()) {
-                if (e)
-                    std::cout << *e;
+            for (const auto& pair : m_Nodes[i].GetData()) {
+                if (pair)
+                    std::cout << pair->first << " -> " << pair->second;
                 else
                     std::cout << "null";
                 std::cout << " ";

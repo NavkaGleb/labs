@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <optional>
+#include <map>
 
 #include <Random/Random.hpp>
 
@@ -19,8 +20,7 @@ std::optional<std::string> Create(bool x) {
 }
 
 int main() {
-    Ng::StaticHashTable<int, 10> hashTable;
-    int ranad;
+    Ng::StaticHashTable<int, std::string, 10> hashTable;
 
     std::cout << hashTable.GetSize() << std::endl;
 
@@ -28,14 +28,11 @@ int main() {
         int rand = Ng::Random::Get(0, 5943);
         std::cout << rand << std::endl;
 
-        hashTable.Push(rand);
-        ranad = rand;
+        hashTable.Push(rand, std::to_string(Ng::Random::Get(0, 10)));
     }
 
     std::cout << std::endl;
     hashTable.Print();
-
-    std::cout << "Find: " << *hashTable.Find(ranad) << std::endl;
 
     return 0;
 }
