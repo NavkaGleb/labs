@@ -6,7 +6,6 @@
 #include <Random/Random.hpp>
 
 #include "HashTable.hpp"
-#include "UniversalHash.hpp"
 
 enum class Category : int { First = 0, Second };
 
@@ -14,10 +13,6 @@ struct News {
     std::string Title;
     Category    Category;
 };
-
-std::optional<std::string> Create(bool x) {
-    return x ? std::optional<std::string>("Fuck") : std::nullopt;
-}
 
 int main() {
     Ng::StaticHashTable<int, std::string, 10> hashTable;
@@ -28,17 +23,22 @@ int main() {
         int rand = Ng::Random::Get(0, 100);
         std::cout << rand << std::endl;
 
-        hashTable.Push(rand, std::to_string(Ng::Random::Get(0, 10)));
+        auto& [key, value] = *hashTable.Push(rand, std::to_string(Ng::Random::Get(0, 10)));
     }
 
     std::cout << std::endl;
     hashTable.Print();
+//
+//    for (int i = 0; i < 10; ++i) {
+//        int rand = Ng::Random::Get(0, 100);
+//
+//        std::cout << rand << " " << hashTable.IsExists(rand) << std::endl;
+//    }
 
-    for (int i = 0; i < 10; ++i) {
-        int rand = Ng::Random::Get(0, 100);
+    hashTable[32] = "Fuck this shit";
 
-        std::cout << rand << " " << hashTable.IsExists(rand) << std::endl;
-    }
+    for (const auto& [key, value] : hashTable)
+        std::cout << "Key: " << key << ", Value: " << value << std::endl;
 
     return 0;
 }

@@ -16,4 +16,12 @@ namespace Ng {
 
     }; // struct UniversalHash<int>
 
+    template<> struct
+        UniversalHash<std::string> {
+        std::size_t operator ()(const std::string&, int a, int b, int p, int m) const {
+            return 0;
+        }
+
+    }; // struct UniversalHash<std::string>
+
 } // namespace Ng

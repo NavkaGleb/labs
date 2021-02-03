@@ -18,8 +18,6 @@ namespace Ng {
 
     public:
         using NodeContainer     = std::array<Node, Size>;
-        using NodeIterator      = typename NodeContainer::iterator;
-        using NodeConstIterator = typename NodeContainer::const_iterator;
 
         using Pair              = std::pair<Key, Value>;
         using DataContainer     = std::vector<Pair*>;
@@ -28,11 +26,11 @@ namespace Ng {
 
         class Iterator {
         public:
-            Iterator(NodeContainer& nodes, std::size_t nodeIndex, std::size_t keyIndex);
+            Iterator(NodeContainer& nodes, std::size_t nodeIndex, std::size_t dataIndex);
             virtual ~Iterator() = default;
 
             Iterator& operator ++() noexcept;
-            Key& operator *() noexcept;
+            Pair& operator *() noexcept;
 
             bool operator ==(const Iterator& other) const noexcept;
             bool operator !=(const Iterator& other) const noexcept;
@@ -42,7 +40,7 @@ namespace Ng {
         private:
             NodeContainer& m_Nodes;
             std::size_t    m_NodeIndex;
-            std::size_t    m_KeyIndex;
+            std::size_t    m_DataIndex;
 
         }; // class Iterator
 
@@ -53,7 +51,8 @@ namespace Ng {
         [[nodiscard]] inline std::size_t GetSize() const { return m_Size; }
 
         [[nodiscard]] bool IsExists(const Key& key) const;
-        [[nodiscard]] std::optional<Value> Find(const Key& key) const;
+        [[nodiscard]] Iterator Find(const Key& key);
+
         Iterator Push(const Key& key, const Value& value);
         void Pop(const Key& key);
 
@@ -67,8 +66,13 @@ namespace Ng {
     private:
         struct UniversalHashParams {
             int Prime = 2153;
-            int A     = Ng::Random::Get(0, Prime);
-            int B     = Ng::Random::Get(1, Prime);
+            int A     = 0;
+            int B     = 0;
+
+            void Random() {
+                A = Ng::Random::Get(0, Prime);
+                B = Ng::Random::Get(1, Prime);
+            }
 
         }; // struct HashParams
 
@@ -123,40 +127,57 @@ namespace Ng {
         Value,
         Size,
         HashFunc
-    >::Iterator::Iterator(NodeContainer& nodes, std::size_t nodeIndex, std::size_t keyIndex) :
+    >::Iterator::Iterator(NodeContainer& nodes, std::size_t nodeIndex, std::size_t dataIndex) :
         m_Nodes(nodes),
         m_NodeIndex(nodeIndex),
-        m_KeyIndex(keyIndex) { }
+        m_DataIndex(dataIndex) { }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator& StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator ++() noexcept {
-        do {
-            ++m_KeyIndex;
+    typename StaticHashTable<
+        Key,
+        Value,
+        Size,
+        HashFunc
+    >::Iterator& StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator ++() noexcept {
 
-            if (m_Nodes[m_NodeIndex].Data.begin() + m_KeyIndex == m_Nodes[m_NodeIndex].Data.end())
+        do {
+            ++m_DataIndex;
+
+            while (m_DataIndex >= m_Nodes[m_NodeIndex].GetActualSize()) {
                 ++m_NodeIndex;
-        } while (!m_Nodes[m_NodeIndex].Data[m_KeyIndex]);
+                m_DataIndex = 0;
+            }
+
+            if (m_NodeIndex == Size)
+                break;
+
+        } while (!m_Nodes[m_NodeIndex][m_DataIndex]);
 
         return *this;
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    Key& StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator *() noexcept {
-        return *m_Nodes[m_NodeIndex][m_KeyIndex];
+    typename StaticHashTable<
+        Key,
+        Value,
+        Size,
+        HashFunc
+    >::Pair& StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator *() noexcept {
+        return *m_Nodes[m_NodeIndex][m_DataIndex];
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     bool StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator ==(const Iterator& other) const noexcept {
         return &m_Nodes == &other.m_Nodes &&
                m_NodeIndex == other.m_NodeIndex &&
-               m_KeyIndex == other.m_KeyIndex;
+               m_DataIndex == other.m_DataIndex;
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     bool StaticHashTable<Key, Value, Size, HashFunc>::Iterator::operator !=(const Iterator& other) const noexcept {
         return !(&m_Nodes == &other.m_Nodes &&
                  m_NodeIndex == other.m_NodeIndex &&
-                 m_KeyIndex == other.m_KeyIndex);
+                 m_DataIndex == other.m_DataIndex);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -176,7 +197,7 @@ namespace Ng {
     void StaticHashTable<Key, Value, Size, HashFunc>::Node::Update(std::size_t size) {
         m_Data.clear();
         m_Data.resize(size, nullptr);
-        m_HashParams = UniversalHashParams();
+        m_HashParams.Random();
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -184,7 +205,10 @@ namespace Ng {
     ///////////////////////////////////////////////////////////////////////
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     StaticHashTable<Key, Value, Size, HashFunc>::StaticHashTable() :
-        m_Size(0) {}
+        m_Size(0) {
+
+        m_HashParams.Random();
+    }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     StaticHashTable<Key, Value, Size, HashFunc>::~StaticHashTable() {
@@ -197,28 +221,32 @@ namespace Ng {
     bool StaticHashTable<Key, Value, Size, HashFunc>::IsExists(const Key& key) const {
         auto& node = m_Nodes[GetHash(key)];
 
-        if (node.GetActualSize() == 1 && node[0]->first == key)
-            return true;
+        if (node.IsEmpty())
+            return false;
 
-        for (std::size_t i = 0; i < node.GetActualSize(); ++i)
-            if (node[i] && node[i]->first == key)
-                return true;
+        auto hash = node.GetHash(key);
 
-        return false;
+        return hash < node.GetActualSize() && node[hash] && node[hash]->first == key;
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
-    std::optional<Value> StaticHashTable<Key, Value, Size, HashFunc>::Find(const Key& key) const {
-        auto& node = m_Nodes[GetHash(key)];
+    typename StaticHashTable<
+        Key,
+        Value,
+        Size,
+        HashFunc
+    >::Iterator StaticHashTable<Key, Value, Size, HashFunc>::Find(const Key& key) {
+        auto  nodeHash = GetHash(key);
+        auto& node     = m_Nodes[nodeHash];
 
-        if (node.GetActualSize() == 1 && node[0] == key)
-            return node[0]->second;
+        if (!node.IsEmpty()) {
+            auto hash = node.GetHash(key);
 
-        for (std::size_t i = 0; i < node.GetActualSize(); ++i)
-            if (node[i] && node[i]->first == key)
-                return node[i]->second;
+            if (hash < node.GetActualSize() && node[hash] && node[hash]->first == key)
+                return { m_Nodes, nodeHash, hash };
+        }
 
-        return std::nullopt;
+        return end();
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
@@ -228,6 +256,9 @@ namespace Ng {
         Size,
         HashFunc
     >::Iterator StaticHashTable<Key, Value, Size, HashFunc>::Push(const Key& key, const Value& value) {
+        if (IsExists(key))
+            return Find(key);
+
         auto  nodeHash    = GetHash(key);
         auto& currentNode = m_Nodes[nodeHash];
 
@@ -236,11 +267,12 @@ namespace Ng {
             return { m_Nodes, nodeHash, 0 };
         }
 
-        std::size_t  size     = currentNode.GetSize() + 1;
-        DataContainer temp    = currentNode.GetData();
-        bool         inserted = false;
+        std::size_t   size      = currentNode.GetSize() + 1;
+        std::size_t   dataIndex = 0;
+        bool          inserted  = false;
+        DataContainer temp      = currentNode.GetData();
 
-        temp.emplace_back(new std::pair<Key, Value>(key, value));
+        temp.emplace_back(new Pair(key, value));
 
         while (!inserted) {
             currentNode.Update(size * size);
@@ -252,6 +284,9 @@ namespace Ng {
 
                 auto hash = currentNode.GetHash(pair->first);
 
+                if (pair->first == key)
+                    dataIndex = hash;
+
                 if (currentNode[hash]) {
                     inserted = false;
                     break;
@@ -261,7 +296,7 @@ namespace Ng {
             }
         }
 
-        return { m_Nodes, 0, 0 };
+        return { m_Nodes, nodeHash, dataIndex };
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
@@ -294,12 +329,17 @@ namespace Ng {
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator StaticHashTable<Key, Value, Size, HashFunc>::begin() {
-        return { m_Nodes, 0, 0 };
+        for (std::size_t i = 0; i < Size; ++i)
+            for (auto& pair : m_Nodes[i])
+                if (pair)
+                    return { m_Nodes, i, m_Nodes[i].GetHash(pair->first) };
+
+        return end();
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator StaticHashTable<Key, Value, Size, HashFunc>::end() {
-        return { m_Nodes, m_Nodes.size(), m_Nodes.back().Data.size() };
+        return { m_Nodes, Size, 0 };
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
@@ -307,7 +347,7 @@ namespace Ng {
         if (!IsExists(key))
             Push(key, Value());
 
-        return Find(key).value();
+        return (*Find(key)).second;
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
