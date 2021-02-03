@@ -62,6 +62,8 @@ namespace Ng {
         Iterator begin();
         Iterator end();
 
+        Value& operator [](const Key& key);
+
     private:
         struct UniversalHashParams {
             int Prime = 2153;
@@ -289,7 +291,7 @@ namespace Ng {
             std::cout << std::endl;
         }
     }
-    
+
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator StaticHashTable<Key, Value, Size, HashFunc>::begin() {
         return { m_Nodes, 0, 0 };
@@ -298,6 +300,14 @@ namespace Ng {
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     typename StaticHashTable<Key, Value, Size, HashFunc>::Iterator StaticHashTable<Key, Value, Size, HashFunc>::end() {
         return { m_Nodes, m_Nodes.size(), m_Nodes.back().Data.size() };
+    }
+
+    template <typename Key, typename Value, std::size_t Size, typename HashFunc>
+    Value& StaticHashTable<Key, Value, Size, HashFunc>::operator [](const Key& key) {
+        if (!IsExists(key))
+            Push(key, Value());
+
+        return Find(key).value();
     }
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>

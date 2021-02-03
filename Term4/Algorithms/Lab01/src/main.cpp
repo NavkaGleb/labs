@@ -25,7 +25,7 @@ int main() {
     std::cout << hashTable.GetSize() << std::endl;
 
     for (int i = 0; i < 6; ++i) {
-        int rand = Ng::Random::Get(0, 5943);
+        int rand = Ng::Random::Get(0, 100);
         std::cout << rand << std::endl;
 
         hashTable.Push(rand, std::to_string(Ng::Random::Get(0, 10)));
@@ -33,6 +33,12 @@ int main() {
 
     std::cout << std::endl;
     hashTable.Print();
+
+    for (int i = 0; i < 10; ++i) {
+        int rand = Ng::Random::Get(0, 100);
+
+        std::cout << rand << " " << hashTable.IsExists(rand) << std::endl;
+    }
 
     return 0;
 }
