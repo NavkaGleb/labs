@@ -20,12 +20,22 @@ std::optional<std::string> Create(bool x) {
 
 int main() {
     Ng::StaticHashTable<int, 10> hashTable;
+    int ranad;
 
     std::cout << hashTable.GetSize() << std::endl;
 
-    auto it = hashTable.Push(3241);
+    for (int i = 0; i < 6; ++i) {
+        int rand = Ng::Random::Get(0, 5943);
+        std::cout << rand << std::endl;
 
-    std::cout << hashTable.GetSize() << " " << *it << std::endl;
+        hashTable.Push(rand);
+        ranad = rand;
+    }
+
+    std::cout << std::endl;
+    hashTable.Print();
+
+    std::cout << "Find: " << *hashTable.Find(ranad) << std::endl;
 
     return 0;
 }

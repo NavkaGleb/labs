@@ -4,16 +4,16 @@ namespace Ng {
 
     template <typename T>
     struct UniversalHash {
-        virtual std::size_t operator ()(const T& t, int a, int b, int p, int m) = 0;
+        virtual std::size_t operator ()(const T& t, int a, int b, int p, int m) const = 0;
 
-    }; // class UniversalHash
+    }; // struct UniversalHash
 
     template <>
     struct UniversalHash<int> {
-        std::size_t operator ()(const int& t, int a, int b, int p, int m) {
+        std::size_t operator ()(const int& t, int a, int b, int p, int m) const {
             return ((a * t + b) % p) % m;
         }
 
-    }; // class UniversalHash<int>
+    }; // struct UniversalHash<int>
 
 } // namespace Ng
