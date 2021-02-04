@@ -14,8 +14,6 @@ int main() {
 //    }
 //
 //    hashTable.Print();
-//
-//    hashTable[32] = "Fuck this shit";
 
     for (int i = 0; i < 10; ++i)
         hashTable[i] = std::to_string(i);

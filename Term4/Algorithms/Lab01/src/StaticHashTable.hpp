@@ -288,8 +288,6 @@ namespace Ng {
 
         temp.emplace_back(new Pair(key, value));
 
-        std::cout << "Col" << " " << std::pow(node.GetSize(), 2) << std::endl;
-
         while (!inserted) {
             node.Update(std::pow(node.GetSize(), 2));
             inserted = true;
@@ -320,8 +318,7 @@ namespace Ng {
         if (!IsExists(key))
             return;
 
-        auto  nodeHash    = GetHash(key);
-        auto& node        = m_Nodes[nodeHash];
+        auto& node        = m_Nodes[GetHash(key)];
         auto  deletedHash = node.GetHash(key);
 
         delete node[deletedHash];
@@ -359,21 +356,19 @@ namespace Ng {
 
     template <typename Key, typename Value, std::size_t Size, typename HashFunc>
     void StaticHashTable<Key, Value, Size, HashFunc>::Print() const {
-        std::cout << "Print" << std::endl;
-
         for (std::size_t i = 0; i < Size; ++i) {
             if (m_Nodes[i].IsEmpty()) {
                 std::cout << i << ": empty" << std::endl;
                 continue;
             }
 
-            std::cout << i << " " << m_Nodes[i].GetSize() << " " << m_Nodes[i].GetActualSize() << ": ";
+            std::cout << i << ": (" << m_Nodes[i].GetSize() << ", " << m_Nodes[i].GetActualSize() << ") ";
 
             for (const auto& pair : m_Nodes[i]) {
                 if (pair)
-                    std::cout << pair->first << " -> " << pair->second;
+                    std::cout << "{ " << pair->first << ", " << pair->second << " }";
                 else
-                    std::cout << "null";
+                    std::cout << "{ null }";
                 std::cout << " ";
             }
             std::cout << std::endl;
