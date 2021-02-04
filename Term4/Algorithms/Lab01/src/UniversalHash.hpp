@@ -16,10 +16,15 @@ namespace Ng {
 
     }; // struct UniversalHash<int>
 
-    template<> struct
-        UniversalHash<std::string> {
-        std::size_t operator ()(const std::string&, int a, int b, int p, int m) const {
-            return 0;
+    template <>
+    struct UniversalHash<std::string> {
+        std::size_t operator ()(const std::string& string, int a, int b, int p, int m) const {
+            return std::accumulate(
+                string.cbegin(),
+                string.cend(),
+                0,
+                [a, b, p](int sum, char ch) { return (a * (sum + ch) + b) % p; }
+            ) % m;
         }
 
     }; // struct UniversalHash<std::string>
