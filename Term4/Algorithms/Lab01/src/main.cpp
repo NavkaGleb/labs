@@ -20,7 +20,7 @@ int main() {
 
     for (int i = 0; i < 10; ++i) {
         auto& [key, value] = *hashTable.Push(
-            std::to_string(i),
+            "Name_" + std::to_string(i),
             static_cast<Category>(Ng::Random::Get(0, 2))
         );
     }

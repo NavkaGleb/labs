@@ -67,14 +67,14 @@ namespace Ng {
 
     private:
         struct UniversalHashParams {
-            int Prime = 2153;
+            int Prime = Random::Get({ 2153, 4027, 8447, 10687 });
             int A     = 0;
             int B     = 0;
 
             void Random() {
-                Prime = Ng::Random::Get({ 2153, 4027, 8447, 10687 });
-                A     = Ng::Random::Get(0, Prime);
-                B     = Ng::Random::Get(1, Prime);
+                Prime = Random::Get({ 2153, 4027, 8447, 10687 });
+                A     = Random::Get(0, Prime);
+                B     = Random::Get(1, Prime);
             }
 
         }; // struct HashParams

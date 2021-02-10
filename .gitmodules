@@ -7,3 +7,6 @@
 [submodule "Term4/Algorithms/Lab01/lib/Random"]
 	path = Term4/Algorithms/Lab01/lib/Random
 	url = https://github.com/NavkaGleb/Random
+[submodule "Term4/Algorithms/Lab02/lib/Random"]
+	path = Term4/Algorithms/Lab02/lib/Random
+	url = https://github.com/NavkaGleb/Random
