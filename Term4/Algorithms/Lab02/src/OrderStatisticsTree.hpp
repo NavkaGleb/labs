@@ -45,14 +45,15 @@ namespace Ng {
         virtual ~OrderStatisticsTree();
 
         [[nodiscard]] inline const Node* GetRoot() const { return m_Root; }
-        [[nodiscard]] inline int GetNodes() const { return m_Nodes; }
+        [[nodiscard]] inline int GetNodes() const { return m_Root ? m_Root->m_Children : 0; }
 
         [[nodiscard]] int GetHeight() const;
         [[nodiscard]] bool IsExists(const T& value) const;
+        [[nodiscard]] std::optional<T> GetValue(int position) const;
         [[nodiscard]] std::optional<T> GetMin() const;
         [[nodiscard]] std::optional<T> GetMax() const;
 
-        Node* Push(const T& value);
+        T& Push(const T& value);
         void Pop(const T& value);
 
         void Print() const;
@@ -60,6 +61,7 @@ namespace Ng {
     private:
         [[nodiscard]] int GetHeight(Node* node) const;
 
+        [[nodiscard]] std::optional<T> GetValue(Node* node, int position) const;
         [[nodiscard]] std::optional<T> GetMin(Node* node) const;
         [[nodiscard]] std::optional<T> GetMax(Node* node) const;
 
@@ -76,7 +78,6 @@ namespace Ng {
 
     private:
         Node* m_Root;
-        int   m_Nodes;
 
     }; // class OrderStatisticsTree
 

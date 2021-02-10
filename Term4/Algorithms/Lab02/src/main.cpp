@@ -19,4 +19,15 @@ int main() {
     tree.Print();
 
     std::cout << "Height = " << tree.GetHeight() << std::endl;
+    std::cout << "Nodes = " << tree.GetNodes() << std::endl;
+
+    std::cout << "Elem = " << tree.GetValue(18).value_or(-1) << std::endl;
+
+    for (int i = 0; i < 19; ++i)
+        std::cout << i << " ";
+    std::cout << std::endl;
+
+    for (int i = 0; i < 19; ++i)
+        std::cout << tree.GetValue(i).value_or(-1) << " ";
+    std::cout << std::endl;
 }

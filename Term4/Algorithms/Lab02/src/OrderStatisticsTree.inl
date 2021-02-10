@@ -29,7 +29,7 @@ template <typename T>
 void OrderStatisticsTree<T>::Node::Print() const {
     std::cout << m_Value << " {";
 
-    std::cout << m_Children << ", C:";
+    std::cout << m_Children << ", C: ";
     std::cout << (m_Color == Node::Color::Black ? "Black"                          : "Red" ) << ", L: ";
     std::cout << (m_Left                        ? std::to_string(m_Left->m_Value)  : "Null") << ", R: ";
     std::cout << (m_Right                       ? std::to_string(m_Right->m_Value) : "Null") << "}";
@@ -40,13 +40,11 @@ void OrderStatisticsTree<T>::Node::Print() const {
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
 OrderStatisticsTree<T>::OrderStatisticsTree(const T& value) :
-    m_Root(new Node(value)),
-    m_Nodes(1) {}
+    m_Root(new Node(value)) { }
 
 template <typename T>
 OrderStatisticsTree<T>::OrderStatisticsTree(Node* root) :
-    m_Root(root),
-    m_Nodes(root ? 1 : 0) { }
+    m_Root(root) { }
 
 template <typename T>
 OrderStatisticsTree<T>::~OrderStatisticsTree() {
@@ -69,6 +67,13 @@ bool OrderStatisticsTree<T>::IsExists(const T& value) const {
 }
 
 template <typename T>
+std::optional<T> OrderStatisticsTree<T>::GetValue(int position) const {
+    return !m_Root || position < 0 || position > m_Root->m_Children ?
+            std::nullopt                                            :
+            GetValue(m_Root, position + 1);
+}
+
+template <typename T>
 std::optional<T> OrderStatisticsTree<T>::GetMin() const {
     return GetMin(m_Root);
 }
@@ -79,12 +84,12 @@ std::optional<T> OrderStatisticsTree<T>::GetMax() const {
 }
 
 template <typename T>
-typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::Push(const T& value) {
+T& OrderStatisticsTree<T>::Push(const T& value) {
     if (!m_Root) {
         m_Root = new Node(value);
         m_Root->m_Color = Node::Color::Black;
 
-        return m_Root;
+        return m_Root->m_Value;
     }
 
     Node* node   = m_Root;
@@ -110,7 +115,7 @@ typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::Push(const T& val
 
     PushFix(node);
 
-    return node;
+    return node->m_Value;
 }
 
 template <typename T>
@@ -122,8 +127,6 @@ void OrderStatisticsTree<T>::Pop(const T& value) {
 
     if (!node)
         return;
-
-    ChildrenFix(node);
 
     Node* parent = node->m_Parent;
     Node* child  = nullptr;
@@ -142,6 +145,8 @@ void OrderStatisticsTree<T>::Pop(const T& value) {
     } else if (node->m_Left && !node->m_Right) {
         child = node->m_Left;
     }
+
+    ChildrenFix(node);
 
     if (parent) {
         if (parent->m_Left == node)
@@ -167,6 +172,18 @@ void OrderStatisticsTree<T>::Print() const {
 template <typename T>
 int OrderStatisticsTree<T>::GetHeight(Node* node) const {
     return node ? std::max(GetHeight(node->m_Left), GetHeight(node->m_Right)) + 1 : 0;
+}
+
+template <typename T>
+std::optional<T> OrderStatisticsTree<T>::GetValue(Node* node, int position) const {
+    int leftChildren = node->m_Left ? node->m_Left->m_Children + 1 : 1;
+
+    if (position == leftChildren)
+        return node->m_Value;
+
+    return position < leftChildren                         ?
+           GetValue(node->m_Left, position)                :
+           GetValue(node->m_Right, position - leftChildren);
 }
 
 template <typename T>
