@@ -27,8 +27,9 @@ OrderStatisticsTree<T>::Node::~Node() {
 
 template <typename T>
 void OrderStatisticsTree<T>::Node::Print() const {
-    std::cout << m_Value << " {C: ";
+    std::cout << m_Value << " {";
 
+    std::cout << m_Children << ", C:";
     std::cout << (m_Color == Node::Color::Black ? "Black"                          : "Red" ) << ", L: ";
     std::cout << (m_Left                        ? std::to_string(m_Left->m_Value)  : "Null") << ", R: ";
     std::cout << (m_Right                       ? std::to_string(m_Right->m_Value) : "Null") << "}";
@@ -89,7 +90,6 @@ typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::Push(const T& val
     Node* node   = m_Root;
     Node* parent = nullptr;
 
-
     while (node) {
         ++node->m_Children;
 
@@ -120,10 +120,10 @@ void OrderStatisticsTree<T>::Pop(const T& value) {
     while (node && node->m_Value != value)
         node = node->m_Value > value ? node->m_Left : node->m_Right;
 
-    if (!node) {
-        std::cout << "Fuck!" << std::endl;
+    if (!node)
         return;
-    }
+
+    ChildrenFix(node);
 
     Node* parent = node->m_Parent;
     Node* child  = nullptr;
@@ -192,22 +192,6 @@ std::optional<T> OrderStatisticsTree<T>::GetMax(Node* node) const {
 }
 
 template <typename T>
-typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::GetMinNode(Node* node) const {
-    while (node && node->m_Left)
-        node = node->m_Left;
-
-    return node;
-}
-
-template <typename T>
-typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::GetMaxNode(Node* node) const {
-    while (node && node->m_Right)
-        node = node->m_Right;
-
-    return node;
-}
-
-template <typename T>
 typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::GetSuccessor(Node* node) const {
     Node* result;
 
@@ -241,7 +225,8 @@ void OrderStatisticsTree<T>::RotateLeft(Node* node) {
     Node* right     = node->m_Right;
     Node* rightLeft = right->m_Left;
 
-    right->m_Parent = node->m_Parent;
+    right->m_Children = node->m_Children;
+    right->m_Parent   = node->m_Parent;
 
     if (!node->m_Parent)
         m_Root = right;
@@ -253,6 +238,13 @@ void OrderStatisticsTree<T>::RotateLeft(Node* node) {
     node->m_Parent = right;
     right->m_Left = node;
     node->m_Right = rightLeft;
+
+    node->m_Children = 1;
+
+    if (node->m_Left)
+        node->m_Children += node->m_Left->m_Children;
+    else if (node->m_Right)
+        node->m_Children += node->m_Right->m_Children;
 
     if (rightLeft)
         rightLeft->m_Parent = node;
@@ -269,7 +261,8 @@ void OrderStatisticsTree<T>::RotateRight(Node* node) {
     Node* left      = node->m_Left;
     Node* leftRight = left->m_Right;
 
-    left->m_Parent = node->m_Parent;
+    left->m_Children = node->m_Children;
+    left->m_Parent   = node->m_Parent;
 
     if (!node->m_Parent)
         m_Root = left;
@@ -281,6 +274,13 @@ void OrderStatisticsTree<T>::RotateRight(Node* node) {
     node->m_Parent = left;
     left->m_Right  = node;
     node->m_Left   = leftRight;
+
+    node->m_Children = 1;
+
+    if (node->m_Left)
+        node->m_Children += node->m_Left->m_Children;
+    else if (node->m_Right)
+        node->m_Children += node->m_Right->m_Children;
 
     if (leftRight)
         leftRight->m_Parent = node;
@@ -481,21 +481,18 @@ void OrderStatisticsTree<T>::PopFix(Node* child, Node* parent) {
 }
 
 template <typename T>
-void OrderStatisticsTree<T>::Transplant(Node* first, Node* second) {
-    if (!first->m_Parent)
-        m_Root = second;
-    else if (first == first->m_Parent->m_Left)
-        first->m_Parent->m_Left = second;
-    else
-        first->m_Parent->m_Right = second;
+void OrderStatisticsTree<T>::ChildrenFix(Node* node) {
+    if (!node)
+        return;
 
-    second->m_Parent = first->m_Parent;
+    --node->m_Children;
+    ChildrenFix(node->m_Parent);
 }
 
 template <typename T>
 void OrderStatisticsTree<T>::Print(const Node* node, const int& level, const char* caption) const {
     if (!node) {
-        std::cout << caption << ": null" << std::endl;
+        std::cout << caption << ": Null" << std::endl;
         return;
     }
 
@@ -507,11 +504,11 @@ void OrderStatisticsTree<T>::Print(const Node* node, const int& level, const cha
 
         for (int i = 0; i < level; i++)
             std::cout << "| ";
-        Print(node->m_Left, level + 1, "left");
+        Print(node->m_Left, level + 1, "Left");
 
         for (int i = 0; i < level; i++)
             std::cout << "| ";
-        Print(node->m_Right, level + 1, "right");
+        Print(node->m_Right, level + 1, "Right");
 
         for (int i = 0; i < level - 1; i++)
             std::cout << "| ";

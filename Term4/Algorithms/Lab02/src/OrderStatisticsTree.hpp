@@ -63,9 +63,6 @@ namespace Ng {
         [[nodiscard]] std::optional<T> GetMin(Node* node) const;
         [[nodiscard]] std::optional<T> GetMax(Node* node) const;
 
-        [[nodiscard]] Node* GetMinNode(Node* node) const;
-        [[nodiscard]] Node* GetMaxNode(Node* node) const;
-
         [[nodiscard]] Node* GetSuccessor(Node* node) const;
 
         void RotateLeft(Node* node);
@@ -73,10 +70,11 @@ namespace Ng {
 
         void PushFix(Node* node);
         void PopFix(Node* child, Node* parent);
+        void ChildrenFix(Node* node);
 
-        void Transplant(Node* first, Node* second);
         void Print(const Node* node, const int& level, const char* caption) const;
 
+    private:
         Node* m_Root;
         int   m_Nodes;
 
