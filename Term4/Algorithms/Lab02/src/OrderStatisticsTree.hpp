@@ -64,7 +64,7 @@ namespace Ng {
     private:
         [[nodiscard]] int GetHeight(Node* node) const;
 
-        [[nodiscard]] std::optional<T> GetValue(Node* node, int position) const;
+        [[nodiscard]] std::optional<T> Get(Node* node, int position) const;
         [[nodiscard]] std::optional<T> GetMin(Node* node) const;
         [[nodiscard]] std::optional<T> GetMax(Node* node) const;
 
@@ -78,7 +78,7 @@ namespace Ng {
 
         void PushFix(Node* node);
         void PopFix(Node* node);
-        void ChildrenFix(Node* node);
+        void ChildrenFix(Node* node, int count);
 
         void Print(const Node* node, const int& level, const char* caption) const;
 

@@ -38,7 +38,6 @@ void OrderStatisticsTree<T>::Node::Print() const {
 //////////////////////////////////////////////////////////////////////////////
 /// class OrderStatisticsTree
 //////////////////////////////////////////////////////////////////////////////
-
 template <typename T>
 OrderStatisticsTree<T>::OrderStatisticsTree(const T& value) :
     m_Root(new Node(value)) { }
@@ -91,7 +90,7 @@ template <typename T>
 std::optional<T> OrderStatisticsTree<T>::Get(int position) const {
     return !m_Root || position < 0 || position > m_Root->m_Children ?
             std::nullopt                                            :
-            GetValue(m_Root, position + 1);
+            Get(m_Root, position + 1);
 }
 
 template <typename T>
@@ -117,14 +116,11 @@ T& OrderStatisticsTree<T>::Push(const T& value) {
     Node* parent = nullptr;
 
     while (node) {
-        ++node->m_Children;
+        if (node->m_Value == value)
+            return node->m_Value;
 
         parent = node;
-
-        if (node->m_Value > value)
-            node = node->m_Left;
-        else
-            node = node->m_Right;
+        node   = node->m_Value > value ? node->m_Left : node->m_Right;
     }
 
     node = new Node(value, parent);
@@ -134,6 +130,7 @@ T& OrderStatisticsTree<T>::Push(const T& value) {
     else
         parent->m_Right = node;
 
+    ChildrenFix(node->m_Parent, 1);
     PushFix(node);
 
     return node->m_Value;
@@ -164,7 +161,7 @@ void OrderStatisticsTree<T>::Pop(const T& value) {
         child = node->m_Left;
     }
 
-    ChildrenFix(node);
+    ChildrenFix(node, -1);
 
     if (parent) {
         if (parent->m_Left == node)
@@ -196,15 +193,15 @@ int OrderStatisticsTree<T>::GetHeight(Node* node) const {
 }
 
 template <typename T>
-std::optional<T> OrderStatisticsTree<T>::GetValue(Node* node, int position) const {
+std::optional<T> OrderStatisticsTree<T>::Get(Node* node, int position) const {
     int leftChildren = node->m_Left ? node->m_Left->m_Children + 1 : 1;
 
     if (position == leftChildren)
         return node->m_Value;
 
-    return position < leftChildren                         ?
-           GetValue(node->m_Left, position)                :
-           GetValue(node->m_Right, position - leftChildren);
+    return position < leftChildren                    ?
+           Get(node->m_Left,  position)               :
+           Get(node->m_Right, position - leftChildren);
 }
 
 template <typename T>
@@ -253,7 +250,7 @@ typename OrderStatisticsTree<T>::Node* OrderStatisticsTree<T>::GetSuccessor(Node
     Node* successor = node->m_Parent;
 
     while (successor && successor->m_Right == node) {
-        node = successor;
+        node      = successor;
         successor = successor->m_Parent;
     }
 
@@ -289,36 +286,11 @@ void OrderStatisticsTree<T>::RotateLeft(Node* node) {
 
     if (node->m_Left)
         node->m_Children += node->m_Left->m_Children;
-    else if (node->m_Right)
+    if (node->m_Right)
         node->m_Children += node->m_Right->m_Children;
 
     if (rightLeft)
         rightLeft->m_Parent = node;
-
-//    Node* right = node->m_Right;
-//    node->m_Right = right->m_Left;
-//
-//    if (right->m_Left)
-//        right->m_Left->m_Parent = node;
-//
-//    right->m_Parent = node->m_Parent;
-//
-//    if (!node->m_Parent)
-//        m_Root = right;
-//    else if (node == node->m_Parent->m_Left)
-//        node->m_Parent->m_Left = right;
-//    else
-//        node->m_Parent->m_Right = right;
-//
-//    right->m_Left  = node;
-//    node->m_Parent = right;
-//
-//    node->m_Children = 1;
-//
-//    if (node->m_Left)
-//        node->m_Children += node->m_Left->m_Children;
-//    else if (node->m_Right)
-//        node->m_Children += node->m_Right->m_Children;
 }
 
 template <typename T>
@@ -350,34 +322,11 @@ void OrderStatisticsTree<T>::RotateRight(Node* node) {
 
     if (node->m_Left)
         node->m_Children += node->m_Left->m_Children;
-    else if (node->m_Right)
+    if (node->m_Right)
         node->m_Children += node->m_Right->m_Children;
 
     if (leftRight)
         leftRight->m_Parent = node;
-
-//    Node* y = node->m_Left;
-//    node->m_Left = y->m_Right;
-//    if (y->m_Right) {
-//        y->m_Right->m_Parent = node;
-//    }
-//    y->m_Parent = node->m_Parent;
-//    if (node->m_Parent == nullptr) {
-//        m_Root = y;
-//    } else if (node == node->m_Parent->m_Right) {
-//        node->m_Parent->m_Right = y;
-//    } else {
-//        node->m_Parent->m_Left = y;
-//    }
-//    y->m_Right = node;
-//    node->m_Parent = y;
-//
-//    node->m_Children = 1;
-//
-//    if (node->m_Left)
-//        node->m_Children += node->m_Left->m_Children;
-//    else if (node->m_Right)
-//        node->m_Children += node->m_Right->m_Children;
 }
 
 template <typename T>
@@ -510,12 +459,12 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
 }
 
 template <typename T>
-void OrderStatisticsTree<T>::ChildrenFix(Node* node) {
+void OrderStatisticsTree<T>::ChildrenFix(Node* node, int count) {
     if (!node)
         return;
 
-    --node->m_Children;
-    ChildrenFix(node->m_Parent);
+    node->m_Children += count;
+    ChildrenFix(node->m_Parent, count);
 }
 
 template <typename T>
