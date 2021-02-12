@@ -20,9 +20,9 @@ namespace Ng {
 
             [[nodiscard]] inline const T& GetValue() const { return m_Value; }
             [[nodiscard]] inline const Color& GetColor() const { return m_Color; }
-            [[nodiscard]] inline const Node* GetParent() const { return m_Parent; }
-            [[nodiscard]] inline const Node* GetLeft() const { return m_Left; }
-            [[nodiscard]] inline const Node* GetRight() const { return m_Right; }
+            [[nodiscard]] inline const Node& GetParent() const { return &m_Parent; }
+            [[nodiscard]] inline const Node& GetLeft() const { return &m_Left; }
+            [[nodiscard]] inline const Node& GetRight() const { return &m_Right; }
             [[nodiscard]] inline int GetChildren() const { return m_Children; }
 
             friend class OrderStatisticsTree;
@@ -44,12 +44,15 @@ namespace Ng {
         explicit OrderStatisticsTree(Node* root = nullptr);
         virtual ~OrderStatisticsTree();
 
+        [[nodiscard]] inline bool IsEmpty() const  { return !m_Root; }
         [[nodiscard]] inline const Node* GetRoot() const { return m_Root; }
-        [[nodiscard]] inline int GetNodes() const { return m_Root ? m_Root->m_Children : 0; }
+        [[nodiscard]] inline int GetSize() const { return m_Root ? m_Root->m_Children : 0; }
 
         [[nodiscard]] int GetHeight() const;
         [[nodiscard]] bool IsExists(const T& value) const;
-        [[nodiscard]] std::optional<T> GetValue(int position) const;
+        [[nodiscard]] Node* GetNode(const T& value);
+        [[nodiscard]] const Node* GetNode(const T& value) const;
+        [[nodiscard]] std::optional<T> Get(int position) const;
         [[nodiscard]] std::optional<T> GetMin() const;
         [[nodiscard]] std::optional<T> GetMax() const;
 
@@ -65,13 +68,16 @@ namespace Ng {
         [[nodiscard]] std::optional<T> GetMin(Node* node) const;
         [[nodiscard]] std::optional<T> GetMax(Node* node) const;
 
+        [[nodiscard]] Node* GetMinNode(Node* node) const;
+        [[nodiscard]] Node* GetMaxNode(Node* node) const;
+
         [[nodiscard]] Node* GetSuccessor(Node* node) const;
 
         void RotateLeft(Node* node);
         void RotateRight(Node* node);
 
         void PushFix(Node* node);
-        void PopFix(Node* child, Node* parent);
+        void PopFix(Node* node);
         void ChildrenFix(Node* node);
 
         void Print(const Node* node, const int& level, const char* caption) const;
