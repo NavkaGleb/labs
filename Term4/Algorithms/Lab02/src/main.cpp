@@ -9,12 +9,8 @@ int main() {
 
     std::cout << tree.GetSize() << std::endl;
 
-    for (int i = 0; i < 10; ++i) {
-        int r = Ng::Random::Get(-10, 10);
-        std::cout << "---------------------------- " << r << std::endl;
-        tree.Push(r);
-        tree.Print();
-    }
+    for (int i = 0; i < 30; ++i)
+        tree.Push(Ng::Random::Get(-20, 20));
 
     tree.Print();
 
@@ -23,8 +19,12 @@ int main() {
         std::cout << *tree.Get(i) << " ";
     std::cout << std::endl;
 
-    while (!tree.IsEmpty())
-        tree.Pop(*tree.Get(0));
+    int size = tree.GetSize();
 
+    for (int i = 0; i < size - 1; ++i) {
+        tree.Pop(*tree.Get(0));
+    }
+
+    std::cout << "######################################################" << std::endl;
     tree.Print();
 }

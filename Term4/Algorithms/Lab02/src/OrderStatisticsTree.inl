@@ -180,6 +180,11 @@ void OrderStatisticsTree<T>::Pop(const T& value) {
 
     if (node->m_Color == Node::Color::Black && child)
         PopFix(child);
+
+    node->m_Left  = nullptr;
+    node->m_Right = nullptr;
+
+    delete node;
 }
 
 template <typename T>
@@ -403,53 +408,63 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
                 sibling = parent->m_Right;
             }
 
-            if (sibling->m_Left->m_Color == Node::Color::Black && sibling->m_Right->m_Color == Node::Color::Black) {
+            if ((!sibling->m_Left || sibling->m_Left->m_Color == Node::Color::Black) &&
+                (!sibling->m_Right || sibling->m_Right->m_Color == Node::Color::Black)) {
+
                 sibling->m_Color = Node::Color::Red;
-                node = parent;
-                parent = node->m_Parent;
-            } else if (sibling->m_Right->m_Color == Node::Color::Black) {
+                node             = parent;
+                parent           = node->m_Parent;
+            } else if (!sibling->m_Right || sibling->m_Right->m_Color == Node::Color::Black) {
                 sibling->m_Color = Node::Color::Red;
 
                 RotateRight(sibling);
-
                 sibling = parent->m_Right;
             }
 
-            sibling->m_Color = parent->m_Color;
-            parent->m_Color  = Node::Color::Black;
-            sibling->m_Right->m_Color = Node::Color::Black;
+            if (parent) {
+                sibling->m_Color = parent->m_Color;
+                parent->m_Color  = Node::Color::Black;
 
-            RotateLeft(parent);
+                if (sibling->m_Right)
+                    sibling->m_Right->m_Color = Node::Color::Black;
+
+                RotateLeft(parent);
+            }
 
             node = m_Root;
         } else {
-            Node* sibling = parent->m_Right;
+            Node* sibling = parent->m_Left;
 
             if (sibling->m_Color == Node::Color::Red) {
                 sibling->m_Color = Node::Color::Black;
                 parent->m_Color  = Node::Color::Red;
 
                 RotateRight(parent);
-                sibling = parent->m_Right;
+                sibling = parent->m_Left;
             }
 
-            if (sibling->m_Right->m_Color == Node::Color::Black && sibling->m_Right->m_Color == Node::Color::Black) {
+            if ((!sibling->m_Left || sibling->m_Left->m_Color == Node::Color::Black) &&
+                (!sibling->m_Right || sibling->m_Right->m_Color == Node::Color::Black)) {
+
                 sibling->m_Color = Node::Color::Red;
-                node = parent;
-                parent = node->m_Parent;
-            } else if (sibling->m_Right->m_Color == Node::Color::Black) {
+                node             = parent;
+                parent           = node->m_Parent;
+            } else if (!sibling->m_Left || sibling->m_Left->m_Color == Node::Color::Black) {
                 sibling->m_Color = Node::Color::Red;
 
                 RotateLeft(sibling);
-
-                sibling = parent->m_Right;
+                sibling = parent->m_Left;
             }
 
-            sibling->m_Color = parent->m_Color;
-            parent->m_Color  = Node::Color::Black;
-            sibling->m_Right->m_Color = Node::Color::Black;
+            if (parent) {
+                sibling->m_Color = parent->m_Color;
+                parent->m_Color  = Node::Color::Black;
 
-            RotateRight(parent);
+                if (sibling->m_Left)
+                    sibling->m_Left->m_Color = Node::Color::Black;
+
+                RotateRight(parent);
+            }
 
             node = m_Root;
         }
