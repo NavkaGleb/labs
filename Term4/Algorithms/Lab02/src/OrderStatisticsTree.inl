@@ -413,15 +413,15 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
 
                 sibling->m_Color = Node::Color::Red;
                 node             = parent;
-                parent           = node->m_Parent;
-            } else if (!sibling->m_Right || sibling->m_Right->m_Color == Node::Color::Black) {
-                sibling->m_Color = Node::Color::Red;
+            } else {
+                if (!sibling->m_Right || sibling->m_Right->m_Color == Node::Color::Black) {
+                    sibling->m_Color         = Node::Color::Red;
+                    sibling->m_Left->m_Color = Node::Color::Black;
 
-                RotateRight(sibling);
-                sibling = parent->m_Right;
-            }
+                    RotateRight(sibling);
+                    sibling = parent->m_Right;
+                }
 
-            if (parent) {
                 sibling->m_Color = parent->m_Color;
                 parent->m_Color  = Node::Color::Black;
 
@@ -429,9 +429,9 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
                     sibling->m_Right->m_Color = Node::Color::Black;
 
                 RotateLeft(parent);
-            }
 
-            node = m_Root;
+                node = m_Root;
+            }
         } else {
             Node* sibling = parent->m_Left;
 
@@ -448,15 +448,15 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
 
                 sibling->m_Color = Node::Color::Red;
                 node             = parent;
-                parent           = node->m_Parent;
-            } else if (!sibling->m_Left || sibling->m_Left->m_Color == Node::Color::Black) {
-                sibling->m_Color = Node::Color::Red;
+            } else {
+                if (!sibling->m_Left || sibling->m_Left->m_Color == Node::Color::Black) {
+                    sibling->m_Color          = Node::Color::Red;
+                    sibling->m_Right->m_Color = Node::Color::Black;
 
-                RotateLeft(sibling);
-                sibling = parent->m_Left;
-            }
+                    RotateLeft(sibling);
+                    sibling = parent->m_Left;
+                }
 
-            if (parent) {
                 sibling->m_Color = parent->m_Color;
                 parent->m_Color  = Node::Color::Black;
 
@@ -464,9 +464,9 @@ void OrderStatisticsTree<T>::PopFix(Node* node) {
                     sibling->m_Left->m_Color = Node::Color::Black;
 
                 RotateRight(parent);
-            }
 
-            node = m_Root;
+                node = m_Root;
+            }
         }
     }
 
