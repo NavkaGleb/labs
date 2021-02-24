@@ -29,8 +29,8 @@ namespace Ng {
             void Print() const {
                 std::cout << "Key: " << m_Key << ", Value " << m_Value << " {L: ";
 
-                std::cout << (m_Left                        ? std::to_string(m_Left->m_Value)  : "Null") << ", R: ";
-                std::cout << (m_Right                       ? std::to_string(m_Right->m_Value) : "Null") << "}";
+                std::cout << (m_Left  ? std::to_string(m_Left->m_Key)  : "Null") << ", R: ";
+                std::cout << (m_Right ? std::to_string(m_Right->m_Key) : "Null") << "}";
             }
 
             friend class SplayTree;
@@ -49,6 +49,7 @@ namespace Ng {
 
         [[nodiscard]] inline bool IsEmpty() const override { return m_Size == 0; };
         [[nodiscard]] inline int GetSize() const override { return m_Size; };
+        [[nodiscard]] inline const Node& GetRoot() const { return *m_Root; }
 
         [[nodiscard]] bool IsExists(const Key& key) const;
         [[nodiscard]] int GetHeight() const;
@@ -158,6 +159,7 @@ namespace Ng {
         while (node) {
             if (node->m_Key == key) {
                 --m_Size;
+                Splay(node);
                 return node->m_Value;
             }
 
@@ -300,51 +302,54 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void SplayTree<Key, Value>::Zig(Node* node) {
-
-    }
-
-    template <typename Key, typename Value>
-    void SplayTree<Key, Value>::ZigZag(Node* node) {
-
+        // Root.Left == node
+        //     p    =>    x
+        //    / \        / \
+        //   x   3  =>  1   p
+        //  / \            / \
+        // 1   2    =>    2   3
+        //
+        // Root.Right == node
+        //   p      =>      x
+        //  / \            / \
+        // 1   x    =>    p   3
+        //    / \        / \
+        //   2   3  =>  1   2
+        m_Root = m_Root->m_Left == node ? RotateRight(m_Root) : RotateLeft(m_Root);
     }
 
     template <typename Key, typename Value>
     void SplayTree<Key, Value>::ZigZig(Node* node) {
-
-    }
-
-    template <typename Key, typename Value>
-    void SplayTree<Key, Value>::Splay(Node* node) {
-        if (node == m_Root || !node)
-            return;
-
         Node* parent      = node->m_Parent;
         Node* grandParent = parent->m_Parent;
 
-        // Zig case
-        if (parent == m_Root) {
-            m_Root = parent->m_Left == node ? RotateRight(m_Root) : RotateLeft(m_Root);
-
-            return;
-        }
-
-        // ZigZig case
+        //       g          x
+        //      / \   =>   / \
+        //     p   4      1   p
+        //    / \     =>     / \
+        //   x   3          2   g
+        //  / \       =>       / \
+        // 1   2              3   4
         if (parent->m_Left == node && grandParent->m_Left == parent) {
             if (grandParent == m_Root) {
                 m_Root = RotateRight(m_Root);
-                m_Root = RotateLeft(m_Root);
+                m_Root = RotateRight(m_Root);
                 return;
             }
 
             node->m_Parent = RotateRight(grandParent);
             node           = RotateRight(node->m_Parent);
 
-            Splay(node);
-
-            return;
+            return Splay(node);
         }
 
-        // ZagZag case
+        //   g                  x
+        //  / \       =>       / \
+        // 1   p              p   4
+        //    / \     =>     / \
+        //   2   x          g   3
+        //      / \   =>   / \
+        //     3   4      1   2
         if (parent->m_Right == node && grandParent->m_Right == parent) {
             if (grandParent == m_Root) {
                 m_Root = RotateLeft(m_Root);
@@ -355,46 +360,76 @@ namespace Ng {
             node->m_Parent = RotateLeft(grandParent);
             node           = RotateLeft(node->m_Parent);
 
-            Splay(node);
-
-            return;
+            return Splay(node);
         }
+    }
 
-        // ZagZig case
+    template <typename Key, typename Value>
+    void SplayTree<Key, Value>::ZigZag(Node* node) {
+        Node* parent      = node->m_Parent;
+        Node* grandParent = parent->m_Parent;
+
+        //     g             x
+        //    / \   =>      / \
+        //   p   4         /   \
+        //  / \     =>    p     g
+        // 1   x         / \   / \
+        //    / \   =>  1   2 3   4
+        //   2   3
         if (parent->m_Right == node && grandParent->m_Left == parent) {
             node   = RotateLeft(parent);
             parent = node->m_Parent;
 
             if (parent == m_Root) {
                 m_Root = RotateRight(m_Root);
-
                 return;
             }
 
             node = RotateRight(parent);
 
-            Splay(node);
-
-            return;
+            return Splay(node);
         }
 
-        // ZigZag case
+        //     g             x
+        //    / \    =>     / \
+        //   1   p         /   \
+        //      / \  =>   g     p
+        //     x   4     / \   / \
+        //    / \    => 1   2 3   4
+        //   2   3
         if (parent->m_Left == node && grandParent->m_Right == parent) {
             node   = RotateRight(parent);
             parent = node->m_Parent;
 
             if (parent == m_Root){
                 m_Root = RotateLeft(m_Root);
-
                 return;
             }
 
             node = RotateLeft(parent);
 
-            Splay(node);
-
-            return;
+            return Splay(node);
         }
+    }
+
+    template <typename Key, typename Value>
+    void SplayTree<Key, Value>::Splay(Node* node) {
+        if (node == m_Root || !node)
+            return;
+
+        Node* parent      = node->m_Parent;
+        Node* grandParent = parent->m_Parent;
+
+        if (parent == m_Root)
+            return Zig(node);
+
+        if (parent->m_Left  == node && grandParent->m_Left  == parent ||
+            parent->m_Right == node && grandParent->m_Right == parent)
+            return ZigZig(node);
+
+        if (parent->m_Right == node && grandParent->m_Left  == parent ||
+            parent->m_Left  == node && grandParent->m_Right == parent)
+            return ZigZag(node);
     }
 
     template <typename Key, typename Value>
