@@ -4,6 +4,8 @@
 
 #include "SplayTree.hpp"
 
+#include <map>
+
 int main() {
     Ng::SplayTree<int, int> tree;
 

@@ -32,7 +32,48 @@ namespace Ng {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    /// class SplayTree
+    /// class SplayTree::Iterator
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Key, typename Value>
+    SplayTree<Key, Value>::Iterator::Iterator(Node* node)
+        : m_Node(node) {}
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Iterator& SplayTree<Key, Value>::Iterator::operator ++() {
+        if (m_Node->m_Right) {
+            m_Node = m_Node->m_Right;
+
+            while (m_Node->m_Left)
+                m_Node = m_Node->m_Left;
+        } else {
+            Node* parent = m_Node->m_Parent;
+
+            while (parent && m_Node == parent->m_Right) {
+                m_Node = parent;
+                parent = parent->m_Parent;
+            }
+
+            m_Node = parent;
+        }
+
+        return *this;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Iterator& SplayTree<Key, Value>::Iterator::operator +=(int n) {
+        for (int i = 0; i < n; i++)
+            (*this)++;
+
+        return *this;
+    }
+
+    template <typename Key, typename Value>
+    bool SplayTree<Key, Value>::Iterator::operator !=(const Iterator& other) const {
+        return m_Node != other.m_Node;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    /// class SplayTree::ConstIterator
     ///////////////////////////////////////////////////////////////////////////////
     template <typename Key, typename Value>
     SplayTree<Key, Value>::ConstIterator::ConstIterator(Node* node)
@@ -53,7 +94,7 @@ namespace Ng {
                 parent = parent->m_Parent;
             }
 
-            m_Node  = parent;
+            m_Node = parent;
         }
 
         return *this;

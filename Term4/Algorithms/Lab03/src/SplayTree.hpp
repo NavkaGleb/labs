@@ -40,6 +40,24 @@ namespace Ng {
 
         }; // class Node
 
+        class Iterator {
+        public:
+            explicit Iterator(Node* node = nullptr);
+            virtual ~Iterator() = default;
+
+            [[nodiscard]] inline Pair& operator *() { return m_Node->m_Pair; }
+            [[nodiscard]] inline Pair* operator ->() { return *m_Node->m_Pair; }
+
+            Iterator& operator ++();
+            Iterator& operator +=(int n);
+
+            bool operator !=(const Iterator& other) const;
+
+        private:
+            Node* m_Node;
+
+        }; // class ConstIterator
+
         class ConstIterator {
         public:
             explicit ConstIterator(Node* node = nullptr);
@@ -78,6 +96,9 @@ namespace Ng {
 
         Value& Push(const Key& key, const Value& value);
         void Pop(const Key& key);
+
+        [[nodiscard]] Iterator begin() { return Iterator(GetMinNode(m_Root)); }
+        [[nodiscard]] Iterator end() { return Iterator(); }
 
         [[nodiscard]] ConstIterator begin() const { return ConstIterator(GetMinNode(m_Root)); }
         [[nodiscard]] ConstIterator end() const { return ConstIterator(); }
