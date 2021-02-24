@@ -1,5 +1,22 @@
 namespace Ng {
 
+    ///////////////////////////////////////////////////////////////////////////////
+    /// class SplayTree::Node
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Key, typename Value>
+    SplayTree<Key, Value>::Node::Node()
+        : m_Pair(Key(), Value())
+        , m_Parent(nullptr)
+        , m_Left(nullptr)
+        , m_Right(nullptr) {}
+
+    template <typename Key, typename Value>
+    SplayTree<Key, Value>::Node::Node(const Key& key, const Value& value, Node* parent, Node* left, Node* right)
+        : m_Pair(key, value)
+        , m_Parent(parent)
+        , m_Left(left)
+        , m_Right(right) {}
+
     template <typename Key, typename Value>
     SplayTree<Key, Value>::Node::~Node() {
         delete m_Left;
@@ -7,21 +24,73 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
+    void SplayTree<Key, Value>::Node::Print(std::ostream& ostream) const {
+        ostream << "Key: " << m_Pair.first << ", Value " << m_Pair.second << " {L: ";
+
+        ostream << (m_Left  ? std::to_string(m_Left->m_Pair.first)  : "Null") << ", R: ";
+        ostream << (m_Right ? std::to_string(m_Right->m_Pair.first) : "Null") << "}";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    /// class SplayTree
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Key, typename Value>
+    SplayTree<Key, Value>::ConstIterator::ConstIterator(Node* node)
+        : m_Node(node) {}
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::ConstIterator& SplayTree<Key, Value>::ConstIterator::operator ++() {
+        if (m_Node->m_Right) {
+            m_Node = m_Node->m_Right;
+
+            while (m_Node->m_Left)
+                m_Node = m_Node->m_Left;
+        } else {
+            Node* parent = m_Node->m_Parent;
+
+            while (parent && m_Node == parent->m_Right) {
+                m_Node = parent;
+                parent = parent->m_Parent;
+            }
+
+            m_Node  = parent;
+        }
+
+        return *this;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::ConstIterator& SplayTree<Key, Value>::ConstIterator::operator +=(int n) {
+        for (int i = 0; i < n; i++)
+            (*this)++;
+
+        return *this;
+    }
+
+    template <typename Key, typename Value>
+    bool SplayTree<Key, Value>::ConstIterator::operator !=(const ConstIterator& other) const {
+        return m_Node != other.m_Node;
+    }
+        
+    ///////////////////////////////////////////////////////////////////////////////
+    /// class SplayTree
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Key, typename Value>
     SplayTree<Key, Value>::SplayTree(Node* root)
         : m_Root(root)
         , m_Size(root ? 1 : 0) { }
 
     template <typename Key, typename Value>
     SplayTree<Key, Value>::~SplayTree() {
-        delete m_Root;
+        Clear();
     }
 
     template <typename Key, typename Value>
     bool SplayTree<Key, Value>::IsExists(const Key& key) const {
         Node* node = m_Root;
 
-        while (node && key != node->m_Key)
-            node = node->m_Key > key ? node->m_Left : node->m_Right;
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
 
         return node;
     }
@@ -51,55 +120,59 @@ namespace Ng {
     Value& SplayTree<Key, Value>::Get(const Key& key) {
         Node* node = m_Root;
 
-        while (node && key != node->m_Key)
-            node = node->m_Key > key ? node->m_Left : node->m_Right;
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
 
         if (!node)
             throw std::out_of_range("Ng::SplayTree::Get: key is not exists!");
 
         Splay(node);
 
-        return node->m_Value;
+        return node->m_Pair.second;
     }
 
     template <typename Key, typename Value>
     const Value& SplayTree<Key, Value>::Get(const Key& key) const {
         return Get(key);
     }
-
-
+    
+    template <typename Key, typename Value>
+    void SplayTree<Key, Value>::Clear() {
+        delete m_Root;
+        m_Root = nullptr;
+    }
 
     template <typename Key, typename Value>
     Value& SplayTree<Key, Value>::Push(const Key& key, const Value& value) {
         ++m_Size;
 
         if (!m_Root)
-            return (m_Root = new Node(key, value))->m_Value;
+            return (m_Root = new Node(key, value))->m_Pair.second;
 
         Node* node   = m_Root;
         Node* parent = nullptr;
 
         while (node) {
-            if (node->m_Key == key) {
+            if (node->m_Pair.first == key) {
                 --m_Size;
                 Splay(node);
-                return node->m_Value;
+                return node->m_Pair.second;
             }
 
             parent = node;
-            node   = node->m_Key > key ? node->m_Left : node->m_Right;
+            node   = node->m_Pair.first > key ? node->m_Left : node->m_Right;
         }
 
         node = new Node(key, value, parent);
 
-        if (parent->m_Key > key)
+        if (parent->m_Pair.first > key)
             parent->m_Left = node;
         else
             parent->m_Right = node;
 
         Splay(node);
 
-        return node->m_Value;
+        return node->m_Pair.second;
     }
 
     template <typename Key, typename Value>
@@ -130,13 +203,8 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    void SplayTree<Key, Value>::Print() const {
-        Print(m_Root, 1, "Root");
-    }
-
-    template <typename Key, typename Value>
     int SplayTree<Key, Value>::GetHeight(Node* node) const {
-        return (node ? std::max(GetHeight(node->m_Left), GetHeight(node->m_Right)) : 0) + 1;
+        return node ? std::max(GetHeight(node->m_Left), GetHeight(node->m_Right)) + 1 : 0;
     }
 
     template <typename Key, typename Value>
@@ -144,7 +212,7 @@ namespace Ng {
         while (node && node->m_Left)
             node = node->m_Left;
 
-        return node->m_Value;
+        return node->m_Pair.second;
     }
 
     template <typename Key, typename Value>
@@ -152,7 +220,7 @@ namespace Ng {
         while (node && node->m_Right)
             node = node->m_Right;
 
-        return node->m_Value;
+        return node->m_Pair.second;
     }
 
     template <typename Key, typename Value>
@@ -205,8 +273,8 @@ namespace Ng {
     typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetNode(const Key& key) {
         Node* node = m_Root;
 
-        while (node && key != node->m_Key)
-            node = node->m_Key > key ? node->m_Left : node->m_Right;
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
 
         if (node)
             Splay(node);
@@ -430,32 +498,39 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    void SplayTree<Key, Value>::Print(const Node* node, const int& level, const char* caption) const {
+    void SplayTree<Key, Value>::Print(const Node* node, int level, const char* caption, std::ostream& ostream) const {
         if (!node) {
-            std::cout << caption << ": Null" << std::endl;
+            ostream << caption << ": Null" << std::endl;
             return;
         }
 
-        std::cout << caption << ": ";
-        node->Print();
+        ostream << caption << ": ";
+        node->Print(ostream);
 
         if (node->m_Left || node->m_Right) {
-            std::cout << " (" << std::endl;
+            ostream << " (" << std::endl;
 
             for (int i = 0; i < level; i++)
-                std::cout << "| ";
-            Print(node->m_Left, level + 1, "Left");
+                ostream << "| ";
+            Print(node->m_Left, level + 1, "Left", ostream);
 
             for (int i = 0; i < level; i++)
-                std::cout << "| ";
-            Print(node->m_Right, level + 1, "Right");
+                ostream << "| ";
+            Print(node->m_Right, level + 1, "Right", ostream);
 
             for (int i = 0; i < level - 1; i++)
-                std::cout << "| ";
-            std::cout << ")";
+                ostream << "| ";
+            ostream << ")";
         }
 
-        std::cout << std::endl;
+        ostream << std::endl;
     }
 
+    template <typename Key, typename Value>
+    std::ostream& operator <<(std::ostream& ostream, const SplayTree<Key, Value>& tree) {
+        tree.Print(tree.m_Root, 1, "Root", ostream);
+
+        return ostream;
+    }
+    
 } // namespace Ng

@@ -9,40 +9,54 @@ namespace Ng {
     template <typename Key, typename Value>
     class SplayTree : public ITree<Key, Value> {
     public:
+        using Pair = std::pair<Key, Value>;
+
         class Node {
         public:
-            Node() = default;
-            Node(const Key& key, const Value& value, Node* parent = nullptr)
-                : m_Key(key)
-                , m_Value(value)
-                , m_Left(nullptr)
-                , m_Right(nullptr)
-                , m_Parent(parent) {}
+
+            Node();
+            Node(const Key& key,
+                 const Value& value,
+                 Node* parent = nullptr,
+                 Node* left   = nullptr,
+                 Node* right  = nullptr);
             virtual ~Node();
 
-            [[nodiscard]] inline const Key& GetKey() const { return m_Key; }
-            [[nodiscard]] inline const Value& GetValue() const { return m_Value; }
-            [[nodiscard]] inline const Node& GetLeft() const { return *m_Left; }
-            [[nodiscard]] inline const Node& GetRight() const { return *m_Right; }
-            [[nodiscard]] inline const Node& GetParent() const { return *m_Parent; }
-
-            void Print() const {
-                std::cout << "Key: " << m_Key << ", Value " << m_Value << " {L: ";
-
-                std::cout << (m_Left  ? std::to_string(m_Left->m_Key)  : "Null") << ", R: ";
-                std::cout << (m_Right ? std::to_string(m_Right->m_Key) : "Null") << "}";
-            }
-
+            [[nodiscard]] inline const Key& GetKey() const { return m_Pair.first; }
+            [[nodiscard]] inline const Value& GetValue() const { return m_Pair.second; }
+            [[nodiscard]] inline const Node* GetParent() const { return m_Parent; }
+            [[nodiscard]] inline const Node* GetLeft() const { return m_Left; }
+            [[nodiscard]] inline const Node* GetRight() const { return m_Right; }
             friend class SplayTree;
 
         private:
-            Key   m_Key;
-            Value m_Value;
+            void Print(std::ostream& ostream) const;
+
+        private:
+            Pair  m_Pair;
+            Node* m_Parent;
             Node* m_Left;
             Node* m_Right;
-            Node* m_Parent;
 
         }; // class Node
+
+        class ConstIterator {
+        public:
+            explicit ConstIterator(Node* node = nullptr);
+            virtual ~ConstIterator() = default;
+
+            [[nodiscard]] inline const Pair& operator *() const { return m_Node->m_Pair; }
+            [[nodiscard]] inline const Pair* operator ->() const { return *m_Node->m_Pair; }
+
+            ConstIterator& operator ++();
+            ConstIterator& operator +=(int n);
+
+            bool operator !=(const ConstIterator& other) const;
+
+        private:
+            Node* m_Node;
+
+        }; // class ConstIterator
 
         explicit SplayTree(Node* root = nullptr);
         ~SplayTree() override;
@@ -60,10 +74,16 @@ namespace Ng {
         [[nodiscard]] Value& Get(const Key& key);
         [[nodiscard]] const Value& Get(const Key& key) const;
 
+        void Clear();
+
         Value& Push(const Key& key, const Value& value);
         void Pop(const Key& key);
 
-        void Print() const;
+        [[nodiscard]] ConstIterator begin() const { return ConstIterator(GetMinNode(m_Root)); }
+        [[nodiscard]] ConstIterator end() const { return ConstIterator(); }
+
+        template <typename Key_, typename Value_>
+        friend std::ostream& operator <<(std::ostream& ostream, const SplayTree<Key_, Value_>& tree);
 
     private:
         [[nodiscard]] int GetHeight(Node* node) const;
@@ -91,15 +111,13 @@ namespace Ng {
 
         void Merge(Node* left, Node* right);
 
-        void Print(const Node* node, const int& level, const char* caption) const;
+        void Print(const Node* node, int level, const char* caption, std::ostream& ostream) const;
 
     private:
         Node* m_Root;
         int   m_Size;
 
     }; // class SplayTree
-
-
 
 } // namespace Ng
 

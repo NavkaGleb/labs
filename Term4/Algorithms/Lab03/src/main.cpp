@@ -15,12 +15,17 @@ int main() {
     }
 
     std::cout << "Size: " << tree.GetSize() << std::endl;
-    tree.Print();
+    std::cout << "Height: " << tree.GetHeight() << std::endl;
+    std::cout << tree << std::endl;
 
-    while (!tree.IsEmpty()) {
+    for (const auto& [key, value] : tree)
+        std::cout << "{ " << key << ", " << value << " } ";
+    std::cout << std::endl;
+
+    while (!tree.IsEmpty())
         tree.Pop(tree.GetRoot()->GetKey());
-        std::cout << "Size after pop: " << tree.GetSize() << std::endl;
-    }
+
+    std::cout << tree << std::endl;
 
     return 0;
 }
