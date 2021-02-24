@@ -7,6 +7,7 @@ add_subdirectory(lib/Random)
 
 file(GLOB HEADER_FILES
     src/*.hpp
+    src/*.inl
 )
 
 file(GLOB SOURCE_FILES
