@@ -49,17 +49,16 @@ namespace Ng {
 
         [[nodiscard]] inline bool IsEmpty() const override { return m_Size == 0; };
         [[nodiscard]] inline int GetSize() const override { return m_Size; };
-        [[nodiscard]] inline const Node& GetRoot() const { return *m_Root; }
+        [[nodiscard]] inline const Node* GetRoot() const { return m_Root; }
 
         [[nodiscard]] bool IsExists(const Key& key) const;
         [[nodiscard]] int GetHeight() const;
 
+        [[nodiscard]] const Value& GetMin() const;
+        [[nodiscard]] const Value& GetMax() const;
+
         [[nodiscard]] Value& Get(const Key& key);
         [[nodiscard]] const Value& Get(const Key& key) const;
-
-        [[nodiscard]] Node* GetNode(const Key& key);
-
-//        void Merge(Node* left, Node* right);
 
         Value& Push(const Key& key, const Value& value);
         void Pop(const Key& key);
@@ -69,6 +68,19 @@ namespace Ng {
     private:
         [[nodiscard]] int GetHeight(Node* node) const;
 
+        [[nodiscard]] const Value& GetMin(Node* node) const;
+        [[nodiscard]] const Value& GetMax(Node* node) const;
+
+        [[nodiscard]] Node* GetMinNode(Node* node) const;
+        [[nodiscard]] Node* GetMaxNode(Node* node) const;
+
+        [[nodiscard]] Node* GetSuccessor(Node* node) const;
+        [[nodiscard]] Node* GetPredecessor(Node* node) const;
+
+        [[nodiscard]] Node* GetNode(const Key& key);
+
+        void Transplant(Node* parent, Node* child);
+
         Node* RotateLeft(Node* node);
         Node* RotateRight(Node* node);
 
@@ -76,6 +88,8 @@ namespace Ng {
         void ZigZag(Node* node);
         void ZigZig(Node* node);
         void Splay(Node* node);
+
+        void Merge(Node* left, Node* right);
 
         void Print(const Node* node, const int& level, const char* caption) const;
 

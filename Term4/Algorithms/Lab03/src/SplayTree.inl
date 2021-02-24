@@ -32,6 +32,22 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
+    const Value& SplayTree<Key, Value>::GetMin() const {
+        if (!m_Root)
+            throw std::out_of_range("Ng::SplayTree::GetMin: m_Root is nullptr!");
+
+        return GetMin(m_Root);
+    }
+
+    template <typename Key, typename Value>
+    const Value& SplayTree<Key, Value>::GetMax() const {
+        if (!m_Root)
+            throw std::out_of_range("Ng::SplayTree::GetMax: m_Root is nullptr!");
+
+        return GetMax(m_Root);
+    }
+
+    template <typename Key, typename Value>
     Value& SplayTree<Key, Value>::Get(const Key& key) {
         Node* node = m_Root;
 
@@ -51,17 +67,7 @@ namespace Ng {
         return Get(key);
     }
 
-    template <typename Key, typename Value>
-    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetNode(const Key& key) {
-        Node* node = m_Root;
 
-        while (node && key != node->m_Key)
-            node = node->m_Key > key ? node->m_Left : node->m_Right;
-
-        Splay(node);
-
-        return node;
-    }
 
     template <typename Key, typename Value>
     Value& SplayTree<Key, Value>::Push(const Key& key, const Value& value) {
@@ -98,53 +104,29 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void SplayTree<Key, Value>::Pop(const Key& key) {
-//        Node* node = GetNode(key);
-//
-//        if (!node)
-//            return;
-//
-//        --m_Size;
-//
-//        Node* parent = node->m_Parent;
-//        Node* child  = nullptr;
-//
-//        if (node->m_Left && node->m_Right) {
-//            Node* successor = GetSuccessor(node);
-//
-//            node->m_Value = successor->m_Value;
-//            parent        = successor->m_Parent;
-//            node          = successor;
-//
-//            if (successor->m_Right)
-//                child = successor->m_Right;
-//        } else if (!node->m_Left && node->m_Right) {
-//            child = node->m_Right;
-//        } else if (node->m_Left && !node->m_Right) {
-//            child = node->m_Left;
-//        }
-//
-//        if (parent) {
-//            if (parent->m_Left == node)
-//                parent->m_Left = child;
-//            else
-//                parent->m_Right = child;
-//
-//            if (child)
-//                child->m_Parent = parent;
-//        } else {
-//            m_Root = child;
-//
-//            if (m_Root)
-//                m_Root->m_Parent = nullptr;
-//        }
-//
-//        Splay(node);
-//
-//
-//        node->m_Left  = nullptr;
-//        node->m_Right = nullptr;
-//
-//        delete node;
+        Node* node = GetNode(key);
+
+        if (!node)
+            return;
+
+        --m_Size;
+
+        Node* left  = node->m_Left;
+        Node* right = node->m_Right;
+
+        if (!left && !right)
+            m_Root = nullptr;
+        else if (!left)
+            Transplant(node, right);
+        else if (!right)
+            Transplant(node, left);
+        else
+            Merge(node->m_Left, node->m_Right);
+
+        node->m_Left  = nullptr;
+        node->m_Right = nullptr;
+
+        delete node;
     }
 
     template <typename Key, typename Value>
@@ -155,6 +137,94 @@ namespace Ng {
     template <typename Key, typename Value>
     int SplayTree<Key, Value>::GetHeight(Node* node) const {
         return (node ? std::max(GetHeight(node->m_Left), GetHeight(node->m_Right)) : 0) + 1;
+    }
+
+    template <typename Key, typename Value>
+    const Value& SplayTree<Key, Value>::GetMin(Node* node) const {
+        while (node && node->m_Left)
+            node = node->m_Left;
+
+        return node->m_Value;
+    }
+
+    template <typename Key, typename Value>
+    const Value& SplayTree<Key, Value>::GetMax(Node* node) const {
+        while (node && node->m_Right)
+            node = node->m_Right;
+
+        return node->m_Value;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetMinNode(Node* node) const {
+        while (node && node->m_Left)
+            node = node->m_Left;
+
+        return node;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetMaxNode(Node* node) const {
+        while (node && node->m_Right)
+            node = node->m_Right;
+
+        return node;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetSuccessor(Node* node) const {
+        if (node->m_Right)
+            return GetMinNode(node->m_Right);
+
+        Node* successor = node->m_Parent;
+
+        while (successor && successor->m_Right == node) {
+            node      = successor;
+            successor = successor->m_Parent;
+        }
+
+        return successor;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetPredecessor(Node* node) const {
+        if (node->m_Left)
+            return GetMaxNode(node->m_Left);
+
+        Node* predecessor = node->m_Parent;
+
+        while (predecessor && predecessor->m_Left == node) {
+            node        = predecessor;
+            predecessor = predecessor->m_Parent;
+        }
+
+        return predecessor;
+    }
+
+    template <typename Key, typename Value>
+    typename SplayTree<Key, Value>::Node* SplayTree<Key, Value>::GetNode(const Key& key) {
+        Node* node = m_Root;
+
+        while (node && key != node->m_Key)
+            node = node->m_Key > key ? node->m_Left : node->m_Right;
+
+        if (node)
+            Splay(node);
+
+        return node;
+    }
+
+    template <typename Key, typename Value>
+    void SplayTree<Key, Value>::Transplant(Node* parent, Node* child) {
+        if (!parent->m_Parent)
+            m_Root = child;
+        else if (parent == parent->m_Parent->m_Left)
+            parent->m_Parent->m_Left = child;
+        else if (parent == parent->m_Parent->m_Right)
+            parent->m_Parent->m_Right = child;
+
+        if (child)
+            child->m_Parent = parent->m_Parent;
     }
 
     template <typename Key, typename Value>
@@ -347,6 +417,16 @@ namespace Ng {
         if (parent->m_Right == node && grandParent->m_Left  == parent ||
             parent->m_Left  == node && grandParent->m_Right == parent)
             return ZigZag(node);
+    }
+
+    template <typename Key, typename Value>
+    void SplayTree<Key, Value>::Merge(Node* left, Node* right) {
+        Node* leftMax = GetMaxNode(left);
+
+        Splay(leftMax);
+
+        leftMax->m_Right = right;
+        m_Root           = leftMax;
     }
 
     template <typename Key, typename Value>
