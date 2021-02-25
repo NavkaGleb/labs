@@ -174,7 +174,15 @@ namespace Ng {
 
     template <typename Key, typename Value>
     const Value& SplayTree<Key, Value>::Get(const Key& key) const {
-        return Get(key);
+        Node* node = m_Root;
+
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
+
+        if (!node)
+            throw std::out_of_range("Ng::SplayTree::Get: key is not exists!");
+
+        return node->m_Pair.second;
     }
     
     template <typename Key, typename Value>
@@ -241,6 +249,11 @@ namespace Ng {
         node->m_Right = nullptr;
 
         delete node;
+    }
+
+    template <typename Key, typename Value>
+    Value& SplayTree<Key, Value>::operator [](const Key& key) {
+        return Push(key, Value());
     }
 
     template <typename Key, typename Value>

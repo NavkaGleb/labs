@@ -9,7 +9,7 @@ namespace Ng {
     template <typename Key, typename Value>
     class SplayTree : public ITree<Key, Value> {
     public:
-        using Pair = std::pair<Key, Value>;
+        using Pair = std::pair<const Key, Value>;
 
         class Node {
         public:
@@ -27,6 +27,7 @@ namespace Ng {
             [[nodiscard]] inline const Node* GetParent() const { return m_Parent; }
             [[nodiscard]] inline const Node* GetLeft() const { return m_Left; }
             [[nodiscard]] inline const Node* GetRight() const { return m_Right; }
+
             friend class SplayTree;
 
         private:
@@ -102,6 +103,11 @@ namespace Ng {
 
         [[nodiscard]] ConstIterator begin() const { return ConstIterator(GetMinNode(m_Root)); }
         [[nodiscard]] ConstIterator end() const { return ConstIterator(); }
+
+        [[nodiscard]] ConstIterator cbegin() const { return ConstIterator(GetMinNode(m_Root)); }
+        [[nodiscard]] ConstIterator cend() const { return ConstIterator(); }
+
+        Value& operator [](const Key& value);
 
         template <typename Key_, typename Value_>
         friend std::ostream& operator <<(std::ostream& ostream, const SplayTree<Key_, Value_>& tree);
