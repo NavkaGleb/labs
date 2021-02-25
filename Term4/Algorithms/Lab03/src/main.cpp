@@ -51,6 +51,7 @@ int main() {
     while (!tree.IsEmpty())
         tree.Pop(tree.GetRoot()->GetKey());
 
+    std::cout << std::endl;
     std::cout << "Size: " << tree.GetSize() << std::endl;
     std::cout << "Height: " << tree.GetHeight() << std::endl;
     std::cout << tree << std::endl;

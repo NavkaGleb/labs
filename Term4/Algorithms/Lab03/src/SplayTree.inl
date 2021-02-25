@@ -27,8 +27,8 @@ namespace Ng {
     void SplayTree<Key, Value>::Node::Print(std::ostream& ostream) const {
         ostream << "Key: " << m_Pair.first << ", Value " << m_Pair.second << " {L: ";
 
-        ostream << (m_Left  ? std::to_string(m_Left->m_Pair.first)  : "Null") << ", R: ";
-        ostream << (m_Right ? std::to_string(m_Right->m_Pair.first) : "Null") << "}";
+        ostream << (m_Left  ? m_Left->m_Pair.first  : "Null") << ", R: ";
+        ostream << (m_Right ? m_Right->m_Pair.first : "Null") << "}";
     }
 
     ///////////////////////////////////////////////////////////////////////////////

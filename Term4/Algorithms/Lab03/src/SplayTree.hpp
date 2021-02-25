@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdexcept>
-
 #include "ITree.hpp"
 
 namespace Ng {
@@ -107,7 +105,7 @@ namespace Ng {
         [[nodiscard]] ConstIterator cbegin() const { return ConstIterator(GetMinNode(m_Root)); }
         [[nodiscard]] ConstIterator cend() const { return ConstIterator(); }
 
-        Value& operator [](const Key& value);
+        Value& operator [](const Key& key);
 
         template <typename Key_, typename Value_>
         friend std::ostream& operator <<(std::ostream& ostream, const SplayTree<Key_, Value_>& tree);
