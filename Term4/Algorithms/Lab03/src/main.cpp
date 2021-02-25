@@ -47,6 +47,18 @@ int main() {
     for (auto& [key, value] : tree)
         std::cout << "{ " << key << ", " << value << " }" << std::endl;
 
+    // Keys
+    std::cout << "Keys: ";
+    for (const auto& key : tree.GetKeys())
+        std::cout << key << " ";
+    std::cout << std::endl;
+
+    // Values
+    std::cout << "Values: ";
+    for (const auto& value : tree.GetValues())
+        std::cout << value << " ";
+    std::cout << std::endl;
+
     // Clear tree
     while (!tree.IsEmpty())
         tree.Pop(tree.GetRoot()->GetKey());

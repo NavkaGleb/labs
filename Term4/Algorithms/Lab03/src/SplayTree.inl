@@ -25,21 +25,26 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void SplayTree<Key, Value>::Node::Print(std::ostream& ostream) const {
-        ostream << "Key: " << m_Pair.first << ", Value " << m_Pair.second << " {L: ";
+        ostream << "<Key: " << m_Pair.first << ", Value: " << m_Pair.second << "> {L: ";
 
-        ostream << (m_Left  ? m_Left->m_Pair.first  : "Null") << ", R: ";
-        ostream << (m_Right ? m_Right->m_Pair.first : "Null") << "}";
+        if (m_Left) ostream << m_Left->m_Pair.first;
+        else        ostream << "Null";
+        ostream << ", R: ";
+
+        if (m_Right) ostream << m_Right->m_Pair.first;
+        else         ostream << "Null";
+        ostream << "}";
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    /// class SplayTree::Iterator
+    /// class SplayTree::IteratorBase
     ///////////////////////////////////////////////////////////////////////////////
     template <typename Key, typename Value>
-    SplayTree<Key, Value>::Iterator::Iterator(Node* node)
+    SplayTree<Key, Value>::IteratorBase::IteratorBase(Node* node)
         : m_Node(node) {}
 
     template <typename Key, typename Value>
-    typename SplayTree<Key, Value>::Iterator& SplayTree<Key, Value>::Iterator::operator ++() {
+    typename SplayTree<Key, Value>::IteratorBase& SplayTree<Key, Value>::IteratorBase::operator ++() {
         if (m_Node->m_Right) {
             m_Node = m_Node->m_Right;
 
@@ -60,7 +65,7 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    typename SplayTree<Key, Value>::Iterator& SplayTree<Key, Value>::Iterator::operator +=(int n) {
+    typename SplayTree<Key, Value>::IteratorBase& SplayTree<Key, Value>::IteratorBase::operator +=(int n) {
         for (int i = 0; i < n; i++)
             (*this)++;
 
@@ -68,48 +73,7 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    bool SplayTree<Key, Value>::Iterator::operator !=(const Iterator& other) const {
-        return m_Node != other.m_Node;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    /// class SplayTree::ConstIterator
-    ///////////////////////////////////////////////////////////////////////////////
-    template <typename Key, typename Value>
-    SplayTree<Key, Value>::ConstIterator::ConstIterator(Node* node)
-        : m_Node(node) {}
-
-    template <typename Key, typename Value>
-    typename SplayTree<Key, Value>::ConstIterator& SplayTree<Key, Value>::ConstIterator::operator ++() {
-        if (m_Node->m_Right) {
-            m_Node = m_Node->m_Right;
-
-            while (m_Node->m_Left)
-                m_Node = m_Node->m_Left;
-        } else {
-            Node* parent = m_Node->m_Parent;
-
-            while (parent && m_Node == parent->m_Right) {
-                m_Node = parent;
-                parent = parent->m_Parent;
-            }
-
-            m_Node = parent;
-        }
-
-        return *this;
-    }
-
-    template <typename Key, typename Value>
-    typename SplayTree<Key, Value>::ConstIterator& SplayTree<Key, Value>::ConstIterator::operator +=(int n) {
-        for (int i = 0; i < n; i++)
-            (*this)++;
-
-        return *this;
-    }
-
-    template <typename Key, typename Value>
-    bool SplayTree<Key, Value>::ConstIterator::operator !=(const ConstIterator& other) const {
+    bool SplayTree<Key, Value>::IteratorBase::operator !=(const IteratorBase& other) const {
         return m_Node != other.m_Node;
     }
         

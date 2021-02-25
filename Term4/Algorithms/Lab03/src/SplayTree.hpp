@@ -4,6 +4,10 @@
 
 namespace Ng {
 
+#define ITERATOR_COMPARING_OPERATORS(Iterator)                                                     \
+    bool operator ==(const Iterator& other) const { return this->GetNode() == other.GetNode(); } \
+    bool operator !=(const Iterator& other) const { return this->GetNode() != other.GetNode(); }
+
     template <typename Key, typename Value>
     class SplayTree : public ITree<Key, Value> {
     public:
@@ -39,41 +43,87 @@ namespace Ng {
 
         }; // class Node
 
-        class Iterator {
+        class IteratorBase {
         public:
-            explicit Iterator(Node* node = nullptr);
-            virtual ~Iterator() = default;
+            explicit IteratorBase(Node* node);
+            virtual ~IteratorBase() = default;
 
-            [[nodiscard]] inline Pair& operator *() { return m_Node->m_Pair; }
-            [[nodiscard]] inline Pair* operator ->() { return *m_Node->m_Pair; }
+            IteratorBase& operator ++();
+            IteratorBase& operator +=(int n);
 
-            Iterator& operator ++();
-            Iterator& operator +=(int n);
+            bool operator !=(const IteratorBase& other) const;
 
-            bool operator !=(const Iterator& other) const;
+        protected:
+            [[nodiscard]] Node* GetNode() { return m_Node; }
+            [[nodiscard]] const Node* GetNode() const { return m_Node; }
 
-        private:
+        protected:
             Node* m_Node;
+
+        }; // class IteratorBase
+
+        class Iterator : public IteratorBase {
+        public:
+            explicit Iterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+             ~Iterator() override = default;
+
+            [[nodiscard]] inline Pair& operator *() { return this->GetNode()->m_Pair; }
+            [[nodiscard]] inline Pair* operator ->() { return &this->GetNode()->m_Pair; }
 
         }; // class ConstIterator
 
-        class ConstIterator {
+        class ConstIterator : public IteratorBase {
         public:
-            explicit ConstIterator(Node* node = nullptr);
+            explicit ConstIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
             virtual ~ConstIterator() = default;
 
-            [[nodiscard]] inline const Pair& operator *() const { return m_Node->m_Pair; }
-            [[nodiscard]] inline const Pair* operator ->() const { return *m_Node->m_Pair; }
-
-            ConstIterator& operator ++();
-            ConstIterator& operator +=(int n);
-
-            bool operator !=(const ConstIterator& other) const;
-
-        private:
-            Node* m_Node;
+            [[nodiscard]] inline const Pair& operator *() const { return this->GetNode()->m_Pair; }
+            [[nodiscard]] inline const Pair* operator ->() const { return &this->GetNode()->m_Pair; }
 
         }; // class ConstIterator
+
+        class KeyIterator : public IteratorBase {
+        public:
+            explicit KeyIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+            virtual ~KeyIterator() = default;
+
+            [[nodiscard]] inline const Key& operator *() const { return this->GetNode()->m_Pair.first; }
+            [[nodiscard]] inline const Key* operator ->() const { return &this->GetNode()->m_Pair.first; }
+
+        }; // class KeyIterator
+
+        class ValueIterator : public IteratorBase {
+        public:
+            explicit ValueIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+            virtual ~ValueIterator() = default;
+
+            [[nodiscard]] inline Value& operator *() { return this->GetNode()->m_Pair.second; }
+            [[nodiscard]] inline Value* operator ->() { return &this->GetNode()->m_Pair.second; }
+
+        }; // class ValueIterator
+
+        template <typename T>
+        class Range {
+        public:
+            Range(T begin, T end)
+                : m_Begin(begin)
+                , m_End(end) {}
+
+            T begin() { return m_Begin; }
+            T end() { return m_End; }
+
+            const T& begin() const { return m_Begin; }
+            const T& end() const { return m_End; }
+
+        private:
+            T m_Begin;
+            T m_End;
+
+        }; // class KeyRange
 
         explicit SplayTree(Node* root = nullptr);
         ~SplayTree() override;
@@ -90,6 +140,9 @@ namespace Ng {
 
         [[nodiscard]] Value& Get(const Key& key);
         [[nodiscard]] const Value& Get(const Key& key) const;
+
+        [[nodiscard]] Range<KeyIterator> GetKeys() const { return Range(KeyIterator(GetMinNode(m_Root)), KeyIterator()); }
+        [[nodiscard]] Range<ValueIterator> GetValues() const { return Range(ValueIterator(GetMinNode(m_Root)), ValueIterator()); }
 
         void Clear();
 
