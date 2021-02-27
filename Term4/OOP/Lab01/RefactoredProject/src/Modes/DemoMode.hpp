@@ -4,13 +4,18 @@
 
 namespace RefactoredProject {
 
-    class DemoMode : public IMode {
+    class DemoMode_Impl : public IMode {
     public:
-        DemoMode() = default;
-        ~DemoMode() noexcept override = default;
+        void Run() override;
 
-        void Run();
+        friend class Singleton<DemoMode_Impl>;
+
+    private:
+        DemoMode_Impl() = default;
+        ~DemoMode_Impl() noexcept override = default;
 
     }; // class DemoMode
+
+    using DemoMode = Singleton<DemoMode_Impl>;
 
 } // namespace RefactoredProject

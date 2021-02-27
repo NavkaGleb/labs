@@ -2,7 +2,7 @@
 
 namespace RefactoredProject {
 
-    void BenchmarkMode::Run() {
+    void BenchmarkMode_Impl::Run() {
 
     }
 

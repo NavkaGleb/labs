@@ -4,13 +4,18 @@
 
 namespace RefactoredProject {
 
-    class InteractiveMode : public IMode {
+    class InteractiveMode_Impl : public IMode {
     public:
-        InteractiveMode() = default;
-        ~InteractiveMode() noexcept override = default;
+        void Run() override;
 
-        void Run();
+        friend class Singleton<InteractiveMode_Impl>;
+
+    private:
+        InteractiveMode_Impl() = default;
+        ~InteractiveMode_Impl() noexcept override = default;
 
     }; // class InteractiveMode
+
+    using InteractiveMode = Singleton<InteractiveMode_Impl>;
 
 } // namespace RefactoredProject

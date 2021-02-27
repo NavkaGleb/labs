@@ -1,6 +1,6 @@
-#include <iostream>
+#include "Application/Application.hpp"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    RefactoredProject::Application::Create().Run();
+    RefactoredProject::Application::Destroy();
 }

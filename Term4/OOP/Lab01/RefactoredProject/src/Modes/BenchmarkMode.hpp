@@ -4,13 +4,18 @@
 
 namespace RefactoredProject {
 
-    class BenchmarkMode : public IMode {
+    class BenchmarkMode_Impl : public IMode {
     public:
-        BenchmarkMode() = default;
-        ~BenchmarkMode() noexcept override = default;
-
         void Run();
 
+        friend class Singleton<BenchmarkMode_Impl>;
+
+    private:
+        BenchmarkMode_Impl() = default;
+        ~BenchmarkMode_Impl() noexcept override = default;
+
     }; // class BenchmarkMode
+
+    using BenchmarkMode = Singleton<BenchmarkMode_Impl>;
 
 } // namespace RefactoredProject

@@ -1,9 +1,7 @@
-#include "DemoMode.hpp"
+#include "Monster.hpp"
 
 namespace RefactoredProject {
 
-    void DemoMode_Impl::Run() {
 
-    }
 
 } // namespace RefactoredProject

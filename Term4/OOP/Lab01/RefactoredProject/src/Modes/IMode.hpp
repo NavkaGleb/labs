@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utility/Singleton.hpp"
+
 namespace RefactoredProject {
 
     class IMode {
