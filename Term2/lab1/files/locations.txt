@@ -1,2 +1,2 @@
-3 mWi1unMi8 598.088 29685 28213
-4 tamara_loc 3443 54 54
+3 mWi1unMi8 598.088 29685 0
+4 tamara_loc 3443 54 0

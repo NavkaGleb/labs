@@ -1,0 +1,23 @@
+00 - print all locations from file
+01 - print all location from memory
+02 - create new location and append it to the memory
+03 - create 'n' locations and append them to the memory
+04 - load all locations from file to memory
+05 - save locations to file
+06 - delete locations from file
+07 - delete locations from memory
+-------------------------------------------------
+08 - print all monsters from file
+09 - print all monsters from binary file
+10 - print all monsters from memory
+11 - create new monster and append it to the memory
+12 - create 'n' new random monsters and append them to the memory
+13 - load all monsters from file to memory
+14 - load all monsters from binary file to memory
+15 - save all monsters from memory to the file
+16 - delete certain monster from file
+17 - delete certain monster from memory
+18 - delete all monsters from file
+19 - delete all monsters from memory
+20 - update certain monster from file
+21 - search monsters by some criteria
