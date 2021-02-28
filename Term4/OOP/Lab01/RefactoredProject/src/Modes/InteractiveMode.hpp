@@ -15,7 +15,7 @@ namespace RefactoredProject {
         ~InteractiveMode_Impl() noexcept override = default;
 
         void UpdateCommand();
-        void ParseCommand() const;
+        [[nodiscard]] bool ParseCommand() const;
         void ParseLocationsCommand() const;
         void ParseMonstersCommand() const;
 

@@ -5,7 +5,7 @@
 namespace RefactoredProject {
 
     Monster::Monster(int id)
-        : m_Id(id)
+        : DataBaseEntity(id)
         , m_Name("MonsterDefault")
         , m_Health(0)
         , m_Damage(0)

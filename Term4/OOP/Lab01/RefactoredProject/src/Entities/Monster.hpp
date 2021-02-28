@@ -2,9 +2,11 @@
 
 #include <string>
 
+#include "DataBase/DataBase.hpp"
+
 namespace RefactoredProject {
 
-    class Monster {
+    class Monster : public DataBaseEntity {
     public:
         enum class AttackType : int {
             None = 0,
@@ -15,9 +17,8 @@ namespace RefactoredProject {
         };
 
         explicit Monster(int id = -1);
-        virtual ~Monster() noexcept;
+        ~Monster() noexcept override;
 
-        [[nodiscard]] inline int GetId() const { return m_Id; }
         [[nodiscard]] inline const std::string& GetName() const { return m_Name; }
         [[nodiscard]] inline int GetHealth() const { return m_Health; }
         [[nodiscard]] inline int GetDamage() const { return m_Damage; }
@@ -36,7 +37,6 @@ namespace RefactoredProject {
         friend std::ostream& operator <<(std::ostream& ostream, const Monster& monster);
 
     private:
-        int         m_Id;
         std::string m_Name;
         int         m_Health;
         int         m_Damage;

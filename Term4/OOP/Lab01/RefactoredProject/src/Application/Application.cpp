@@ -7,18 +7,20 @@
 #include "Modes/BenchmarkMode.hpp"
 
 #include "DataBase/DataBase.hpp"
+#include "Entities/Location.hpp"
+#include "Entities/Monster.hpp"
 
 namespace RefactoredProject {
 
     void Application_Impl::Run() {
-        char response = 'y';
-        int  mode;
+        int mode;
 
-        while (response == 'y') {
-            std::cout << "select the mode:" << std::endl;
-            std::cout << "0 - interactive mode" << std::endl;
-            std::cout << "1 - demo mode" << std::endl;
-            std::cout << "2 - benchmark mode" << std::endl;
+        while (true) {
+            std::cout << "Select the mode:" << std::endl;
+            std::cout << "0 - Interactive mode" << std::endl;
+            std::cout << "1 - Demo mode" << std::endl;
+            std::cout << "2 - Benchmark mode" << std::endl;
+            std::cout << "3 - Exit" << std::endl;
 
             std::cin >> mode;
 
@@ -38,25 +40,21 @@ namespace RefactoredProject {
                     BenchmarkMode::Destroy();
                     break;
 
+                case 3:
+                    return;
+
                 default:
                     std::cout << "try again!" << std::endl;
                     break;
-            }
-
-            std::cout << '\n' << "do you want to select another mode? press 'y' or 'q'. 'y' - yes, 'q' - quit" << '\n';
-            std::cin >> response;
-
-            while (response != 'y' && response != 'q') {
-
-                std::cout << "please, press 'y' or 'q'!" << '\n';
-                std::cin >> response;
-
             }
         }
     }
 
     Application_Impl::Application_Impl() {
         DataBase::Create();
+        DataBase::Get().Init<Location>();
+        DataBase::Get().Init<Monster>();
+        DataBase::Get().SetOneToMany<Location, Monster>();
     }
 
     Application_Impl::~Application_Impl() noexcept {

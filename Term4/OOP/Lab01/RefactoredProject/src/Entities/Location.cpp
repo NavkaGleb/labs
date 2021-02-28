@@ -5,7 +5,7 @@
 namespace RefactoredProject {
 
     Location::Location(int id)
-        : m_Id(id)
+        : DataBaseEntity(id)
         , m_Name("LocationDefault")
         , m_Area(0.0f)
         , m_MonstersCount(0)
@@ -25,6 +25,10 @@ namespace RefactoredProject {
 
     void Location::SetMonstersMaxCount(int monstersMaxCount) {
         m_MonstersMaxCount = monstersMaxCount;
+    }
+
+    bool Location::IsFull() const {
+        return m_MonstersCount == m_MonstersMaxCount;
     }
 
     bool Location::IncreaseMonsters(int count) {
