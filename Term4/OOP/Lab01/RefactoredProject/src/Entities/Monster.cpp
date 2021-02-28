@@ -6,6 +6,7 @@ namespace RefactoredProject {
 
     Monster::Monster(int id)
         : m_Id(id)
+        , m_Name("MonsterDefault")
         , m_Health(0)
         , m_Damage(0)
         , m_Attack(0.0f)
@@ -14,6 +15,30 @@ namespace RefactoredProject {
 
     Monster::~Monster() noexcept {
         std::cout << "Monster dtor" << std::endl;
+    }
+
+    void Monster::SetName(const std::string& name) {
+        m_Name = name;
+    }
+
+    void Monster::SetHealth(int health) {
+        m_Health = health;
+    }
+
+    void Monster::SetDamage(int damage) {
+        m_Damage = damage;
+    }
+
+    void Monster::SetAttack(float attack) {
+        m_Attack = attack;
+    }
+
+    void Monster::SetAttackType(const AttackType& attackType) {
+        m_AttackType = attackType;
+    }
+
+    void Monster::SetLocationId(int locationId) {
+        m_LocationId = locationId;
     }
 
     std::istream& operator >>(std::istream& istream, Monster& monster) {

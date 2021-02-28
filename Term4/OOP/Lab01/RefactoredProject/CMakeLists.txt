@@ -19,6 +19,10 @@ file(GLOB SOURCE_FILES
     src/*.cpp
 )
 
+add_subdirectory(lib/Random)
+
 include_directories(src)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} NgRandom)

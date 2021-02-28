@@ -11,8 +11,16 @@ namespace RefactoredProject {
         friend class Singleton<InteractiveMode_Impl>;
 
     private:
-        InteractiveMode_Impl() = default;
+        InteractiveMode_Impl();
         ~InteractiveMode_Impl() noexcept override = default;
+
+        void UpdateCommand();
+        void ParseCommand() const;
+        void ParseLocationsCommand() const;
+        void ParseMonstersCommand() const;
+
+    private:
+        int m_Command;
 
     }; // class InteractiveMode
 
