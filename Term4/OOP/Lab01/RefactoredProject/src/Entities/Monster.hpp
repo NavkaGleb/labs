@@ -10,8 +10,8 @@ namespace RefactoredProject {
             None = 0
         };
 
-        Monster(int id) :
-            m_Id(id) {}
+        explicit Monster(int id);
+        virtual ~Monster() noexcept;
 
         [[nodiscard]] inline int GetId() const { return m_Id; }
         [[nodiscard]] inline const std::string& GetName() const { return m_Name; }
@@ -20,6 +20,9 @@ namespace RefactoredProject {
         [[nodiscard]] inline float GetAttack() const { return m_Attack; }
         [[nodiscard]] inline const AttackType& GetAttackType() const { return m_AttackType; }
         [[nodiscard]] inline int GetLocationId() const { return m_LocationId; }
+
+        friend std::istream& operator >>(std::istream& istream, Monster& monster);
+        friend std::ostream& operator <<(std::ostream& ostream, const Monster& monster);
 
     private:
         int         m_Id;

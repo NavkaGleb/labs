@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "DataBase/DataBase.hpp"
+#include "Entities/Location.hpp"
 #include "Entities/Monster.hpp"
 
 namespace RefactoredProject {
@@ -14,6 +15,9 @@ namespace RefactoredProject {
         while (response == 'y') {
             std::cout << "0 = create monster" << std::endl;
             std::cout << "1 = get monster" << std::endl;
+            std::cout << "2 = print monsters from file" << std::endl;
+            std::cout << "3 = create location" << std::endl;
+            std::cout << "4 - get location" << std::endl;
 
             std::cin >> command;
 
@@ -23,6 +27,12 @@ namespace RefactoredProject {
             if (command == 1) {
                 std::cout << "Monster id: " << DataBase::Get().Get<Monster>(123).GetId() << std::endl;
             }
+
+            if (command == 3)
+                DataBase::Get().Create<Location>(321);
+
+            if (command == 4)
+                std::cout << "Location id: " << DataBase::Get().Get<Location>(321).GetId() << std::endl;
 
             std::cout << "\ndo you want to continue? press 'y' or 'n'" << '\n';
             std::cin >> response;
