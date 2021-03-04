@@ -29,7 +29,7 @@ namespace RefactoredProject {
                 std::cout << "Enter location monstersMaxCount:" << std::endl;
                 std::cin >> monstersMaxCount;
 
-                location.SetName(name);
+                location.SetName(std::move(name));
                 location.SetArea(area);
                 location.SetMonstersMaxCount(monstersMaxCount);
 
@@ -134,7 +134,7 @@ namespace RefactoredProject {
                 std::cout << "Enter Location id:" << std::endl;
                 std::cin >> locationId;
 
-                auto&       location = DataBase::Get().Get<Location>(locationId);
+                auto&       location = DataBase::Get().GetFromMemory<Location>(locationId);
                 std::string name;
                 float       area;
                 int         monstersMaxCount;
@@ -148,7 +148,7 @@ namespace RefactoredProject {
                 std::cout << "Enter location monstersMaxCount:" << std::endl;
                 std::cin >> monstersMaxCount;
 
-                location.SetName(name);
+                location.SetName(std::move(name));
                 location.SetArea(area);
                 location.SetMonstersMaxCount(monstersMaxCount);
 
@@ -171,7 +171,7 @@ namespace RefactoredProject {
                 std::cout << "Enter Location id:" << std::endl;
                 std::cin >> locationId;
 
-                auto        location = *DataBase::Get().GetFromFile<Location>(locationId);
+                auto        location = DataBase::Get().GetFromFile<Location>(locationId);
                 std::string name;
                 float       area;
                 int         monstersMaxCount;
@@ -185,7 +185,7 @@ namespace RefactoredProject {
                 std::cout << "Enter location monstersMaxCount:" << std::endl;
                 std::cin >> monstersMaxCount;
 
-                location.SetName(name);
+                location.SetName(std::move(name));
                 location.SetArea(area);
                 location.SetMonstersMaxCount(monstersMaxCount);
 

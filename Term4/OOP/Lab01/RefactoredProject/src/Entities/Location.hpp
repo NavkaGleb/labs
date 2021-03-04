@@ -16,7 +16,8 @@ namespace RefactoredProject {
         [[nodiscard]] inline int GetMonstersCount() const { return m_MonstersCount; }
         [[nodiscard]] inline int GetMonstersMaxCount() const { return m_MonstersMaxCount; }
 
-        void SetName(const std::string& string);
+        void SetName(const std::string& name);
+        void SetName(std::string&& name);
         void SetArea(float area);
         void SetMonstersMaxCount(int monstersMaxCount);
 
@@ -25,10 +26,14 @@ namespace RefactoredProject {
         bool IncreaseMonsters(int count = 1);
         void DecreaseMonsters(int count = 1);
 
+        void ReadFromBinary(std::ifstream& infile) override;
+        void WriteToBinary(std::ofstream& outfile) const override;
+
         friend std::istream& operator >>(std::istream& istream, Location& location);
         friend std::ostream& operator <<(std::ostream& ostream, const Location& location);
 
     private:
+        const int   m_NameLength;
         std::string m_Name;
         float       m_Area;
         int         m_MonstersCount;

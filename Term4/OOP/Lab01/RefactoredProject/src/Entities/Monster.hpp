@@ -33,6 +33,9 @@ namespace RefactoredProject {
         void SetAttackType(const AttackType& attackType);
         void SetLocationId(int locationId);
 
+        void ReadFromBinary(std::ifstream& infile) override {}
+        void WriteToBinary(std::ofstream& outfile) const override {}
+
         friend std::istream& operator >>(std::istream& istream, Monster& monster);
         friend std::ostream& operator <<(std::ostream& ostream, const Monster& monster);
 

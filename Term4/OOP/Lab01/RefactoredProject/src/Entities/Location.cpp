@@ -6,10 +6,14 @@ namespace RefactoredProject {
 
     Location::Location(int id)
         : DataBaseEntity(id)
-        , m_Name("LocationDefault")
+        , m_NameLength(30)
+        , m_Name("DefaultLocation")
         , m_Area(0.0f)
         , m_MonstersCount(0)
-        , m_MonstersMaxCount(0) {}
+        , m_MonstersMaxCount(0) {
+
+        m_Name.resize(m_NameLength);
+    }
 
     Location::~Location() noexcept {
         std::cout << "Location dtor" << std::endl;
@@ -17,6 +21,12 @@ namespace RefactoredProject {
 
     void Location::SetName(const std::string& name) {
         m_Name = name;
+        m_Name.resize(m_NameLength);
+    }
+
+    void Location::SetName(std::string&& name) {
+        m_Name = std::move(name);
+        m_Name.resize(m_NameLength);
     }
 
     void Location::SetArea(float area) {
@@ -45,6 +55,26 @@ namespace RefactoredProject {
             return;
 
         m_MonstersCount -= count;
+    }
+
+    void Location::ReadFromBinary(std::ifstream& infile) {
+        infile.read((char*)&m_Id, sizeof(m_Id));
+        infile.read((char*)&m_NameLength, sizeof(m_NameLength));
+        infile.read((char*)m_Name.c_str(), m_NameLength);
+        infile.read((char*)&m_Area, sizeof(m_Area));
+        infile.read((char*)&m_MonstersCount, sizeof(m_MonstersCount));
+        infile.read((char*)&m_MonstersMaxCount, sizeof(m_MonstersMaxCount));
+    }
+
+    void Location::WriteToBinary(std::ofstream& outfile) const {
+        std::size_t nameLength = m_Name.capacity();
+
+        outfile.write((char*)&m_Id, sizeof(m_Id));
+        outfile.write((char*)&m_NameLength, sizeof(m_NameLength));
+        outfile.write((char*)m_Name.c_str(), nameLength);
+        outfile.write((char*)&m_Area, sizeof(m_Area));
+        outfile.write((char*)&m_MonstersCount, sizeof(m_MonstersCount));
+        outfile.write((char*)&m_MonstersMaxCount, sizeof(m_MonstersMaxCount));
     }
 
     std::istream& operator >>(std::istream& istream, Location& location) {

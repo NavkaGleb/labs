@@ -11,7 +11,10 @@
 #include <typeinfo>
 #include <tuple>
 #include <functional>
+#include <type_traits>
 
+#include "MemoryManager.hpp"
+#include "FileManager.hpp"
 #include "Utility/Singleton.hpp"
 
 namespace RefactoredProject {
@@ -24,10 +27,16 @@ namespace RefactoredProject {
 
         [[nodiscard]] inline int GetId() const { return m_Id; }
 
+        virtual void ReadFromBinary(std::ifstream& infile) = 0;
+        virtual void WriteToBinary(std::ofstream& outfile) const = 0;
+
     protected:
         int m_Id = -1;
 
     }; // class DataBaseEntity
+
+    template <typename T>
+    concept Entity = std::is_base_of<DataBaseEntity, T>::value;
 
     class DataBase_Impl {
     public:
@@ -36,65 +45,27 @@ namespace RefactoredProject {
         template <typename T>
         using SearchFunc = std::function<bool(const T&)>;
 
-        template <typename T>
-        static std::string GetFileName();
+        template <Entity T> void Init();
 
-        template <typename T>
-        static TypeId GetHashCode();
+        template <Entity T> T& Create();
 
-        template <typename T>
-        void Init();
+        template <Entity T> T& GetFromMemory(int id);
+        template <Entity T> T GetFromFile(int id) const;
+        template <Entity T> std::vector<std::shared_ptr<T>> GetFromMemory() const;
+        template <Entity T> std::vector<std::shared_ptr<T>> GetFromFile() const;
 
-        template <typename T>
-        bool IsEmptyFile() const;
+        template <Entity T> void Load();
+        template <Entity T> void Save();
 
-        template <typename T>
-        T& Create();
-
-        template <typename T, typename U>
-        std::pair<T, U&> Create(int idT);
-
-        template <typename T>
-        T& Get(int id);
-
-        template <typename T>
-        std::optional<T> GetFromFile(int id) const;
-
-        template <typename T>
-        bool IsExistsInMemory(int id) const;
-
-        template <typename T>
-        bool IsExistsInFile(int id) const;
-
-        template <typename T>
-        void LoadFromFile();
-
-        template <typename T>
-        void SaveToFile();
-
-        template <typename T>
-        void DeleteFromMemory(int id);
-
-        template <typename T>
-        void DeleteFromFile(int id);
-
-        template <typename T>
-        void DeleteFromMemory();
-
-        template <typename T>
-        void DeleteFromFile();
-
-        template <typename T>
-        std::vector<T> GetFromMemory() const;
-
-        template <typename T>
-        std::vector<T> GetFromFile() const;
+        template <Entity T> void DeleteFromMemory(int id);
+        template <Entity T> void DeleteFromFile(int id);
+        template <Entity T> void DeleteFromMemory();
+        template <Entity T> void DeleteFromFile();
 
         template <typename T>
         std::vector<int> GetIdsFromFile() const;
 
-        template <typename T, typename U>
-        void SetOneToMany();
+        template <Entity T, Entity U> void SetOneToMany();
 
         template <typename T>
         void Update(const T& entity);
@@ -106,358 +77,256 @@ namespace RefactoredProject {
         std::vector<T> SearchInFile(SearchFunc<T> predicate) const;
 
         friend class Singleton<DataBase_Impl>;
+        friend class MemoryManager;
+        friend class FileManager;
 
     private:
-        struct EntityData {
-            std::shared_ptr<void> Handle     = nullptr;
-            bool                  IsInFile   = false;
-            bool                  IsDepended = false;
-        };
-
-        template <typename T>
-        using EntityContainer = std::unordered_map<TypeId, std::map<int, T>>;
+        using EntityPosition = std::pair<int, uintmax_t>;
+        using IndexTable     = std::unordered_map<std::size_t, std::vector<EntityPosition>>;
+        using RelationTable  = std::unordered_map<std::pair<std::size_t, std::size_t>, std::map<int, std::vector<int>>>;
 
         DataBase_Impl();
         virtual ~DataBase_Impl() noexcept;
 
     private:
-        EntityContainer<EntityData>       m_Entities;
-        std::unordered_map<TypeId, int>   m_IdManager;
-        std::filesystem::path m_WorkingDirectory;
-        std::map<std::pair<std::string, std::string>, std::map<int, int>> m_Relations;
+        IndexTable    m_IndexTable;
+        RelationTable m_RelationTable;
+
+        MemoryManager m_MemoryManager;
+        FileManager   m_FileManager;
+
+        std::filesystem::path                                   m_WorkingDirectory;
 
     }; // class DataBase_Impl
 
     using DataBase = Singleton<DataBase_Impl>;
-    template <typename T>
-    std::string DataBase_Impl::GetFileName() {
-        return typeid(T).name();
-    }
 
-    template <typename T>
-    std::size_t DataBase_Impl::GetHashCode() {
-        return typeid(T).hash_code();
-    }
-
-    template <typename T>
+    template <Entity T>
     void DataBase_Impl::Init() {
+        std::string   path = GetIndexTablePath(GetHash<T>());
+        uintmax_t     size = std::filesystem::file_size(path);
+        std::ifstream infile(path, std::fstream::in | std::fstream::binary);
 
-        std::ifstream infile(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-        T             entity;
+        if (!infile.is_open())
+            return;
 
-        while (infile >> entity) {}
+        for (EntityPosition data; true;) {
+            infile.read(reinterpret_cast<char*>(&data), sizeof(data));
+            m_IndexTable[GetHash<T>()].emplace_back(data);
 
-        m_IdManager[GetHashCode<T>()] = entity.GetId() + 1;
+            if (infile.tellg() == size)
+                break;
+        }
 
         infile.close();
     }
 
-    template <typename T>
-    bool DataBase_Impl::IsEmptyFile() const {
-        return std::filesystem::file_size(m_WorkingDirectory / (GetFileName<T>() + ".txt")) == 0;
-    }
-
-    template <typename T>
+    template <Entity T>
     T& DataBase_Impl::Create() {
-        TypeId hashCode = GetHashCode<T>();
-        int    id       = m_IdManager[hashCode]++;
-
-        auto& entity = m_Entities[hashCode][id].Handle = std::make_shared<T>(id);
-
-        return *static_cast<T*>(entity.get());
+        return m_MemoryManager.Create<T>(m_IndexTable[GetHash<T>()]++);
     }
 
-    template <typename T, typename U>
-    std::pair<T, U&> DataBase_Impl::Create(int idT) {
-        TypeId hashCodeT = GetHashCode<T>();
-        TypeId hashCodeU = GetHashCode<U>();
+    template <Entity T>
+    T& DataBase_Impl::GetFromMemory(int id) {
+        return m_MemoryManager.Get<T>(id);
+    }
 
-        if (!m_Relations.contains({ GetFileName<T>(), GetFileName<U>() }))
-            throw std::invalid_argument("RefactoredProject::Database_Impl::Create<T, U>: No such relation!");
-
-        auto t = GetFromFile<T>(idT);
-
-        if (!t.has_value()) {
+    template <Entity T>
+    T DataBase_Impl::GetFromFile(int id) const {
+        if (!m_IndexTable.contains(GetHash<T>())) {
             throw std::invalid_argument(
-                "RefactoredProject::DataBase_Impl::Create<T, U>: No such record by id = " + std::to_string(idT)
+                "RefactoredProject::DataBase_Impl::GetFromFile: No such type in m_IndexTable!"
             );
         }
 
-        int   idU    = m_IdManager[hashCodeU]++;
-        auto& entity = m_Entities[hashCodeU][idU].Handle = std::make_shared<U>(idU);
+        auto* entityPosition = static_cast<EntityPosition*>(
+            std::bsearch(
+                &id,
+                m_IndexTable[GetHash<T>()].data(),
+                m_IndexTable[GetHash<T>()].size(),
+                sizeof(EntityPosition),
+                [](const void* lhs, const void* rhs) {
+                    const auto& left  = *static_cast<const EntityPosition*>(lhs);
+                    const auto& right = *static_cast<const EntityPosition*>(rhs);
 
-        m_Entities[hashCodeU][idU].IsDepended = true;
-        m_Relations[{ GetFileName<T>(), GetFileName<U>() }][idT] = idU;
+                    if (left.first < right.first)
+                        return -1;
 
-        return { *t, *static_cast<U*>(entity.get()) };
-    }
+                    if (left.first > right.first)
+                        return 1;
 
-    template <typename T>
-    T& DataBase_Impl::Get(int id) {
-        TypeId hashCode = GetHashCode<T>();
+                    return 0;
+                }
+            )
+        );
 
-        if (m_Entities.contains(hashCode) && m_Entities[hashCode].contains(id))
-            return *static_cast<T*>(m_Entities[hashCode][id].Handle.get());
-
-        throw std::out_of_range("RefactoredProject::DataBase_Impl::Get: No such record on database!");
-    }
-
-    template <typename T>
-    std::optional<T> DataBase_Impl::GetFromFile(int id) const {
-        if (IsEmptyFile<T>())
-            return std::nullopt;
-
-        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-
-        for (T entity; file >> entity;)
-            if (entity.GetId() == id)
-                return entity;
-
-        file.close();
-
-        return std::nullopt;
-    }
-
-    template <typename T>
-    bool DataBase_Impl::IsExistsInMemory(int id) const {
-        return m_Entities.contains(GetHashCode<T>()) && m_Entities.at(GetHashCode<T>()).contains(id);
-    }
-
-    template <typename T>
-    bool DataBase_Impl::IsExistsInFile(int id) const {
-        if (IsEmptyFile<T>())
-            return false;
-
-        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-
-        for (T entity; file >> entity;)
-            if (entity.GetId() == id)
-                return true;
-
-        file.close();
-
-        return false;
-    }
-
-    template <typename T>
-    void DataBase_Impl::LoadFromFile() {
-        if (IsEmptyFile<T>())
-            return;
-
-        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-        TypeId        hashCode = GetHashCode<T>();
-
-        for (T entity; file >> entity;) {
-            if (!(m_Entities.contains(hashCode) && m_Entities[hashCode].contains(entity.GetId())))
-                m_Entities[hashCode][entity.GetId()].Handle = std::make_shared<T>(entity);
+        if (!entityPosition) {
+            throw std::range_error(
+                "RefactoredProject::DataBase_Impl::GetFromFile: No record by given id!"
+            );
         }
 
-        file.close();
+        return m_FileManager.Get<T>(entityPosition->first);
     }
 
-    template <typename T>
-    void DataBase_Impl::SaveToFile() {
-        if (!m_Entities.contains(GetHashCode<T>()))
-            return;
-
-        TypeId        hashCode = GetHashCode<T>();
-        std::ofstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"), std::ios_base::app);
-
-        for (auto& [id, entityData] : m_Entities[hashCode]) {
-            entityData.IsInFile = true;
-            file << *static_cast<T*>(entityData.Handle.get()) << std::endl;
-        }
-
-        file.close();
+    template <Entity T>
+    std::vector<std::shared_ptr<T>> DataBase_Impl::GetFromMemory() const {
+        return m_MemoryManager.Get<T>();
     }
 
-    template <typename T>
+    template <Entity T>
+    std::vector<std::shared_ptr<T>> DataBase_Impl::GetFromFile() const {
+        return m_FileManager.Get<T>();
+    }
+
+    template <Entity T>
+    void DataBase_Impl::Load() {
+        return m_MemoryManager.Load<T>();
+    }
+
+    template <Entity T>
+    void DataBase_Impl::Save() {
+        return m_MemoryManager.Save<T>();
+    }
+
+    template <Entity T>
     void DataBase_Impl::DeleteFromMemory(int id) {
-        m_Entities.erase(GetHashCode<T>());
+        if (m_MemoryManager.IsInFile<T>(id))
+            return m_MemoryManager.Delete<T>(id);
+
+        for (auto& [relation, ids] : m_RelationTable) {
+            if (relation.first == TypeInfo::GetHash<T>()) {
+                for (auto& [id, dependedId] : ids)
+                    m_MemoryManager.Delete<T>(dependedId);
+                    // TODO: Delete by hash!!!
+            }
+        }
     }
 
-    template <typename T>
+    template <Entity T>
     void DataBase_Impl::DeleteFromFile(int id) {
-        std::vector<std::string> dependedTypes(1, GetFileName<T>());
 
+    }
+
+    template <Entity T>
+    void DataBase_Impl::DeleteFromMemory() {
+        return m_MemoryManager.Delete<T>();
+    }
+
+    template <Entity T>
+    void DataBase_Impl::DeleteFromFile() {
         for (auto& [relation, ids] : m_Relations) {
-            // Delete the relation
-            if (relation.first == GetFileName<T>()) {
-                dependedTypes.emplace_back(relation.second);
-                m_Relations.erase(relation);
+            if (relation.first == GetHash<T>()) {
+                m_Entities[relation.first].clear();
+                m_Entities[relation.second].clear();
+
+                ClearFile(m_Types[relation.second].IdFilePath);
+                ClearFile(m_Types[relation.second].TxtFilePath);
+                ClearFile(m_Types[relation.second].BinFilePath);
             }
 
-            // Clear the ids but save the relation
-            if (relation.second == GetFileName<T>())
-                ids.clear();
+            if (relation.second == GetHash<T>()) {
+                m_Entities[relation.second].clear();
+
+                ClearFile(m_Types[relation.second].IdFilePath);
+                ClearFile(m_Types[relation.second].TxtFilePath);
+                ClearFile(m_Types[relation.second].BinFilePath);
+            }
         }
 
-        for (const auto& filename : dependedTypes) {
-            std::ofstream file(m_WorkingDirectory / (filename + ".txt"), std::ios_base::trunc);
-            file.close();
-        }
-    }
-
-    template <typename T>
-    void DataBase_Impl::DeleteFromMemory() {
-//        std::vector<TypeId> dependedTypes;
-//
-//        for (auto& [relation, ids] : m_Relations) {
-//            // Delete the relation
-//            if (relation.first == GetFileName<T>()) {
-//                dependedTypes.emplace_back(relation.second);
-//                m_Relations.erase(relation);
-//            }
-//
-//            // Clear the ids but save the relation
-//            if (relation.second == GetFileName<T>())
-//                ids.clear();
-//        }
-//
-//        for (const auto& filename : dependedTypes) {
-//            std::ofstream file(m_WorkingDirectory / (filename + ".txt"), std::ios_base::trunc);
-//            file.close();
-//        }
-    }
-
-    template <typename T>
-    void DataBase_Impl::DeleteFromFile() {
-        std::vector<std::string> dependedTypes(1, GetFileName<T>());
-        std::vector<std::pair<std::string, std::string>> relationsToDelete;
-
-        std::cout << "Size: " << m_Relations.size() << std::endl;
-
-        for (auto& [relation, ids] : m_Relations) {
-            // Delete the relation
-            std::cout << "First: " << relation.first << ", Second: " << relation.second << std::endl;
-
-            if (relation.first == GetFileName<T>())
-                dependedTypes.emplace_back(relation.second);
-
-            // Clear the ids but save the relation
-            if (relation.second == GetFileName<T>())
-                ids.clear();
-        }
-
-        for (const auto& filename : dependedTypes) {
-            std::ofstream file(m_WorkingDirectory / (filename + ".txt"), std::ios_base::trunc);
-            file.close();
-        }
-    }
-
-    template <typename T>
-    std::vector<T> DataBase_Impl::GetFromMemory() const {
-        if (!m_Entities.contains(GetHashCode<T>()))
-            return {};
-
-        std::vector<T> result;
-
-        for (const auto& [id, entityData] : m_Entities.at(GetHashCode<T>()))
-            result.emplace_back(*static_cast<T*>(entityData.Handle.get()));
-
-        return result;
-    }
-
-    template <typename T>
-    std::vector<T> DataBase_Impl::GetFromFile() const {
-        if (IsEmptyFile<T>())
-            return {};
-
-        std::ifstream  file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-        std::vector<T> result;
-
-        for (T entity; file >> entity;)
-            result.emplace_back(entity);
-
-        file.close();
-
-        return result;
+        ClearFile(m_Types[GetHash<T>()].IdFilePath);
+        ClearFile(m_Types[GetHash<T>()].TxtFilePath);
+        ClearFile(m_Types[GetHash<T>()].BinFilePath);
     }
 
     template <typename T>
     std::vector<int> DataBase_Impl::GetIdsFromFile() const {
-        if (IsEmptyFile<T>())
-            return {};
+//        if (IsEmptyFile<T>())
+//            return {};
+//
+//        std::vector<int> result;
+//
+//        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
+//        T             entity;
+//
+//        while (file >> entity)
+//            result.emplace_back(entity.GetId());
+//
+//        file.close();
+//
+//        return result;
 
-        std::vector<int> result;
 
-        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-        T             entity;
-
-        while (file >> entity)
-            result.emplace_back(entity.GetId());
-
-        file.close();
-
-        return result;
+        return {};
     }
 
-    template <typename T, typename U>
+    template <Entity T, Entity U>
     void DataBase_Impl::SetOneToMany() {
-        m_Relations[{ GetFileName<T>(), GetFileName<U>() }];
+        m_RelationTable[{ TypeInfo::GetHash<T>(), TypeInfo::GetHash<U>() }];
     }
 
     template <typename T>
     void DataBase_Impl::Update(const T& entity) {
-        if (IsExistsInMemory<T>(entity.GetId()))
-            Get<T>(entity.GetId()) = entity;
-
-        if (IsEmptyFile<T>())
-            return;
-
-        // Read from file
-        std::ifstream infile(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-        std::vector<T> temp;
-
-        for (T elem; infile >> elem;)
-            temp.emplace_back(elem.GetId() == entity.GetId() ? entity : elem);
-
-        infile.close();
-
-        // Write to file
-        std::ofstream outfile(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-
-        for (const auto& elem : temp)
-            outfile << elem << std::endl;
-
-        outfile.close();
+//        if (IsExistsInMemory<T>(entity.GetId()))
+//            Get<T>(entity.GetId()) = entity;
+//
+//        if (IsEmptyFile<T>())
+//            return;
+//
+//        // Read from file
+//        std::ifstream infile(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
+//        std::vector<T> temp;
+//
+//        for (T elem; infile >> elem;)
+//            temp.emplace_back(elem.GetId() == entity.GetId() ? entity : elem);
+//
+//        infile.close();
+//
+//        // Write to file
+//        std::ofstream outfile(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
+//
+//        for (const auto& elem : temp)
+//            outfile << elem << std::endl;
+//
+//        outfile.close();
     }
 
     template <typename T>
     std::vector<T> DataBase_Impl::SearchInMemory(SearchFunc<T> predicate) const {
-        TypeId hashCode = GetHashCode<T>();
-
-        if (!m_Entities.contains(hashCode))
-            return {};
-
-        std::vector<T> result;
-
-        for (const auto& [id, entityData] : m_Entities.at(hashCode)) {
-            auto entity = *static_cast<T*>(entityData.Handle.get());
-
-            if (predicate(entity))
-                result.emplace_back(std::move(entity));
-        }
-
-        return result;
+//        TypeId hashCode = GetHashCode<T>();
+//
+//        if (!m_Entities.contains(hashCode))
+//            return {};
+//
+//        std::vector<T> result;
+//
+//        for (const auto& [id, entityData] : m_Entities.at(hashCode)) {
+//            auto entity = *static_cast<T*>(entityData.Handle.get());
+//
+//            if (predicate(entity))
+//                result.emplace_back(std::move(entity));
+//        }
+//
+//        return result;
     }
 
     template <typename T>
     std::vector<T> DataBase_Impl::SearchInFile(SearchFunc<T> predicate) const {
-        if (IsEmptyFile<T>())
-            return {};
-
-        std::vector<T> result;
-
-        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
-
-        for (T entity; file >> entity;)
-            if (predicate(entity))
-                result.emplace_back(std::move(entity));
-
-        file.close();
-
-        return result;
+//        if (IsEmptyFile<T>())
+//            return {};
+//
+//        std::vector<T> result;
+//
+//        std::ifstream file(m_WorkingDirectory / (GetFileName<T>() + ".txt"));
+//
+//        for (T entity; file >> entity;)
+//            if (predicate(entity))
+//                result.emplace_back(std::move(entity));
+//
+//        file.close();
+//
+//        return result;
+        return {};
     }
 
 } // namespace RefactoredProject
