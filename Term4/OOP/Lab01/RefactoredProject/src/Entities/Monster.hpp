@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "DataBase/DataBase.hpp"
+#include "DataBase/IDataBaseEntity.hpp"
 
 namespace RefactoredProject {
 
-    class Monster : public DataBaseEntity {
+    class Monster : public IDataBaseEntity {
     public:
         enum class AttackType : int {
             None = 0,

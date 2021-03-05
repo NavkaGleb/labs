@@ -62,7 +62,7 @@ namespace RefactoredProject {
                 }
 
                 for (const auto& location : locations)
-                    std::cout << location << std::endl;
+                    std::cout << *location << std::endl;
             }
 
             void PrintFromFile() {
@@ -74,16 +74,16 @@ namespace RefactoredProject {
                 }
 
                 for (const auto& location : locations)
-                    std::cout << location << std::endl;
+                    std::cout << *location << std::endl;
             }
 
             void Load() {
-                DataBase::Get().LoadFromFile<Location>();
+                DataBase::Get().Load<Location>();
                 std::cout << "Locations was successfully loaded from file" << std::endl;
             }
             
             void Save() {
-                DataBase::Get().SaveToFile<Location>();
+                DataBase::Get().Save<Location>();
                 std::cout << "Locations was successfully saved to file" << std::endl;
             }
 
@@ -197,83 +197,83 @@ namespace RefactoredProject {
         namespace Monsters {
 
             void Create() {
-                using AttackType = Monster::AttackType;
-
-                std::vector<Location> locations = DataBase::Get().SearchInFile<Location>([](const Location& location) {
-                    return !location.IsFull();
-                });
-
-                if (locations.empty()) {
-                    std::cout << "No Location to add Monster! All Locations are full or there are no Location in file!";
-                    return;
-                }
-
-                int locationId;
-
-                for (const auto& location : locations)
-                    std::cout << location << std::endl;
-
-                std::cout << "Enter monster locationId:" << std::endl;
-                std::cin >> locationId;
-
-                auto [location, monster] = DataBase::Get().Create<Location, Monster>(locationId);
-                std::string name;
-                int         health;
-                int         damage;
-                float       attack;
-                AttackType  attackType;
-
-                std::cout << "Enter monster name:" << std::endl;
-                std::cin >> name;
-
-                std::cout << "Enter monster health:" << std::endl;
-                std::cin >> health;
-
-                std::cout << "Enter monster damage:" << std::endl;
-                std::cin >> damage;
-
-                std::cout << "Enter monster attack:" << std::endl;
-                std::cin >> attack;
-
-                std::cout << "Enter monster attackType:" << std::endl;
-                std::cin >> reinterpret_cast<int&>(attackType);
-
-                monster.SetName(name);
-                monster.SetHealth(health);
-                monster.SetDamage(damage);
-                monster.SetAttack(attack);
-                monster.SetAttackType(attackType);
-                monster.SetLocationId(locationId);
-
-                location.IncreaseMonsters();
-
-                DataBase::Get().Update<Location>(location);
-
-                std::cout << "Monster " << monster.GetName() << " was successfully created!" << std::endl;
+//                using AttackType = Monster::AttackType;
+//
+//                auto locations = DataBase::Get().SearchInFile<Location>([](const Location& location) {
+//                    return !location.IsFull();
+//                });
+//
+//                if (locations.empty()) {
+//                    std::cout << "No Location to add Monster! All Locations are full or there are no Location in file!";
+//                    return;
+//                }
+//
+//                int locationId;
+//
+//                for (const auto& location : locations)
+//                    std::cout << location << std::endl;
+//
+//                std::cout << "Enter monster locationId:" << std::endl;
+//                std::cin >> locationId;
+//
+//                auto [location, monster] = DataBase::Get().Create<Location, Monster>(locationId);
+//                std::string name;
+//                int         health;
+//                int         damage;
+//                float       attack;
+//                AttackType  attackType;
+//
+//                std::cout << "Enter monster name:" << std::endl;
+//                std::cin >> name;
+//
+//                std::cout << "Enter monster health:" << std::endl;
+//                std::cin >> health;
+//
+//                std::cout << "Enter monster damage:" << std::endl;
+//                std::cin >> damage;
+//
+//                std::cout << "Enter monster attack:" << std::endl;
+//                std::cin >> attack;
+//
+//                std::cout << "Enter monster attackType:" << std::endl;
+//                std::cin >> reinterpret_cast<int&>(attackType);
+//
+//                monster.SetName(name);
+//                monster.SetHealth(health);
+//                monster.SetDamage(damage);
+//                monster.SetAttack(attack);
+//                monster.SetAttackType(attackType);
+//                monster.SetLocationId(locationId);
+//
+//                location.IncreaseMonsters();
+//
+//                DataBase::Get().Update<Location>(location);
+//
+//                std::cout << "Monster " << monster.GetName() << " was successfully created!" << std::endl;
             }
 
             void CreateRandom() {
-                int n;
-                std::vector<int> locationIds = DataBase::Get().GetIdsFromFile<Location>();
-
-                if (locationIds.empty()) {
-                    std::cout << "No Locations in file!" << std::endl;
-                    return;
-                }
-
-                std::cout << "Enter amount of monsters:" << std::endl;
-                std::cin >> n;
-
-                for (int i = 0; i < n; ++i) {
-                    auto& monster = DataBase::Get().Create<Monster>();
-
-                    monster.SetName(Ng::Random::GetString(Ng::Random::Get(3, 7)));
-                    monster.SetHealth(Ng::Random::Get(10, 100));
-                    monster.SetDamage(Ng::Random::Get(15, 40));
-                    monster.SetAttack(Ng::Random::Get(0.0f, 1.0f));
-                    monster.SetAttackType(static_cast<Monster::AttackType>(Ng::Random::Get(1, 4)));
-                    monster.SetLocationId(Ng::Random::Get(locationIds));
-                }
+//                int n;
+//                std::vector<int> locationIds = DataBase::Get().GetIdsFromFile<Location>();
+//
+//                if (locationIds.empty()) {
+//                    std::cout << "No Locations in file!" << std::endl;
+//                    return;
+//                }
+//
+//                std::cout << "Enter amount of monsters:" << std::endl;
+//                std::cin >> n;
+//
+//                for (int i = 0; i < n; ++i) {
+//                    auto& monster = DataBase::Get().Create<Monster>();
+//
+//                    monster.SetName(Ng::Random::GetString(Ng::Random::Get(3, 7)));
+//                    monster.SetHealth(Ng::Random::Get(10, 100));
+//                    monster.SetDamage(Ng::Random::Get(15, 40));
+//                    monster.SetAttack(Ng::Random::Get(0.0f, 1.0f));
+//                    monster.SetAttackType(static_cast<Monster::AttackType>(Ng::Random::Get(1, 4)));
+//                    monster.SetLocationId(Ng::Random::Get(locationIds));
+//                }
             }
 
             void PrintFromMemory() {
@@ -301,12 +301,12 @@ namespace RefactoredProject {
             }
 
             void Load() {
-                DataBase::Get().LoadFromFile<Monster>();
+                DataBase::Get().Load<Monster>();
                 std::cout << "Monsters was successfully loaded from file" << std::endl;
             }
 
             void Save() {
-                DataBase::Get().SaveToFile<Monster>();
+                DataBase::Get().Save<Monster>();
                 std::cout << "Monsters was successfully saved to file" << std::endl;
             }
 
@@ -473,11 +473,11 @@ namespace RefactoredProject {
                 break;
 
             case 6:
-//                Internal::LoadLocations();
+                DeleteFromMemory();
                 break;
 
             case 7:
-//                Internal::DeleteLocationsFromMemory();
+                DeleteFromFile();
                 break;
 
             case 8:

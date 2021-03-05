@@ -8,32 +8,43 @@
 #include <type_traits>
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 
+#include "IndexTable.hpp"
 #include "TypeInfo.hpp"
+#include "IDataBaseEntity.hpp"
 
 namespace RefactoredProject {
 
     class MemoryManager {
     public:
-        explicit MemoryManager(std::unordered_map<std::size_t, std::vector<std::pair<int, uintmax_t>>>& indexTable);
+        explicit MemoryManager(IndexTable& indexTable);
         virtual ~MemoryManager() noexcept;
 
         [[nodiscard]] inline const auto& GetEntities() const { return m_Entities; }
 
-        template <typename T> T& Create(int id);
+        template <Entity T> T& Create(int id);
 
-        template <typename T> bool IsExists() const;
-        template <typename T> bool IsExists(int id) const;
-        template <typename T> bool IsInFile(int id) const;
+        bool IsExists(std::size_t hash) const;
+        bool IsExists(int id, std::size_t hash) const;
+        template <Entity T> bool IsExists() const;
+        template <Entity T> bool IsExists(int id) const;
+        template <Entity T> bool IsInFile(int id) const;
 
-        template <typename T> T& Get(int id);
-        template <typename T> std::vector<std::shared_ptr<T>> Get();
+        template <Entity T> std::vector<std::shared_ptr<T>> Get() const;
+        template <Entity T> T& Get(int id);
 
-        template <typename T> void Load();
-        template <typename T> void Save();
+        template <Entity T> void Load();
+        template <Entity T> void Save();
 
-        template <typename T> void Delete(int id);
-        template <typename T> void Delete();
+        void Delete(std::size_t hash);
+        void Delete(int id, std::size_t hash);
+        template <Entity T> void Delete();
+        template <Entity T> void Delete(int id);
+
+        template <Entity T> void Update(const T& entity);
+
+        template <Entity T> std::vector<std::shared_ptr<T>> Search(SearchFunc<T> predicate);
 
     private:
         struct EntityData {
@@ -43,56 +54,56 @@ namespace RefactoredProject {
         }; // struct EntityData
 
     private:
-        std::unordered_map<std::size_t, std::vector<std::pair<int, uintmax_t>>>& m_IndexTable;
-        std::unordered_map<std::size_t, std::map<int, EntityData>>               m_Entities;
+        IndexTable&                                                m_IndexTable;
+        std::unordered_map<std::size_t, std::map<int, EntityData>> m_Entities;
 
     }; // class MemoryManger
 
-    template <typename T>
+    template <Entity T>
     T& MemoryManager::Create(int id) {
-        return *static_cast<T*>((m_Entities[TypeInfo::GetHash<T>][id].Handle = std::make_shared<T>(id)).get());
+        return *static_cast<T*>((m_Entities[TypeInfo::GetHash<T>()][id].Handle = std::make_shared<T>(id)).get());
     }
 
-    template <typename T>
+    template <Entity T>
     bool MemoryManager::IsExists() const {
         return m_Entities.contains(TypeInfo::GetHash<T>());
     }
 
-    template <typename T>
+    template <Entity T>
     bool MemoryManager::IsExists(int id) const {
         return m_Entities.contains(TypeInfo::GetHash<T>()) && m_Entities.at(TypeInfo::GetHash<T>()).contains(id);
     }
 
-    template <typename T>
+    template <Entity T>
     bool MemoryManager::IsInFile(int id) const {
-        return IsExists<T>(id) && m_Entities[TypeInfo::GetHash<T>()][id].IsInFile;
+        return IsExists<T>(id) && m_Entities.at(TypeInfo::GetHash<T>()).at(id).IsInFile;
     }
 
-    template <typename T>
-    T& MemoryManager::Get(int id) {
-        if (IsExists<T>(id))
-            return *static_cast<T*>(m_Entities[GetHash<T>()][id].Handle.get());
-
-        throw std::range_error("RefactoredProject::MemoryManager: Don't exists record with id = " + std::to_string(id));
-    }
-
-    template <typename T>
-    std::vector<std::shared_ptr<T>> MemoryManager::Get() {
+    template <Entity T>
+    std::vector<std::shared_ptr<T>> MemoryManager::Get() const {
         if (!IsExists<T>()) {
             throw std::range_error(
                 "RefactoredProject::MemoryManager: Don't exists such type" + std::string(typeid(T).name())
             );
         }
 
-        std::vector<T*> result;
+        std::vector<std::shared_ptr<T>> result;
 
-        for (auto& [id, entityData] : m_Entities[GetHash<T>()])
-            result.emplace_back(static_cast<std::shared_ptr<T>>(entityData.Handle));
+        for (const auto& [id, entityData] : m_Entities.at(TypeInfo::GetHash<T>()))
+            result.emplace_back(std::static_pointer_cast<T>(entityData.Handle));
 
         return result;
     }
 
-    template <typename T>
+    template <Entity T>
+    T& MemoryManager::Get(int id) {
+        if (IsExists<T>(id))
+            return *static_cast<T*>(m_Entities[TypeInfo::GetHash<T>()][id].Handle.get());
+
+        throw std::range_error("RefactoredProject::MemoryManager: Don't exists record with id = " + std::to_string(id));
+    }
+
+    template <Entity T>
     void MemoryManager::Load() {
         auto          hash = TypeInfo::GetHash<T>();
         auto          path = TypeInfo::GetBinaryDataPath(hash);
@@ -115,7 +126,7 @@ namespace RefactoredProject {
         file.close();
     }
 
-    template <typename T>
+    template <Entity T>
     void MemoryManager::Save() {
         using namespace TypeInfo;
 
@@ -133,7 +144,7 @@ namespace RefactoredProject {
             T& entity             = *static_cast<T*>(entityData.Handle.get());
             entityData.IsInFile   = true;
 
-            m_IndexTable[hash].emplace_back(entity.GetId(), binaryFile.tellp());
+            m_IndexTable.Push<T>({ entity.GetId(), binaryFile.tellp() });
 
             textFile << entity << std::endl;
             entity.WriteToBinary(binaryFile);
@@ -143,7 +154,15 @@ namespace RefactoredProject {
         binaryFile.close();
     }
 
-    template <typename T>
+    template <Entity T>
+    void MemoryManager::Delete() {
+        if (!IsExists<T>())
+            return;
+
+        m_Entities[TypeInfo::GetHash<T>()].clear();
+    }
+
+    template <Entity T>
     void MemoryManager::Delete(int id) {
         if (!IsExists<T>(id))
             return;
@@ -151,12 +170,26 @@ namespace RefactoredProject {
         m_Entities[TypeInfo::GetHash<T>()].erase(id);
     }
 
-    template <typename T>
-    void MemoryManager::Delete() {
-        if (!IsExists<T>())
-            return;
+    template <Entity T>
+    void MemoryManager::Update(const T& entity) {
+        m_Entities[TypeInfo::GetHash<T>()][entity.GetId()].Handle = std::make_shared<T>(entity);
+    }
 
-        m_Entities[TypeInfo::GetHash<T>()].clear();
+    template <Entity T>
+    std::vector<std::shared_ptr<T>> MemoryManager::Search(SearchFunc<T> predicate) {
+        if (!IsExists<T>())
+            return {};
+
+        std::vector<std::shared_ptr<T>> result;
+
+        for (auto& [id, entityData] : m_Entities[TypeInfo::GetHash<T>()]) {
+            auto& entity = static_cast<std::shared_ptr<T>>(entityData.Handle);
+
+            if (predicate(entity))
+                result.emplace_back(entity);
+        }
+
+        return result;
     }
 
 } // namespace RefactoredProject

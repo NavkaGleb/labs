@@ -6,7 +6,7 @@
 namespace RefactoredProject::TypeInfo {
 
     template <typename T>
-    inline std::size_t GetHash() {
+    inline constexpr std::size_t GetHash() {
         return typeid(T).hash_code();
     }
 

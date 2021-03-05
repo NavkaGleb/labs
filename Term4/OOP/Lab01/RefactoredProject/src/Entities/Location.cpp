@@ -1,11 +1,12 @@
 #include "Location.hpp"
 
 #include <iostream>
+#include <fstream>
 
 namespace RefactoredProject {
 
     Location::Location(int id)
-        : DataBaseEntity(id)
+        : IDataBaseEntity(id)
         , m_NameLength(30)
         , m_Name("DefaultLocation")
         , m_Area(0.0f)

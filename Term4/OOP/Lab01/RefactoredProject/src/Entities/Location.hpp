@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "DataBase/DataBase.hpp"
+#include "DataBase/IDataBaseEntity.hpp"
 
 namespace RefactoredProject {
 
-    class Location : public DataBaseEntity {
+    class Location : public IDataBaseEntity {
     public:
         explicit Location(int id = -1);
         ~Location() noexcept override;
