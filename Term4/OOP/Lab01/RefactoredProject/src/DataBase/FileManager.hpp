@@ -17,8 +17,8 @@ namespace RefactoredProject {
         FileManager() = default;
         virtual ~FileManager() = default;
 
-        template <Entity T> T Get(uintmax_t pos) const;
         template <Entity T> std::vector<std::shared_ptr<T>> Get() const;
+        template <Entity T> T Get(uintmax_t pos) const;
 
         template <Entity T> void Update(const T& entity, uintmax_t position) const;
 
@@ -27,22 +27,6 @@ namespace RefactoredProject {
     private:
 
     };
-
-    template <Entity T>
-    T FileManager::Get(uintmax_t pos) const {
-        using TypeInfo::GetHash;
-        using TypeInfo::GetBinaryDataPath;
-
-        std::ifstream infile(GetBinaryDataPath(GetHash<T>()), std::fstream::in | std::fstream::binary);
-        T             entity;
-
-        infile.seekg(pos);
-        entity.ReadFromBinary(infile);
-
-        infile.close();
-
-        return entity;
-    }
 
     template <Entity T>
     std::vector<std::shared_ptr<T>> FileManager::Get() const {
@@ -67,6 +51,22 @@ namespace RefactoredProject {
         infile.close();
 
         return result;
+    }
+
+    template <Entity T>
+    T FileManager::Get(uintmax_t pos) const {
+        using TypeInfo::GetHash;
+        using TypeInfo::GetBinaryDataPath;
+
+        std::ifstream infile(GetBinaryDataPath(GetHash<T>()), std::fstream::in | std::fstream::binary);
+        T             entity;
+
+        infile.seekg(pos);
+        entity.ReadFromBinary(infile);
+
+        infile.close();
+
+        return entity;
     }
 
     template <Entity T>

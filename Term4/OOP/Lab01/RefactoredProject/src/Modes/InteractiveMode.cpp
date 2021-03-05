@@ -199,59 +199,59 @@ namespace RefactoredProject {
         namespace Monsters {
 
             void Create() {
-//                using AttackType = Monster::AttackType;
-//
-//                auto locations = DataBase::Get().SearchInFile<Location>([](const Location& location) {
-//                    return !location.IsFull();
-//                });
-//
-//                if (locations.empty()) {
-//                    std::cout << "No Location to add Monster! All Locations are full or there are no Location in file!";
-//                    return;
-//                }
-//
-//                int locationId;
-//
-//                for (const auto& location : locations)
-//                    std::cout << location << std::endl;
-//
-//                std::cout << "Enter monster locationId:" << std::endl;
-//                std::cin >> locationId;
-//
-//                auto [location, monster] = DataBase::Get().Create<Location, Monster>(locationId);
-//                std::string name;
-//                int         health;
-//                int         damage;
-//                float       attack;
-//                AttackType  attackType;
-//
-//                std::cout << "Enter monster name:" << std::endl;
-//                std::cin >> name;
-//
-//                std::cout << "Enter monster health:" << std::endl;
-//                std::cin >> health;
-//
-//                std::cout << "Enter monster damage:" << std::endl;
-//                std::cin >> damage;
-//
-//                std::cout << "Enter monster attack:" << std::endl;
-//                std::cin >> attack;
-//
-//                std::cout << "Enter monster attackType:" << std::endl;
-//                std::cin >> reinterpret_cast<int&>(attackType);
-//
-//                monster.SetName(name);
-//                monster.SetHealth(health);
-//                monster.SetDamage(damage);
-//                monster.SetAttack(attack);
-//                monster.SetAttackType(attackType);
-//                monster.SetLocationId(locationId);
-//
-//                location.IncreaseMonsters();
-//
-//                DataBase::Get().Update<Location>(location);
-//
-//                std::cout << "Monster " << monster.GetName() << " was successfully created!" << std::endl;
+                using AttackType = Monster::AttackType;
+
+                auto locations = DataBase::Get().SearchInFile<Location>([](const Location& location) {
+                    return !location.IsFull();
+                });
+
+                if (locations.empty()) {
+                    std::cout << "No Location to add Monster! All Locations are full or there are no Location in file!";
+                    return;
+                }
+
+                int locationId;
+
+                for (const auto& location : locations)
+                    std::cout << location << std::endl;
+
+                std::cout << "Enter monster locationId:" << std::endl;
+                std::cin >> locationId;
+
+                auto [location, monster] = DataBase::Get().Create<Location, Monster>(locationId);
+                std::string name;
+                int         health;
+                int         damage;
+                float       attack;
+                AttackType  attackType;
+
+                std::cout << "Enter monster name:" << std::endl;
+                std::cin >> name;
+
+                std::cout << "Enter monster health:" << std::endl;
+                std::cin >> health;
+
+                std::cout << "Enter monster damage:" << std::endl;
+                std::cin >> damage;
+
+                std::cout << "Enter monster attack:" << std::endl;
+                std::cin >> attack;
+
+                std::cout << "Enter monster attackType:" << std::endl;
+                std::cin >> reinterpret_cast<int&>(attackType);
+
+                monster.SetName(name);
+                monster.SetHealth(health);
+                monster.SetDamage(damage);
+                monster.SetAttack(attack);
+                monster.SetAttackType(attackType);
+                monster.SetLocationId(locationId);
+
+                location.IncreaseMonsters();
+
+                DataBase::Get().Update<Location>(location);
+
+                std::cout << "Monster " << monster.GetName() << " was successfully created!" << std::endl;
             }
 
             void CreateRandom() {

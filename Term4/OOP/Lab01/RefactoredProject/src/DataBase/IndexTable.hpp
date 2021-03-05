@@ -23,6 +23,7 @@ namespace RefactoredProject {
         template <Entity T> void Init();
 
         template <Entity T> [[nodiscard]] bool IsExists() const;
+        template <Entity T> [[nodiscard]] bool IsExists(int id) const;
 
         template <Entity T> [[nodiscard]] int GetNewId();
         template <Entity T> [[nodiscard]] std::optional<uintmax_t> GetPosition(int id) const;
@@ -68,6 +69,11 @@ namespace RefactoredProject {
     template <Entity T>
     bool IndexTable::IsExists() const {
         return m_Table.contains(TypeInfo::GetHash<T>());
+    }
+
+    template <Entity T>
+    bool IndexTable::IsExists(int id) const {
+        return GetPosition<T>(id);
     }
 
     template <Entity T>

@@ -12,7 +12,14 @@ namespace RefactoredProject {
     public:
         template <Entity T> void Init();
 
+        template <Entity T, Entity U>
+        void CreateRelation();
+
+        template <Entity T, Entity U>
+        void DeleteRelation();
+
         template <Entity T> T& Create();
+        template <Entity T, Entity U> std::pair<T, U&> Create(int tId);
 
         template <Entity T> T& GetFromMemory(int id);
         template <Entity T> T GetFromFile(int id) const;
@@ -26,8 +33,6 @@ namespace RefactoredProject {
         template <Entity T> void DeleteFromFile(int id);
         template <Entity T> void DeleteFromMemory();
         template <Entity T> void DeleteFromFile();
-
-        template <Entity T, Entity U> void SetOneToMany();
 
         template <Entity T> void Update(const T& entity);
 
@@ -57,9 +62,40 @@ namespace RefactoredProject {
         return m_IndexTable.Init<T>();
     }
 
+    template <Entity T, Entity U>
+    void DataBase_Impl::CreateRelation() {
+        return m_RelationTable.CreateRelation<T, U>();
+    }
+
+    template <Entity T, Entity U>
+    void DataBase_Impl::DeleteRelation() {
+        return m_RelationTable.DeleteRelation<T, U>();
+    }
+
     template <Entity T>
     T& DataBase_Impl::Create() {
         return m_MemoryManager.Create<T>(m_IndexTable.GetNewId<T>());
+    }
+
+    template <Entity T, Entity U>
+    std::pair<T, U&> DataBase_Impl::Create(int tId) {
+        if (!m_RelationTable.IsExists<T, U>()) {
+            throw std::invalid_argument(
+                "RefactoredProject::DataBase_Impl::Create: No relation from T to U!"
+            );
+        }
+
+        if (!m_IndexTable.IsExists<T>(tId)) {
+            throw std::invalid_argument(
+                "RefactoredProject::DataBase_Impl::Create: No entity by id = " + std::to_string(tId)
+            );
+        }
+
+        U& u = m_MemoryManager.Create<U>();
+
+        m_RelationTable.AddAccordance<T, U>(tId, u.GetId());
+
+        return { GetFromFile<T>(tId), u };
     }
 
     template <Entity T>
@@ -84,8 +120,6 @@ namespace RefactoredProject {
                 "RefactoredProject::DataBase_Impl::GetFromFile: No record by given id!"
             );
         }
-
-        std::cout << "Entity pos int file!!" << *entityPosition << std::endl;
 
         return m_FileManager.Get<T>(*entityPosition);
     }
@@ -145,11 +179,6 @@ namespace RefactoredProject {
     template <Entity T>
     void DataBase_Impl::DeleteFromFile() {
 
-    }
-
-    template <Entity T, Entity U>
-    void DataBase_Impl::SetOneToMany() {
-        m_RelationTable[{ TypeInfo::GetHash<T>(), TypeInfo::GetHash<U>() }];
     }
 
     template <Entity T>

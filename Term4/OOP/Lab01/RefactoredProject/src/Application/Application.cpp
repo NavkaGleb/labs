@@ -52,9 +52,9 @@ namespace RefactoredProject {
 
     Application_Impl::Application_Impl() {
         DataBase::Create();
+        DataBase::Get().CreateRelation<Location, Monster>();
         DataBase::Get().Init<Location>();
         DataBase::Get().Init<Monster>();
-        DataBase::Get().SetOneToMany<Location, Monster>();
     }
 
     Application_Impl::~Application_Impl() noexcept {
