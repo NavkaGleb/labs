@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IndexTable.hpp"
+#include "RelationTable.hpp"
 #include "MemoryManager.hpp"
 #include "FileManager.hpp"
 #include "Utility/Singleton.hpp"
@@ -38,19 +39,14 @@ namespace RefactoredProject {
         friend class FileManager;
 
     private:
-        using RelationTable  = std::map<std::pair<std::size_t, std::size_t>, std::map<int, std::vector<int>>>;
-
         DataBase_Impl();
         virtual ~DataBase_Impl() noexcept = default;
 
     private:
         IndexTable    m_IndexTable;
         RelationTable m_RelationTable;
-
         MemoryManager m_MemoryManager;
         FileManager   m_FileManager;
-
-        std::filesystem::path m_WorkingDirectory;
 
     }; // class DataBase_Impl
 
@@ -58,8 +54,7 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::Init() {
-        m_IndexTable.Init<T>();
-        m_IndexTable.Print();
+        return m_IndexTable.Init<T>();
     }
 
     template <Entity T>
