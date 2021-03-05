@@ -5,6 +5,7 @@
 #include <fstream>
 #include <filesystem>
 #include <memory>
+#include <iostream>
 
 #include "TypeInfo.hpp"
 #include "IDataBaseEntity.hpp"
@@ -45,11 +46,14 @@ namespace RefactoredProject {
 
     template <Entity T>
     std::vector<std::shared_ptr<T>> FileManager::Get() const {
-        std::vector<std::shared_ptr<T>> result;
-
         std::string   path = TypeInfo::GetBinaryDataPath(TypeInfo::GetHash<T>());
-        uintmax_t     size = std::filesystem::file_size(path);
         std::ifstream infile(path, std::fstream::in | std::fstream::binary);
+
+        if (!infile.is_open())
+            return {};
+
+        std::vector<std::shared_ptr<T>> result;
+        uintmax_t                       size = std::filesystem::file_size(path);
 
         for (T entity; true;) {
             entity.ReadFromBinary(infile);
@@ -67,13 +71,27 @@ namespace RefactoredProject {
 
     template <Entity T>
     void FileManager::Update(const T& entity, uintmax_t position) const {
-        using TypeInfo::GetHash;
-        using TypeInfo::GetBinaryDataPath;
+        std::string       path = TypeInfo::GetBinaryDataPath(TypeInfo::GetHash<T>());
+        uintmax_t         size = std::filesystem::file_size(path);
+        std::ifstream     infile(path, std::fstream::in | std::fstream::out);
+        std::vector<char> before;
+        std::vector<char> after;
 
-        std::ofstream outfile(GetBinaryDataPath(GetHash<T>()), std::fstream::out | std::fstream::binary);
+        before.resize(position);
+        infile.read(before.data(), before.size());
 
-        outfile.seekp(position);
+        infile.seekg(static_cast<intmax_t>(infile.tellg()) + T::GetBytesCount());
+
+        after.resize(size - infile.tellg());
+        infile.read(after.data(), after.size());
+
+        infile.close();
+
+        std::ofstream outfile(path, std::fstream::out | std::fstream::binary);
+
+        outfile.write(before.data(), before.size());
         entity.WriteToBinary(outfile);
+        outfile.write(after.data(), after.size());
 
         outfile.close();
     }

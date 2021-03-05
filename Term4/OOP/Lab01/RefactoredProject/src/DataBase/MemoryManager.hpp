@@ -81,11 +81,8 @@ namespace RefactoredProject {
 
     template <Entity T>
     std::vector<std::shared_ptr<T>> MemoryManager::Get() const {
-        if (!IsExists<T>()) {
-            throw std::range_error(
-                "RefactoredProject::MemoryManager: Don't exists such type" + std::string(typeid(T).name())
-            );
-        }
+        if (!IsExists<T>())
+            return {};
 
         std::vector<std::shared_ptr<T>> result;
 
@@ -136,6 +133,8 @@ namespace RefactoredProject {
         auto          hash = GetHash<T>();
         std::ofstream textFile(GetTextDataPath(hash),     std::fstream::out | std::fstream::app                       );
         std::ofstream binaryFile(GetBinaryDataPath(hash), std::fstream::out | std::fstream::app | std::fstream::binary);
+
+        binaryFile.seekp(std::filesystem::file_size(GetBinaryDataPath(hash)));
 
         for (auto& [id, entityData] : m_Entities[hash]) {
             if (entityData.IsInFile)

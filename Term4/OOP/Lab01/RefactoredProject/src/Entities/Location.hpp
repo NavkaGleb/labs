@@ -11,6 +11,8 @@ namespace RefactoredProject {
         explicit Location(int id = -1);
         ~Location() noexcept override;
 
+        static int GetBytesCount();
+
         [[nodiscard]] inline const std::string& GetName() const { return m_Name; }
         [[nodiscard]] inline float GetArea() const { return m_Area; }
         [[nodiscard]] inline int GetMonstersCount() const { return m_MonstersCount; }

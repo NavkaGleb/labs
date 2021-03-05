@@ -6,6 +6,7 @@
 #include <optional>
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 
 #include "TypeInfo.hpp"
 #include "IDataBaseEntity.hpp"
@@ -27,6 +28,8 @@ namespace RefactoredProject {
         template <Entity T> [[nodiscard]] std::optional<uintmax_t> GetPosition(int id) const;
 
         template <Entity T> void Push(const EntityData& entityData);
+
+        void Print() const;
 
     private:
         std::map<std::size_t, std::vector<EntityData>> m_Table;

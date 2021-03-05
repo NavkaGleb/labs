@@ -164,7 +164,7 @@ namespace RefactoredProject {
                 }
 
                 for (const auto& location : locations)
-                    std::cout << location << std::endl;
+                    std::cout << *location << std::endl;
 
                 int locationId;
 
@@ -175,6 +175,8 @@ namespace RefactoredProject {
                 std::string name;
                 float       area;
                 int         monstersMaxCount;
+
+                std::cout << "Get location: " << location << std::endl;
 
                 std::cout << "Enter location name:" << std::endl;
                 std::cin >> name;
@@ -389,7 +391,7 @@ namespace RefactoredProject {
     void InteractiveMode_Impl::ParseLocationsCommand() const {
         using namespace Internal::Locations;
         
-        switch (m_Command % 10) {
+        switch (m_Command % 20) {
             case 0:
                 Create();
                 break;
@@ -447,7 +449,7 @@ namespace RefactoredProject {
     void InteractiveMode_Impl::ParseMonstersCommand() const {
         using namespace Internal::Monsters;
 
-        switch (m_Command % 10) {
+        switch (m_Command % 20) {
             case 0:
                 Create();
                 break;

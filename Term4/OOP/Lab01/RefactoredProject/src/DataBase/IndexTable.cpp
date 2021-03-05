@@ -13,4 +13,15 @@ namespace RefactoredProject {
         }
     }
 
+    void IndexTable::Print() const {
+        std::cout << "Size: " << m_Table.size() << std::endl;
+        for (const auto& [hash, pairs] : m_Table) {
+            std::cout << "Pairs: " << pairs.size() << std::endl;
+            for (const auto& pair : pairs)
+                std::cout << pair.first << " -> " << pair.second << std::endl;
+
+            std::cout << std::endl;
+        }
+    }
+
 } // namespace RefactoredProject

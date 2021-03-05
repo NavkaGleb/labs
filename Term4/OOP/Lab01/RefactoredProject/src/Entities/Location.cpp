@@ -20,6 +20,19 @@ namespace RefactoredProject {
         std::cout << "Location dtor" << std::endl;
     }
 
+    int Location::GetBytesCount() {
+        int bytesCount = 0;
+
+        bytesCount += sizeof(int);   // m_Id;
+        bytesCount += sizeof(int);   // m_NameLength
+        bytesCount += 30;            // m_Name
+        bytesCount += sizeof(float); // m_Area
+        bytesCount += sizeof(int);   // m_MonstersCount
+        bytesCount += sizeof(int);   // m_MonstersMaxCount
+
+        return bytesCount;
+    }
+
     void Location::SetName(const std::string& name) {
         m_Name = name;
         m_Name.resize(m_NameLength);

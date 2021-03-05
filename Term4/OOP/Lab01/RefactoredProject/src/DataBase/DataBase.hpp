@@ -58,7 +58,8 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::Init() {
-        return m_IndexTable.Init<T>();
+        m_IndexTable.Init<T>();
+        m_IndexTable.Print();
     }
 
     template <Entity T>
@@ -79,6 +80,8 @@ namespace RefactoredProject {
             );
         }
 
+        m_IndexTable.Print();
+
         auto entityPosition = m_IndexTable.GetPosition<T>(id);
 
         if (!entityPosition.has_value()) {
@@ -86,6 +89,8 @@ namespace RefactoredProject {
                 "RefactoredProject::DataBase_Impl::GetFromFile: No record by given id!"
             );
         }
+
+        std::cout << "Entity pos int file!!" << *entityPosition << std::endl;
 
         return m_FileManager.Get<T>(*entityPosition);
     }
@@ -107,7 +112,8 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::Save() {
-        return m_MemoryManager.Save<T>();
+        m_MemoryManager.Save<T>();
+        m_IndexTable.Print();
     }
 
     template <Entity T>
@@ -153,9 +159,12 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::Update(const T& entity) {
-        m_MemoryManager.Update(entity);
+        if (m_MemoryManager.IsExists<T>(entity.GetId()))
+            m_MemoryManager.Update(entity);
 
         auto position = m_IndexTable.GetPosition<T>(entity.GetId());
+
+        std::cout << "position" << *position << std::endl;
 
         if (position.has_value())
             m_FileManager.Update(entity, *position);
