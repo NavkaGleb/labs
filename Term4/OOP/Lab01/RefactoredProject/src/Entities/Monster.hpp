@@ -19,6 +19,8 @@ namespace RefactoredProject {
         explicit Monster(int id = -1);
         ~Monster() noexcept override;
 
+        static int GetBytesCount();
+
         [[nodiscard]] inline const std::string& GetName() const { return m_Name; }
         [[nodiscard]] inline int GetHealth() const { return m_Health; }
         [[nodiscard]] inline int GetDamage() const { return m_Damage; }
@@ -40,6 +42,7 @@ namespace RefactoredProject {
         friend std::ostream& operator <<(std::ostream& ostream, const Monster& monster);
 
     private:
+        const int   m_NameLength;
         std::string m_Name;
         int         m_Health;
         int         m_Damage;

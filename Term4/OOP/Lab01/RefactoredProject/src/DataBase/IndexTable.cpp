@@ -16,6 +16,7 @@ namespace RefactoredProject {
     void IndexTable::Print() const {
         std::cout << "Size: " << m_Table.size() << std::endl;
         for (const auto& [hash, pairs] : m_Table) {
+            std::cout << "Hash: " << hash.GetHash() << std::endl;
             std::cout << "Pairs: " << pairs.size() << std::endl;
             for (const auto& pair : pairs)
                 std::cout << pair.first << " -> " << pair.second << std::endl;

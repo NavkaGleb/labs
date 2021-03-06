@@ -11,6 +11,9 @@ namespace RefactoredProject {
     }
 
     TypeInfo::TypeInfo(Handle&& handle)
-        : m_Handle(handle) {}
+        : m_Handle(handle) {
+
+        std::cout << "TypeInfo ctor" << std::endl;
+    }
 
 } // namespace RefactoredProject

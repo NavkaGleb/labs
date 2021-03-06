@@ -24,8 +24,8 @@ namespace RefactoredProject {
         template <Entity T> void Delete() const;
         template <Entity T> void Delete(int id) const;
 
-        template <TypeInfo& TypeInfo> void Delete() const;
-        template <TypeInfo& TypeInfo> void Delete(int id) const;
+        void Delete(const TypeInfo& typeInfo) const;
+        void Delete(const TypeInfo& typeInfo, int id) const;
 
         template <Entity T> void Update(const T& entity, uintmax_t position) const;
 
@@ -80,16 +80,6 @@ namespace RefactoredProject {
     }
 
     template <Entity T>
-    void FileManager::Delete(int id) const {
-
-    }
-
-    template <TypeInfo& TypeInfo>
-    void FileManager::Delete() const {
-
-    }
-
-    template <TypeInfo& TypeInfo>
     void FileManager::Delete(int id) const {
 
     }

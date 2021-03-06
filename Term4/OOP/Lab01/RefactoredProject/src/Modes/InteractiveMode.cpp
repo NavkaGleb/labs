@@ -225,7 +225,7 @@ namespace RefactoredProject {
                 int locationId;
 
                 for (const auto& location : locations)
-                    std::cout << location << std::endl;
+                    std::cout << *location << std::endl;
 
                 std::cout << "Enter monster locationId:" << std::endl;
                 std::cin >> locationId;
@@ -299,7 +299,7 @@ namespace RefactoredProject {
                 }
 
                 for (const auto& monster : monsters)
-                    std::cout << monster << std::endl;
+                    std::cout << *monster << std::endl;
             }
 
             void PrintFromFile() {
@@ -311,7 +311,7 @@ namespace RefactoredProject {
                 }
 
                 for (const auto& monster : monsters)
-                    std::cout << monster << std::endl;
+                    std::cout << *monster << std::endl;
             }
 
             void Load() {
@@ -352,22 +352,24 @@ namespace RefactoredProject {
         using std::cout;
         using std::endl;
 
-        cout << "Location commands                  | Monster commands                 " << endl;
-        cout << "00 - Create Location               | 20 - Create Monster              " << endl;
-        cout << "01 - Create 'n' random Locations   | 21 - Create 'n' random Monsters  " << endl;
-        cout << "02 - Print Locations from memory   | 22 - Print Monsters from memory  " << endl;
-        cout << "03 - Print Locations from file     | 23 - Print Monsters from file    " << endl;
-        cout << "04 - Load Locations                | 24 - Load Monsters               " << endl;
-        cout << "05 - Save Locations                | 25 - Save Monsters               " << endl;
+        cout << "Location commands                  | Monster commands                " << endl;
+        cout << "00 - Create Location               | 20 - Create Monster             " << endl;
+        cout << "01 - Create 'n' random Locations   | 21 - Create 'n' random Monsters " << endl;
+        cout << "02 - Print Locations from memory   | 22 - Print Monsters from memory " << endl;
+        cout << "03 - Print Locations from file     | 23 - Print Monsters from file   " << endl;
+        cout << "04 - Load Locations                | 24 - Load Monsters              " << endl;
+        cout << "05 - Save Locations                | 25 - Save Monsters              " << endl;
         cout << "06 - Delete Location from memory   | 26 - Delete Monster from memory " << endl;
         cout << "07 - Delete Location from file     | 27 - Delete Monster from file   " << endl;
         cout << "08 - Delete Locations from memory  | 28 - Delete Monsters from memory" << endl;
         cout << "09 - Delete Locations from file    | 29 - Delete Monsters from file  " << endl;
-        cout << "10 - Update Location in memory     | 30 - Update Monster in memory " << endl;
+        cout << "10 - Update Location in memory     | 30 - Update Monster in memory   " << endl;
         cout << "11 - Update Location in file       | 31 - Update Monster in file     " << endl;
         cout << "12 - Search Locations in memory    | 32 - Search Monsters in memory  " << endl;
         cout << "13 - Search Locations in file      | 33 - Search Monsters in file    " << endl;
-        cout << "40 - Exit                                                           :)" << endl;
+        cout << "40 - Exit                                                          :)" << endl;
+        cout << "60 - Print RelationTable                                             " << endl;
+        cout << "80 - Print IndexTable" << endl;
 
         std::cin >> m_Command;
     }
@@ -387,6 +389,13 @@ namespace RefactoredProject {
 
             case 2:
                 return false;
+
+            case 3:
+                DataBase::Get().PrintRelationTable();
+                break;
+
+            case 4:
+                DataBase::Get().PrintIndexTable();
 
             default:
                 std::cout << "No such command. Try again!" << std::endl;

@@ -6,19 +6,28 @@ namespace RefactoredProject {
 
     Monster::Monster(int id)
         : IDataBaseEntity(id)
+        , m_NameLength(30)
         , m_Name("MonsterDefault")
         , m_Health(0)
         , m_Damage(0)
         , m_Attack(0.0f)
         , m_AttackType(AttackType::None)
-        , m_LocationId(-1) {}
+        , m_LocationId(-1) {
+
+        m_Name.resize(m_NameLength);
+    }
 
     Monster::~Monster() noexcept {
         std::cout << "Monster dtor" << std::endl;
     }
 
+    int Monster::GetBytesCount() {
+        return 0;
+    }
+
     void Monster::SetName(const std::string& name) {
         m_Name = name;
+        m_Name.resize(m_NameLength);
     }
 
     void Monster::SetHealth(int health) {

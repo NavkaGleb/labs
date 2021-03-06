@@ -39,6 +39,9 @@ namespace RefactoredProject {
         template <Entity T> std::vector<std::shared_ptr<T>> SearchInMemory(SearchFunc<T> predicate) const;
         template <Entity T> std::vector<std::shared_ptr<T>> SearchInFile(SearchFunc<T> predicate) const;
 
+        void PrintRelationTable() const;
+        void PrintIndexTable() const;
+
         friend class Singleton<DataBase_Impl>;
         friend class MemoryManager;
         friend class FileManager;
@@ -176,18 +179,18 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::DeleteFromFile(int id) {
-//        if (m_RelationTable.IsMajor<T>()) {
-//            m_FileManager.Delete<T>(id);
-//
-//            auto toDelete = m_RelationTable.GetMinorIds<T>(id);
-//
-//            for (const auto& [typeInfo, idsToDelete] : toDelete) {
-//                for (const auto& idToDelete : idsToDelete) {
-//                    m_FileManager.Delete<typeInfo>(idToDelete);
-//                    m_MemoryManager.Delete<typeInfo>(idToDelete);
-//                }
-//            }
-//        }
+        if (m_RelationTable.IsMajor<T>()) {
+            m_FileManager.Delete<T>(id);
+
+            auto toDelete = m_RelationTable.GetMinorIds<T>(id);
+
+            for (const auto& [typeInfo, idsToDelete] : toDelete) {
+                for (const auto& idToDelete : idsToDelete) {
+                    m_FileManager.Delete(typeInfo, idToDelete);
+                    m_MemoryManager.Delete(typeInfo, idToDelete);
+                }
+            }
+        }
     }
 
     template <Entity T>

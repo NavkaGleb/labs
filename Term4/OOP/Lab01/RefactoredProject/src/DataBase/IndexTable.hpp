@@ -55,6 +55,7 @@ namespace RefactoredProject {
 
         for (EntityData entityData; true;) {
             infile.read(reinterpret_cast<char*>(&entityData), sizeof(entityData));
+
             m_Table[TypeInfo::Get<T>()].emplace_back(entityData);
 
             if (infile.tellg() == size)

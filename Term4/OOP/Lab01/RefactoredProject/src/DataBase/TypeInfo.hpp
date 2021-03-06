@@ -3,6 +3,7 @@
 #include <string>
 #include <typeinfo>
 #include <functional>
+#include <iostream>
 
 namespace RefactoredProject {
 
@@ -16,7 +17,8 @@ namespace RefactoredProject {
             }
         };
 
-        template <typename T> static TypeInfo Get();
+        template <typename T>
+        static TypeInfo Get();
 
         [[nodiscard]] inline std::size_t GetHash() const { return m_Handle.get().hash_code(); }
 
@@ -29,12 +31,11 @@ namespace RefactoredProject {
     private:
         Handle m_Handle;
 
-    }; // class Ref
+    }; // class TypeInfo
 
     template <typename T>
     TypeInfo TypeInfo::Get() {
         static TypeInfo typeInfo(typeid(T));
-
         return typeInfo;
     }
 
@@ -63,6 +64,10 @@ namespace RefactoredProject {
 
     inline std::string GetTextDataPath(std::size_t hash) {
         return "../media/DataBaseFiles/" + std::to_string(hash) + "Data.txt";
+    }
+
+    inline std::string GetRelationPath(std::size_t hash1, std::size_t hash2) {
+        return "../media/DataBaseFiles/" + std::to_string(hash1) + "_" + std::to_string(hash2) + "Relation.bin";
     }
 
 } // namespace RefactoredProject::TypeInfo

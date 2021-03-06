@@ -3,13 +3,12 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <filesystem>
 
 #include "TypeInfo.hpp"
 #include "IDataBaseEntity.hpp"
 
 namespace RefactoredProject {
-
-    // TODO: Save relation to the file!
 
     class RelationTable {
     public:
@@ -20,7 +19,9 @@ namespace RefactoredProject {
         using ConstIterator = Table::const_iterator;
 
         RelationTable() = default;
-        virtual ~RelationTable() = default;
+        virtual ~RelationTable() noexcept;
+
+        template <Entity T, Entity U> void Init();
 
         template <Entity T, Entity U> [[nodiscard]] bool IsExists() const;
         template <Entity T> [[nodiscard]] bool IsMajor() const;
@@ -40,10 +41,37 @@ namespace RefactoredProject {
         [[nodiscard]] inline ConstIterator begin() const noexcept { return m_Table.begin(); }
         [[nodiscard]] inline ConstIterator end() const noexcept { return m_Table.end(); }
 
+        void Print() const;
+
     private:
        Table m_Table;
 
     }; // class RelationTable
+
+    template <Entity T, Entity U>
+    void RelationTable::Init() {
+        Relation relation = { TypeInfo::Get<T>(), TypeInfo::Get<U>() };
+
+        std::ifstream infile(
+            GetRelationPath(relation.first.GetHash(), relation.second.GetHash()),
+            std::fstream::out | std::fstream::binary
+        );
+
+        int         majorId       = 0;
+        std::size_t minorIdsCount = 0;
+
+        infile.read(reinterpret_cast<char*>(&majorId), sizeof(majorId));
+        infile.read(reinterpret_cast<char*>(&minorIdsCount), sizeof(minorIdsCount));
+
+        auto& minorIds = m_Table[relation][majorId];
+
+        minorIds.resize(minorIdsCount);
+
+        for (int i = 0; i < minorIdsCount; ++i)
+            infile.read(reinterpret_cast<char*>(&minorIds[i]), sizeof(minorIds[i]));
+
+        infile.close();
+    }
 
     template <Entity T, Entity U>
     bool RelationTable::IsExists() const {
@@ -66,6 +94,9 @@ namespace RefactoredProject {
 
     template <Entity T, Entity U>
     void RelationTable::CreateRelation() {
+        if (std::filesystem::exists(GetRelationPath(TypeInfo::Get<T>().GetHash(), TypeInfo::Get<U>().GetHash())))
+            return Init<T, U>();
+
         m_Table[{ TypeInfo::Get<T>(), TypeInfo::Get<U>() }];
     }
 

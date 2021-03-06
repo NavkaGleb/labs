@@ -25,11 +25,11 @@ namespace RefactoredProject {
 
         template <Entity T> T& Create(int id);
 
-        template <TypeInfo& TypeInfo> [[nodiscard]] bool IsExists() const;
-        template <TypeInfo& TypeInfo> [[nodiscard]] bool IsExists(int id) const;
-        template <Entity T> bool IsExists() const;
-        template <Entity T> bool IsExists(int id) const;
-        template <Entity T> bool IsInFile(int id) const;
+        [[nodiscard]] bool IsExists(const TypeInfo& typeInfo) const;
+        [[nodiscard]] bool IsExists(const TypeInfo& typeInfo, int id) const;
+        template <Entity T> [[nodiscard]] bool IsExists() const;
+        template <Entity T> [[nodiscard]] bool IsExists(int id) const;
+        template <Entity T> [[nodiscard]] bool IsInFile(int id) const;
 
         template <Entity T> std::vector<std::shared_ptr<T>> Get() const;
         template <Entity T> T& Get(int id);
@@ -40,8 +40,8 @@ namespace RefactoredProject {
         template <Entity T> void Delete();
         template <Entity T> void Delete(int id);
 
-        template <TypeInfo& TypeInfo> void Delete();
-        template <TypeInfo& TypeInfo> void Delete(int id);
+        void Delete(const TypeInfo& typeInfo);
+        void Delete(const TypeInfo& typeInfo, int id);
 
         template <Entity T> void Update(const T& entity);
 
@@ -65,16 +65,6 @@ namespace RefactoredProject {
     template <Entity T>
     T& MemoryManager::Create(int id) {
         return *static_cast<T*>((m_Entities[TypeInfo::Get<T>()][id].Handle = std::make_shared<T>(id)).get());
-    }
-
-    template <TypeInfo& TypeInfo>
-    bool MemoryManager::IsExists() const {
-        return m_Entities.contains(TypeInfo);
-    }
-
-    template <TypeInfo& TypeInfo>
-    bool MemoryManager::IsExists(int id) const {
-        return IsExists<TypeInfo>() && m_Entities.at(TypeInfo).contains(id);
     }
 
     template <Entity T>
@@ -158,6 +148,8 @@ namespace RefactoredProject {
             entity.WriteToBinary(binaryFile);
         }
 
+        m_IndexTable.Print();
+
         textFile.close();
         binaryFile.close();
     }
@@ -176,22 +168,6 @@ namespace RefactoredProject {
             return;
 
         m_Entities[TypeInfo::Get<T>()].erase(id);
-    }
-
-    template <TypeInfo& TypeInfo>
-    void MemoryManager::Delete() {
-        if (!IsExists<TypeInfo>())
-            return;
-
-        m_Entities[TypeInfo].clear();
-    }
-
-    template <TypeInfo& TypeInfo>
-    void MemoryManager::Delete(int id) {
-        if (!IsExists<TypeInfo>(id))
-            return;
-
-        m_Entities[TypeInfo].erase(id);
     }
 
     template <Entity T>
