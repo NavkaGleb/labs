@@ -74,6 +74,12 @@ namespace RefactoredProject {
 
     template <Entity T>
     T& DataBase_Impl::Create() {
+        if (m_RelationTable.IsMinor<T>()) {
+            throw std::invalid_argument(
+                "RefactoredProject::DataBase_Impl::Create: Given type is depended from another!"
+            );
+        }
+
         return m_MemoryManager.Create<T>(m_IndexTable.GetNewId<T>());
     }
 
@@ -91,9 +97,9 @@ namespace RefactoredProject {
             );
         }
 
-        U& u = m_MemoryManager.Create<U>();
+        U& u = m_MemoryManager.Create<U>(m_IndexTable.GetNewId<U>());
 
-        m_RelationTable.AddAccordance<T, U>(tId, u.GetId());
+        m_RelationTable.CreateConnection<T, U>(tId, u.GetId());
 
         return { GetFromFile<T>(tId), u };
     }
@@ -141,34 +147,47 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::Save() {
-        m_MemoryManager.Save<T>();
-        m_IndexTable.Print();
+        return m_MemoryManager.Save<T>();
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromMemory(int id) {
-        if (m_MemoryManager.IsInFile<T>(id))
-            return m_MemoryManager.Delete<T>(id);
-
-        for (auto& [relation, connections] : m_RelationTable) {
-            if (relation.first == TypeInfo::GetHash<T>()) {
-                for (auto& [mainId, dependedIds] : connections)
-                    for (const auto& dependedId : dependedIds)
-                        m_MemoryManager.Delete(dependedId, relation.second);
-
-                m_MemoryManager.Delete<T>(id);
-                connections.clear();
-            }
-
-            if (relation.second == TypeInfo::GetHash<T>()) {
-                m_MemoryManager.Delete<T>(id);
-            }
-        }
+//        if (m_MemoryManager.IsInFile<T>(id))
+//            return m_MemoryManager.Delete<T>(id);
+//
+//        for (auto& [relation, connections] : m_RelationTable) {
+//            if (relation.first == TypeInfo::GetHash<T>()) {
+//                for (auto& [mainId, dependedIds] : connections) {
+//                    for (const auto& dependedId : dependedIds) {
+////                        auto hash = relation.second;
+////                        m_MemoryManager.Delete<hash>(dependedId);
+//                    }
+//                }
+//
+//                m_MemoryManager.Delete<T>(id);
+//                connections.clear();
+//            }
+//
+//            if (relation.second == TypeInfo::GetHash<T>()) {
+//                m_MemoryManager.Delete<T>(id);
+//            }
+//        }
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromFile(int id) {
-
+//        if (m_RelationTable.IsMajor<T>()) {
+//            m_FileManager.Delete<T>(id);
+//
+//            auto toDelete = m_RelationTable.GetMinorIds<T>(id);
+//
+//            for (const auto& [typeInfo, idsToDelete] : toDelete) {
+//                for (const auto& idToDelete : idsToDelete) {
+//                    m_FileManager.Delete<typeInfo>(idToDelete);
+//                    m_MemoryManager.Delete<typeInfo>(idToDelete);
+//                }
+//            }
+//        }
     }
 
     template <Entity T>

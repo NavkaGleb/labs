@@ -33,14 +33,14 @@ namespace RefactoredProject {
         void Print() const;
 
     private:
-        std::map<std::size_t, std::vector<EntityData>> m_Table;
-        std::map<std::size_t, int>                     m_Ids;
+        std::map<TypeInfo, std::vector<EntityData>> m_Table;
+        std::map<TypeInfo, int>                     m_Ids;
 
     }; // namespace IndexTable
 
     template <Entity T>
     void IndexTable::Init() {
-        std::string   path = TypeInfo::GetIndexTablePath(TypeInfo::GetHash<T>());
+        std::string   path = GetIndexTablePath<T>();
         std::ifstream infile(path, std::fstream::in | std::fstream::binary | std::fstream::app);
 
         if (!infile.is_open())
@@ -49,36 +49,36 @@ namespace RefactoredProject {
         uintmax_t size = std::filesystem::file_size(path);
 
         if (size == 0) {
-            m_Ids[TypeInfo::GetHash<T>()] = -1;
+            m_Ids[TypeInfo::Get<T>()] = -1;
             return;
         }
 
         for (EntityData entityData; true;) {
             infile.read(reinterpret_cast<char*>(&entityData), sizeof(entityData));
-            m_Table[TypeInfo::GetHash<T>()].emplace_back(entityData);
+            m_Table[TypeInfo::Get<T>()].emplace_back(entityData);
 
             if (infile.tellg() == size)
                 break;
         }
 
-        m_Ids[TypeInfo::GetHash<T>()] = m_Table[TypeInfo::GetHash<T>()].back().first;
+        m_Ids[TypeInfo::Get<T>()] = m_Table[TypeInfo::Get<T>()].back().first;
 
         infile.close();
     }
 
     template <Entity T>
     bool IndexTable::IsExists() const {
-        return m_Table.contains(TypeInfo::GetHash<T>());
+        return m_Table.contains(TypeInfo::Get<T>());
     }
 
     template <Entity T>
     bool IndexTable::IsExists(int id) const {
-        return GetPosition<T>(id);
+        return GetPosition<T>(id).has_value();
     }
 
     template <Entity T>
     int IndexTable::GetNewId() {
-        return ++m_Ids[TypeInfo::GetHash<T>()];
+        return ++m_Ids[TypeInfo::Get<T>()];
     }
 
     template <Entity T>
@@ -86,8 +86,8 @@ namespace RefactoredProject {
         auto* entityData = static_cast<EntityData*>(
             std::bsearch(
                 &id,
-                m_Table.at(TypeInfo::GetHash<T>()).data(),
-                m_Table.at(TypeInfo::GetHash<T>()).size(),
+                m_Table.at(TypeInfo::Get<T>()).data(),
+                m_Table.at(TypeInfo::Get<T>()).size(),
                 sizeof(EntityData),
                 [](const void* lhs, const void* rhs) {
                     const auto& left  = *static_cast<const EntityData*>(lhs);
@@ -109,7 +109,7 @@ namespace RefactoredProject {
 
     template <Entity T>
     void IndexTable::Push(const EntityData& entityData) {
-        m_Table[TypeInfo::GetHash<T>()].emplace_back(entityData);
+        m_Table[TypeInfo::Get<T>()].emplace_back(entityData);
     }
 
 } // namespace RefactoredProject

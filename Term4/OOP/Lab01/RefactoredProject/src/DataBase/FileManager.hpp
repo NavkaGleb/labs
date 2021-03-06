@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <memory>
 #include <iostream>
+#include <unordered_set>
 
 #include "TypeInfo.hpp"
 #include "IDataBaseEntity.hpp"
@@ -20,17 +21,24 @@ namespace RefactoredProject {
         template <Entity T> std::vector<std::shared_ptr<T>> Get() const;
         template <Entity T> T Get(uintmax_t pos) const;
 
+        template <Entity T> void Delete() const;
+        template <Entity T> void Delete(int id) const;
+
+        template <TypeInfo& TypeInfo> void Delete() const;
+        template <TypeInfo& TypeInfo> void Delete(int id) const;
+
         template <Entity T> void Update(const T& entity, uintmax_t position) const;
 
-        template <Entity T> std::vector<std::shared_ptr<T>> Search(SearchFunc<T> predicate);
+        template <Entity T> std::vector<std::shared_ptr<T>> Search(SearchFunc<T> predicate) const;
 
     private:
+        std::unordered_set<int> m_DeletedEntities;
 
-    };
+    }; // class FileManager
 
     template <Entity T>
     std::vector<std::shared_ptr<T>> FileManager::Get() const {
-        std::string   path = TypeInfo::GetBinaryDataPath(TypeInfo::GetHash<T>());
+        std::string   path = GetBinaryDataPath<T>();
         std::ifstream infile(path, std::fstream::in | std::fstream::binary);
 
         if (!infile.is_open())
@@ -55,10 +63,7 @@ namespace RefactoredProject {
 
     template <Entity T>
     T FileManager::Get(uintmax_t pos) const {
-        using TypeInfo::GetHash;
-        using TypeInfo::GetBinaryDataPath;
-
-        std::ifstream infile(GetBinaryDataPath(GetHash<T>()), std::fstream::in | std::fstream::binary);
+        std::ifstream infile(GetBinaryDataPath<T>(), std::fstream::in | std::fstream::binary);
         T             entity;
 
         infile.seekg(pos);
@@ -70,8 +75,28 @@ namespace RefactoredProject {
     }
 
     template <Entity T>
+    void FileManager::Delete() const {
+
+    }
+
+    template <Entity T>
+    void FileManager::Delete(int id) const {
+
+    }
+
+    template <TypeInfo& TypeInfo>
+    void FileManager::Delete() const {
+
+    }
+
+    template <TypeInfo& TypeInfo>
+    void FileManager::Delete(int id) const {
+
+    }
+
+    template <Entity T>
     void FileManager::Update(const T& entity, uintmax_t position) const {
-        std::string       path = TypeInfo::GetBinaryDataPath(TypeInfo::GetHash<T>());
+        std::string       path = GetBinaryDataPath<T>();
         uintmax_t         size = std::filesystem::file_size(path);
         std::ifstream     infile(path, std::fstream::in | std::fstream::out);
         std::vector<char> before;
@@ -97,10 +122,10 @@ namespace RefactoredProject {
     }
 
     template <Entity T>
-    std::vector<std::shared_ptr<T>> FileManager::Search(SearchFunc<T> predicate) {
+    std::vector<std::shared_ptr<T>> FileManager::Search(SearchFunc<T> predicate) const {
         std::vector<std::shared_ptr<T>> result;
 
-        std::string   path = TypeInfo::GetBinaryDataPath(TypeInfo::GetHash<T>());
+        std::string   path = GetBinaryDataPath<T>();
         uintmax_t     size = std::filesystem::file_size(path);
         std::ifstream infile(path, std::fstream::in | std::fstream::binary);
 

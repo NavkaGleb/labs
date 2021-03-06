@@ -25,8 +25,8 @@ namespace RefactoredProject {
 
         template <Entity T> T& Create(int id);
 
-        bool IsExists(std::size_t hash) const;
-        bool IsExists(int id, std::size_t hash) const;
+        template <TypeInfo& TypeInfo> [[nodiscard]] bool IsExists() const;
+        template <TypeInfo& TypeInfo> [[nodiscard]] bool IsExists(int id) const;
         template <Entity T> bool IsExists() const;
         template <Entity T> bool IsExists(int id) const;
         template <Entity T> bool IsInFile(int id) const;
@@ -37,10 +37,11 @@ namespace RefactoredProject {
         template <Entity T> void Load();
         template <Entity T> void Save();
 
-        void Delete(std::size_t hash);
-        void Delete(int id, std::size_t hash);
         template <Entity T> void Delete();
         template <Entity T> void Delete(int id);
+
+        template <TypeInfo& TypeInfo> void Delete();
+        template <TypeInfo& TypeInfo> void Delete(int id);
 
         template <Entity T> void Update(const T& entity);
 
@@ -53,30 +54,42 @@ namespace RefactoredProject {
 
         }; // struct EntityData
 
+        using EntityContainer = std::map<TypeInfo, std::map<int, EntityData>>;
+
     private:
-        IndexTable&                                                m_IndexTable;
-        std::unordered_map<std::size_t, std::map<int, EntityData>> m_Entities;
+        IndexTable&     m_IndexTable;
+        EntityContainer m_Entities;
 
     }; // class MemoryManger
 
     template <Entity T>
     T& MemoryManager::Create(int id) {
-        return *static_cast<T*>((m_Entities[TypeInfo::GetHash<T>()][id].Handle = std::make_shared<T>(id)).get());
+        return *static_cast<T*>((m_Entities[TypeInfo::Get<T>()][id].Handle = std::make_shared<T>(id)).get());
+    }
+
+    template <TypeInfo& TypeInfo>
+    bool MemoryManager::IsExists() const {
+        return m_Entities.contains(TypeInfo);
+    }
+
+    template <TypeInfo& TypeInfo>
+    bool MemoryManager::IsExists(int id) const {
+        return IsExists<TypeInfo>() && m_Entities.at(TypeInfo).contains(id);
     }
 
     template <Entity T>
     bool MemoryManager::IsExists() const {
-        return m_Entities.contains(TypeInfo::GetHash<T>());
+        return m_Entities.contains(TypeInfo::Get<T>());
     }
 
     template <Entity T>
     bool MemoryManager::IsExists(int id) const {
-        return m_Entities.contains(TypeInfo::GetHash<T>()) && m_Entities.at(TypeInfo::GetHash<T>()).contains(id);
+        return m_Entities.contains(TypeInfo::Get<T>()) && m_Entities.at(TypeInfo::Get<T>()).contains(id);
     }
 
     template <Entity T>
     bool MemoryManager::IsInFile(int id) const {
-        return IsExists<T>(id) && m_Entities.at(TypeInfo::GetHash<T>()).at(id).IsInFile;
+        return IsExists<T>(id) && m_Entities.at(TypeInfo::Get<T>()).at(id).IsInFile;
     }
 
     template <Entity T>
@@ -86,7 +99,7 @@ namespace RefactoredProject {
 
         std::vector<std::shared_ptr<T>> result;
 
-        for (const auto& [id, entityData] : m_Entities.at(TypeInfo::GetHash<T>()))
+        for (const auto& [id, entityData] : m_Entities.at(TypeInfo::Get<T>()))
             result.emplace_back(std::static_pointer_cast<T>(entityData.Handle));
 
         return result;
@@ -95,15 +108,14 @@ namespace RefactoredProject {
     template <Entity T>
     T& MemoryManager::Get(int id) {
         if (IsExists<T>(id))
-            return *static_cast<T*>(m_Entities[TypeInfo::GetHash<T>()][id].Handle.get());
+            return *static_cast<T*>(m_Entities[TypeInfo::Get<T>()][id].Handle.get());
 
         throw std::range_error("RefactoredProject::MemoryManager: Don't exists record with id = " + std::to_string(id));
     }
 
     template <Entity T>
     void MemoryManager::Load() {
-        auto          hash = TypeInfo::GetHash<T>();
-        auto          path = TypeInfo::GetBinaryDataPath(hash);
+        auto          path = GetBinaryDataPath<T>();
         auto          size = std::filesystem::file_size(path);
         std::ifstream file(path, std::fstream::in | std::fstream::binary);
 
@@ -111,7 +123,7 @@ namespace RefactoredProject {
             entity.ReadFromBinary(file);
 
             if (!IsExists<T>(entity.GetId())) {
-                auto& entityData    = m_Entities[hash][entity.GetId()];
+                auto& entityData    = m_Entities[TypeInfo::Get<T>()][entity.GetId()];
                 entityData.Handle   = std::make_shared<T>(std::move(entity));
                 entityData.IsInFile = true;
             }
@@ -125,18 +137,15 @@ namespace RefactoredProject {
 
     template <Entity T>
     void MemoryManager::Save() {
-        using namespace TypeInfo;
-
         if (!IsExists<T>())
             return;
 
-        auto          hash = GetHash<T>();
-        std::ofstream textFile(GetTextDataPath(hash),     std::fstream::out | std::fstream::app                       );
-        std::ofstream binaryFile(GetBinaryDataPath(hash), std::fstream::out | std::fstream::app | std::fstream::binary);
+        std::ofstream textFile(GetTextDataPath<T>(),     std::fstream::out | std::fstream::app                       );
+        std::ofstream binaryFile(GetBinaryDataPath<T>(), std::fstream::out | std::fstream::app | std::fstream::binary);
 
-        binaryFile.seekp(std::filesystem::file_size(GetBinaryDataPath(hash)));
+        binaryFile.seekp(std::filesystem::file_size(GetBinaryDataPath<T>()));
 
-        for (auto& [id, entityData] : m_Entities[hash]) {
+        for (auto& [id, entityData] : m_Entities[TypeInfo::Get<T>()]) {
             if (entityData.IsInFile)
                 continue;
 
@@ -158,7 +167,7 @@ namespace RefactoredProject {
         if (!IsExists<T>())
             return;
 
-        m_Entities[TypeInfo::GetHash<T>()].clear();
+        m_Entities[TypeInfo::Get<T>()].clear();
     }
 
     template <Entity T>
@@ -166,12 +175,28 @@ namespace RefactoredProject {
         if (!IsExists<T>(id))
             return;
 
-        m_Entities[TypeInfo::GetHash<T>()].erase(id);
+        m_Entities[TypeInfo::Get<T>()].erase(id);
+    }
+
+    template <TypeInfo& TypeInfo>
+    void MemoryManager::Delete() {
+        if (!IsExists<TypeInfo>())
+            return;
+
+        m_Entities[TypeInfo].clear();
+    }
+
+    template <TypeInfo& TypeInfo>
+    void MemoryManager::Delete(int id) {
+        if (!IsExists<TypeInfo>(id))
+            return;
+
+        m_Entities[TypeInfo].erase(id);
     }
 
     template <Entity T>
     void MemoryManager::Update(const T& entity) {
-        m_Entities[TypeInfo::GetHash<T>()][entity.GetId()].Handle = std::make_shared<T>(entity);
+        m_Entities[TypeInfo::Get<T>()][entity.GetId()].Handle = std::make_shared<T>(entity);
     }
 
     template <Entity T>
@@ -181,7 +206,7 @@ namespace RefactoredProject {
 
         std::vector<std::shared_ptr<T>> result;
 
-        for (auto& [id, entityData] : m_Entities[TypeInfo::GetHash<T>()]) {
+        for (auto& [id, entityData] : m_Entities[TypeInfo::Get<T>()]) {
             auto& entity = static_cast<std::shared_ptr<T>>(entityData.Handle);
 
             if (predicate(entity))

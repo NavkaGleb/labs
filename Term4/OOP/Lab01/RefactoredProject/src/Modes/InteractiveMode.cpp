@@ -114,8 +114,20 @@ namespace RefactoredProject {
             }
 
             void DeleteFromFile(bool single = false) {
-                DataBase::Get().DeleteFromFile<Location>();
-                std::cout << "Locations was successfully deleted from file!" << std::endl;
+                if (single) {
+                    int locationId = -1;
+
+                    PrintFromFile();
+
+                    std::cout << "Enter locationId:" << std::endl;
+                    std::cin >> locationId;
+
+                    DataBase::Get().DeleteFromFile<Location>(locationId);
+
+                } else {
+                    DataBase::Get().DeleteFromFile<Location>();
+                    std::cout << "Locations was successfully deleted from file!" << std::endl;
+                }
             }
 
             void UpdateInMemory() {
@@ -319,8 +331,6 @@ namespace RefactoredProject {
 
             void DeleteFromFile() {
                 DataBase::Get().DeleteFromFile<Monster>();
-
-
 
                 std::cout << "Monsters was successfully deleted from file" << std::endl;
             }
