@@ -81,11 +81,9 @@ namespace RefactoredProject {
     }
 
     void Location::WriteToBinary(std::ofstream& outfile) const {
-        std::size_t nameLength = m_Name.capacity();
-
         outfile.write((char*)&m_Id, sizeof(m_Id));
         outfile.write((char*)&m_NameLength, sizeof(m_NameLength));
-        outfile.write((char*)m_Name.c_str(), nameLength);
+        outfile.write((char*)m_Name.c_str(), m_NameLength);
         outfile.write((char*)&m_Area, sizeof(m_Area));
         outfile.write((char*)&m_MonstersCount, sizeof(m_MonstersCount));
         outfile.write((char*)&m_MonstersMaxCount, sizeof(m_MonstersMaxCount));

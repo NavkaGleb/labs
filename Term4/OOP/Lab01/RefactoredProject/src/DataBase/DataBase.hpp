@@ -184,10 +184,12 @@ namespace RefactoredProject {
 
             auto toDelete = m_RelationTable.GetMinorIds<T>(id);
 
-            for (const auto& [typeInfo, idsToDelete] : toDelete) {
-                for (const auto& idToDelete : idsToDelete) {
-                    m_FileManager.Delete(typeInfo, idToDelete);
-                    m_MemoryManager.Delete(typeInfo, idToDelete);
+            for (const auto& [typeInfo, minorIds] : toDelete) {
+                m_RelationTable.DeleteMajor({ TypeInfo::Get<T>(), typeInfo }, id);
+
+                for (const auto& minorId : minorIds) {
+                    m_FileManager.Delete(typeInfo, minorId);
+                    m_MemoryManager.Delete(typeInfo, minorId);
                 }
             }
         }
@@ -209,8 +211,6 @@ namespace RefactoredProject {
             m_MemoryManager.Update(entity);
 
         auto position = m_IndexTable.GetPosition<T>(entity.GetId());
-
-        std::cout << "position" << *position << std::endl;
 
         if (position.has_value())
             m_FileManager.Update(entity, *position);

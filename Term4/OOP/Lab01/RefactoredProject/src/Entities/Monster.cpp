@@ -22,10 +22,26 @@ namespace RefactoredProject {
     }
 
     int Monster::GetBytesCount() {
-        return 0;
+        int bytesCount = 0;
+
+        bytesCount += sizeof(int);        // m_Id;
+        bytesCount += sizeof(int);        // m_NameLength
+        bytesCount += 30;                 // m_Name
+        bytesCount += sizeof(int);        // m_Health
+        bytesCount += sizeof(int);        // m_Damage
+        bytesCount += sizeof(float);      // m_Attack
+        bytesCount += sizeof(AttackType); // m_AttackType
+        bytesCount += sizeof(int);        // m_LocationId
+
+        return bytesCount;
     }
 
     void Monster::SetName(const std::string& name) {
+        m_Name = name;
+        m_Name.resize(m_NameLength);
+    }
+
+    void Monster::SetName(std::string&& name) {
         m_Name = name;
         m_Name.resize(m_NameLength);
     }
@@ -48,6 +64,28 @@ namespace RefactoredProject {
 
     void Monster::SetLocationId(int locationId) {
         m_LocationId = locationId;
+    }
+
+    void Monster::ReadFromBinary(std::ifstream& infile) {
+        infile.read((char*)&m_Id, sizeof(m_Id));
+        infile.read((char*)&m_NameLength, sizeof(m_NameLength));
+        infile.read((char*)m_Name.c_str(), m_NameLength);
+        infile.read((char*)&m_Health, sizeof(m_Health));
+        infile.read((char*)&m_Damage, sizeof(m_Damage));
+        infile.read((char*)&m_Attack, sizeof(m_Attack));
+        infile.read((char*)&m_AttackType, sizeof(m_AttackType));
+        infile.read((char*)&m_LocationId, sizeof(m_LocationId));
+    }
+
+    void Monster::WriteToBinary(std::ofstream& outfile) const {
+        outfile.write((const char*)&m_Id, sizeof(m_Id));
+        outfile.write((const char*)&m_NameLength, sizeof(m_NameLength));
+        outfile.write((const char*)m_Name.c_str(), m_NameLength);
+        outfile.write((const char*)&m_Health, sizeof(m_Health));
+        outfile.write((const char*)&m_Damage, sizeof(m_Damage));
+        outfile.write((const char*)&m_Attack, sizeof(m_Attack));
+        outfile.write((const char*)&m_AttackType, sizeof(m_AttackType));
+        outfile.write((const char*)&m_LocationId, sizeof(m_LocationId));
     }
 
     std::istream& operator >>(std::istream& istream, Monster& monster) {

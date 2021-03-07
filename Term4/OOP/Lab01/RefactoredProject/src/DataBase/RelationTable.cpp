@@ -23,6 +23,26 @@ namespace RefactoredProject {
         }
     }
 
+    bool RelationTable::IsExists(const Relation& relation) const {
+        return m_Table.contains(relation);
+    }
+
+    void RelationTable::DeleteMajor(const Relation& relation, int id) {
+        if (!IsExists(relation))
+            return;
+
+        m_Table[relation].erase(id);
+    }
+
+    void RelationTable::DeleteMinor(const Relation& relation, int majorId, int minorId) {
+        if (!IsExists(relation))
+            return;
+
+        auto& minorIds = m_Table[relation][majorId];
+
+        minorIds.erase(std::find(minorIds.begin(), minorIds.end(), minorId));
+    }
+
     void RelationTable::Print() const {
         for (const auto& [relation, connections] : m_Table) {
             std::cout << "Relation: " << relation.first.GetHash() << " -> " << relation.second.GetHash() << std::endl;

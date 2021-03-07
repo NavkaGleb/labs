@@ -29,14 +29,15 @@ namespace RefactoredProject {
         [[nodiscard]] inline int GetLocationId() const { return m_LocationId; }
 
         void SetName(const std::string& name);
+        void SetName(std::string&& name);
         void SetHealth(int health);
         void SetDamage(int damage);
         void SetAttack(float attack);
         void SetAttackType(const AttackType& attackType);
         void SetLocationId(int locationId);
 
-        void ReadFromBinary(std::ifstream& infile) override {}
-        void WriteToBinary(std::ofstream& outfile) const override {}
+        void ReadFromBinary(std::ifstream& infile) override;
+        void WriteToBinary(std::ofstream& outfile) const override;
 
         friend std::istream& operator >>(std::istream& istream, Monster& monster);
         friend std::ostream& operator <<(std::ostream& ostream, const Monster& monster);

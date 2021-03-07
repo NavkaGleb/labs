@@ -24,8 +24,13 @@ namespace RefactoredProject {
         template <Entity T, Entity U> void Init();
 
         template <Entity T, Entity U> [[nodiscard]] bool IsExists() const;
+        [[nodiscard]] bool IsExists(const Relation& relation) const;
+
         template <Entity T> [[nodiscard]] bool IsMajor() const;
         template <Entity T> [[nodiscard]] bool IsMinor() const;
+
+        void DeleteMajor(const Relation& relation, int id);
+        void DeleteMinor(const Relation& relation, int majorId, int minorId);
 
         template <Entity T, Entity U> void CreateRelation();
         template <Entity T, Entity U> void DeleteRelation();
