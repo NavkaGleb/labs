@@ -15,26 +15,43 @@ namespace RefactoredProject {
 
     class IndexTable {
     public:
-        using EntityData = std::pair<int, uintmax_t>;
+        struct EntityData {
+            int       Id        = -1;
+            uintmax_t Position  = 0;
+            bool      IsDeleted = false;
+        };
+
+        using EntityDataContainer = std::vector<EntityData>;
 
         IndexTable() = default;
         virtual ~IndexTable();
 
         template <Entity T> void Init();
 
-        template <Entity T> [[nodiscard]] bool IsExists() const;
-        template <Entity T> [[nodiscard]] bool IsExists(int id) const;
+        [[nodiscard]] bool IsExists(const TypeInfo& typeInfo) const;
+        [[nodiscard]] bool IsExists(const TypeInfo& typeInfo, int id) const;
 
-        template <Entity T> [[nodiscard]] int GetNewId();
-        template <Entity T> [[nodiscard]] std::optional<uintmax_t> GetPosition(int id) const;
+        [[nodiscard]] int GetNewId(const TypeInfo& typeInfo);
+        [[nodiscard]] std::optional<uintmax_t> GetPosition(const TypeInfo& typeInfo, int id) const;
 
-        template <Entity T> void Push(const EntityData& entityData);
+        [[nodiscard]] inline int GetBytesCount(const TypeInfo& typeInfo) const { return m_BytesCount.at(typeInfo); }
+
+        [[nodiscard]] EntityDataContainer& GetData(const TypeInfo& typeInfo) { return m_Table[typeInfo]; }
+        [[nodiscard]] const EntityDataContainer& GetData(const TypeInfo& typeInfo) const { return m_Table.at(typeInfo); }
+
+        template <Entity T> void SetIsDeleted(int id, bool isDeleted);
+
+        template <Entity T> void Push(int id, uintmax_t position);
 
         void Print() const;
 
     private:
-        std::map<TypeInfo, std::vector<EntityData>> m_Table;
-        std::map<TypeInfo, int>                     m_Ids;
+        [[nodiscard]] EntityData* GetEntityData(const TypeInfo& typeInfo, int id) const;
+
+    private:
+        std::map<TypeInfo, EntityDataContainer> m_Table;
+        std::map<TypeInfo, int>                 m_Ids;
+        std::map<TypeInfo, int>                 m_BytesCount;
 
     }; // namespace IndexTable
 
@@ -62,55 +79,25 @@ namespace RefactoredProject {
                 break;
         }
 
-        m_Ids[TypeInfo::Get<T>()] = m_Table[TypeInfo::Get<T>()].back().first;
+        m_Ids[TypeInfo::Get<T>()]        = m_Table[TypeInfo::Get<T>()].back().Id;
+        m_BytesCount[TypeInfo::Get<T>()] = T::GetBytesCount();
 
         infile.close();
     }
 
+
+
     template <Entity T>
-    bool IndexTable::IsExists() const {
-        return m_Table.contains(TypeInfo::Get<T>());
+    void IndexTable::SetIsDeleted(int id, bool isDeleted) {
+        auto* entityData = GetEntityData(TypeInfo::Get<T>(), id);
+
+        if (entityData)
+            entityData->IsDeleted = isDeleted;
     }
 
     template <Entity T>
-    bool IndexTable::IsExists(int id) const {
-        return GetPosition<T>(id).has_value();
-    }
-
-    template <Entity T>
-    int IndexTable::GetNewId() {
-        return ++m_Ids[TypeInfo::Get<T>()];
-    }
-
-    template <Entity T>
-    std::optional<uintmax_t> IndexTable::GetPosition(int id) const {
-        auto* entityData = static_cast<EntityData*>(
-            std::bsearch(
-                &id,
-                m_Table.at(TypeInfo::Get<T>()).data(),
-                m_Table.at(TypeInfo::Get<T>()).size(),
-                sizeof(EntityData),
-                [](const void* lhs, const void* rhs) {
-                    const auto& left  = *static_cast<const EntityData*>(lhs);
-                    const auto& right = *static_cast<const EntityData*>(rhs);
-
-                    if (left.first < right.first)
-                        return -1;
-
-                    if (left.first > right.first)
-                        return 1;
-
-                    return 0;
-                }
-            )
-        );
-
-        return !entityData ? std::nullopt : std::optional(entityData->second);
-    }
-
-    template <Entity T>
-    void IndexTable::Push(const EntityData& entityData) {
-        m_Table[TypeInfo::Get<T>()].emplace_back(entityData);
+    void IndexTable::Push(int id, uintmax_t position) {
+        m_Table[TypeInfo::Get<T>()].emplace_back(id, position);
     }
 
 } // namespace RefactoredProject

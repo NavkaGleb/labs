@@ -142,7 +142,7 @@ namespace RefactoredProject {
             T& entity             = *static_cast<T*>(entityData.Handle.get());
             entityData.IsInFile   = true;
 
-            m_IndexTable.Push<T>({ entity.GetId(), binaryFile.tellp() });
+            m_IndexTable.Push<T>(entity.GetId(), binaryFile.tellp());
 
             textFile << entity << std::endl;
             entity.WriteToBinary(binaryFile);

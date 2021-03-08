@@ -12,11 +12,8 @@ namespace RefactoredProject {
     public:
         template <Entity T> void Init();
 
-        template <Entity T, Entity U>
-        void CreateRelation();
-
-        template <Entity T, Entity U>
-        void DeleteRelation();
+        template <Entity T, Entity U> void CreateRelation();
+        template <Entity T, Entity U> void DeleteRelation();
 
         template <Entity T> T& Create();
         template <Entity T, Entity U> std::pair<T, U&> Create(int tId);
@@ -34,6 +31,8 @@ namespace RefactoredProject {
         template <Entity T> void DeleteFromMemory();
         template <Entity T> void DeleteFromFile();
 
+        template <Entity T> void Truncate();
+
         template <Entity T> void Update(const T& entity);
 
         template <Entity T> std::vector<std::shared_ptr<T>> SearchInMemory(SearchFunc<T> predicate) const;
@@ -43,8 +42,6 @@ namespace RefactoredProject {
         void PrintIndexTable() const;
 
         friend class Singleton<DataBase_Impl>;
-        friend class MemoryManager;
-        friend class FileManager;
 
     private:
         DataBase_Impl();
@@ -83,7 +80,7 @@ namespace RefactoredProject {
             );
         }
 
-        return m_MemoryManager.Create<T>(m_IndexTable.GetNewId<T>());
+        return m_MemoryManager.Create<T>(m_IndexTable.GetNewId(TypeInfo::Get<T>()));
     }
 
     template <Entity T, Entity U>
@@ -94,13 +91,13 @@ namespace RefactoredProject {
             );
         }
 
-        if (!m_IndexTable.IsExists<T>(tId)) {
+        if (!m_IndexTable.IsExists(TypeInfo::Get<T>(), tId)) {
             throw std::invalid_argument(
                 "RefactoredProject::DataBase_Impl::Create: No entity by id = " + std::to_string(tId)
             );
         }
 
-        U& u = m_MemoryManager.Create<U>(m_IndexTable.GetNewId<U>());
+        U& u = m_MemoryManager.Create<U>(m_IndexTable.GetNewId(TypeInfo::Get<U>()));
 
         m_RelationTable.CreateConnection<T, U>(tId, u.GetId());
 
@@ -114,7 +111,7 @@ namespace RefactoredProject {
 
     template <Entity T>
     T DataBase_Impl::GetFromFile(int id) const {
-        if (!m_IndexTable.IsExists<T>()) {
+        if (!m_IndexTable.IsExists(TypeInfo::Get<T>())) {
             throw std::invalid_argument(
                 "RefactoredProject::DataBase_Impl::GetFromFile: No such type in m_IndexTable!"
             );
@@ -122,7 +119,7 @@ namespace RefactoredProject {
 
         m_IndexTable.Print();
 
-        auto entityPosition = m_IndexTable.GetPosition<T>(id);
+        auto entityPosition = m_IndexTable.GetPosition(TypeInfo::Get<T>(), id);
 
         if (!entityPosition.has_value()) {
             throw std::range_error(
@@ -155,54 +152,79 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::DeleteFromMemory(int id) {
-//        if (m_MemoryManager.IsInFile<T>(id))
-//            return m_MemoryManager.Delete<T>(id);
-//
-//        for (auto& [relation, connections] : m_RelationTable) {
-//            if (relation.first == TypeInfo::GetHash<T>()) {
-//                for (auto& [mainId, dependedIds] : connections) {
-//                    for (const auto& dependedId : dependedIds) {
-////                        auto hash = relation.second;
-////                        m_MemoryManager.Delete<hash>(dependedId);
-//                    }
-//                }
-//
-//                m_MemoryManager.Delete<T>(id);
-//                connections.clear();
-//            }
-//
-//            if (relation.second == TypeInfo::GetHash<T>()) {
-//                m_MemoryManager.Delete<T>(id);
-//            }
-//        }
+        if (!m_MemoryManager.IsInFile<T>(id)) {
+            if (m_RelationTable.IsMajor<T>())
+                m_RelationTable.DeleteMajor<T>(id);
+            else
+                m_RelationTable.DeleteMinor<T>(id);
+        }
+
+        return m_MemoryManager.Delete<T>(id);
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromFile(int id) {
         if (m_RelationTable.IsMajor<T>()) {
             m_FileManager.Delete<T>(id);
+            m_MemoryManager.Delete<T>(id);
 
             auto toDelete = m_RelationTable.GetMinorIds<T>(id);
 
             for (const auto& [typeInfo, minorIds] : toDelete) {
-                m_RelationTable.DeleteMajor({ TypeInfo::Get<T>(), typeInfo }, id);
+                RelationTable::Relation relation = { TypeInfo::Get<T>(), typeInfo };
+
+                m_RelationTable.DeleteMajor(relation, id);
 
                 for (const auto& minorId : minorIds) {
                     m_FileManager.Delete(typeInfo, minorId);
                     m_MemoryManager.Delete(typeInfo, minorId);
+                    m_RelationTable.DeleteMinor(relation, id, minorId);
                 }
             }
+        } else {
+            m_FileManager.Delete<T>(id);
+//            m_MemoryManager.Delete<T>(id);
+//            m_RelationTable.DeleteMinor<T>(id);
         }
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromMemory() {
+        if (m_RelationTable.IsMinor<T>())
+            m_RelationTable.DeleteMinor<T>();
 
+        return m_MemoryManager.Delete<T>();
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromFile() {
+        if (m_RelationTable.IsMajor<T>()) {
+            auto toDeleteTypes = m_RelationTable.GetMinorTypes<T>();
 
+            m_RelationTable.DeleteMajor<T>();
+
+            for (const auto& deleteType : toDeleteTypes) {
+                m_FileManager.Delete(deleteType);
+                m_MemoryManager.Delete(deleteType);
+            }
+        } else {
+            m_RelationTable.DeleteMinor<T>();
+        }
+
+        return m_FileManager.Delete<T>();
+    }
+
+    template <Entity T>
+    void DataBase_Impl::Truncate() {
+        if (m_RelationTable.IsMajor<T>()) {
+            auto toDeleteTypes = m_RelationTable.GetMinorTypes<T>();
+
+            for (const auto &deleteType : toDeleteTypes) {
+                m_FileManager.Truncate(deleteType);
+            }
+        }
+
+        return m_FileManager.Delete<T>();
     }
 
     template <Entity T>
@@ -210,7 +232,7 @@ namespace RefactoredProject {
         if (m_MemoryManager.IsExists<T>(entity.GetId()))
             m_MemoryManager.Update(entity);
 
-        auto position = m_IndexTable.GetPosition<T>(entity.GetId());
+        auto position = m_IndexTable.GetPosition(TypeInfo::Get<T>(), entity.GetId());
 
         if (position.has_value())
             m_FileManager.Update(entity, *position);

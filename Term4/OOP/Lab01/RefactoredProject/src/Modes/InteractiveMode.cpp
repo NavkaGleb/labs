@@ -8,205 +8,11 @@
 #include "Entities/Location.hpp"
 #include "Entities/Monster.hpp"
 
+#include "LocationManager.hpp"
+
 namespace RefactoredProject {
 
     namespace Internal {
-
-        namespace Locations {
-
-            void Create() {
-                auto&       location = DataBase::Get().Create<Location>();
-                std::string name;
-                float       area;
-                int         monstersMaxCount;
-
-                std::cout << "Enter location name:" << std::endl;
-                std::cin >> name;
-
-                std::cout << "Enter location area:" << std::endl;
-                std::cin >> area;
-
-                std::cout << "Enter location monstersMaxCount:" << std::endl;
-                std::cin >> monstersMaxCount;
-
-                location.SetName(std::move(name));
-                location.SetArea(area);
-                location.SetMonstersMaxCount(monstersMaxCount);
-
-                std::cout << "Location " << location.GetName() << " was successfully created!" << std::endl;
-            }
-
-            void CreateRandom() {
-                int n;
-
-                std::cout << "Enter amount of locations:" << std::endl;
-                std::cin >> n;
-
-                for (int i = 0; i < n; ++i) {
-                    auto& location = DataBase::Get().Create<Location>();
-
-                    location.SetName(Ng::Random::GetString(Ng::Random::Get(2, 7)));
-                    location.SetArea(Ng::Random::Get(10.0f, 500.0f));
-                    location.SetMonstersMaxCount(Ng::Random::Get(5, 100));
-                }
-                
-                std::cout << n << " Locations was successfully added" << std::endl;
-            }
-
-            void PrintFromMemory() {
-                auto locations = DataBase::Get().GetFromMemory<Location>();
-
-                if (locations.empty()) {
-                    std::cout << "No Locations in memory!" << std::endl;
-                    return;
-                }
-
-                for (const auto& location : locations)
-                    std::cout << *location << std::endl;
-            }
-
-            void PrintFromFile() {
-                auto locations = DataBase::Get().GetFromFile<Location>();
-
-                if (locations.empty()) {
-                    std::cout << "No Locations in file!" << std::endl;
-                    return;
-                }
-
-                for (const auto& location : locations)
-                    std::cout << *location << std::endl;
-            }
-
-            void Load() {
-                DataBase::Get().Load<Location>();
-                std::cout << "Locations was successfully loaded from file" << std::endl;
-            }
-            
-            void Save() {
-                DataBase::Get().Save<Location>();
-                std::cout << "Locations was successfully saved to file" << std::endl;
-            }
-
-            void DeleteFromMemory(bool single = false) {
-                if (!single) {
-                    DataBase::Get().DeleteFromMemory<Location>();
-                    std::cout << "Locations was successfully deleted from memory" << std::endl;
-
-                    return;
-                }
-
-                auto locations = DataBase::Get().GetFromMemory<Location>();
-
-                if (locations.empty()) {
-                    std::cout << "No Locations on memory!";
-                    return;
-                }
-
-                for (const auto& location : locations)
-                    std::cout << location << std::endl;
-
-                int id;
-
-                std::cout << "Enter Location id" << std::endl;
-                std::cin >> id;
-
-                DataBase::Get().DeleteFromMemory<Location>(id);
-            }
-
-            void DeleteFromFile(bool single = false) {
-                if (single) {
-                    int locationId = -1;
-
-                    PrintFromFile();
-
-                    std::cout << "Enter locationId:" << std::endl;
-                    std::cin >> locationId;
-
-                    DataBase::Get().DeleteFromFile<Location>(locationId);
-
-                } else {
-                    DataBase::Get().DeleteFromFile<Location>();
-                    std::cout << "Locations was successfully deleted from file!" << std::endl;
-                }
-            }
-
-            void UpdateInMemory() {
-                auto locations = DataBase::Get().GetFromMemory<Location>();
-
-                if (locations.empty()) {
-                    std::cout << "No Locations in memory!" << std::endl;
-                    return;
-                }
-
-                for (const auto& location : locations)
-                    std::cout << location << std::endl;
-
-                int locationId;
-
-                std::cout << "Enter Location id:" << std::endl;
-                std::cin >> locationId;
-
-                auto&       location = DataBase::Get().GetFromMemory<Location>(locationId);
-                std::string name;
-                float       area;
-                int         monstersMaxCount;
-
-                std::cout << "Enter location name:" << std::endl;
-                std::cin >> name;
-
-                std::cout << "Enter location area:" << std::endl;
-                std::cin >> area;
-
-                std::cout << "Enter location monstersMaxCount:" << std::endl;
-                std::cin >> monstersMaxCount;
-
-                location.SetName(std::move(name));
-                location.SetArea(area);
-                location.SetMonstersMaxCount(monstersMaxCount);
-
-                DataBase::Get().Update(location);
-            }
-
-            void UpdateInFile() {
-                auto locations = DataBase::Get().GetFromFile<Location>();
-
-                if (locations.empty()) {
-                    std::cout << "No Locations in file!" << std::endl;
-                    return;
-                }
-
-                for (const auto& location : locations)
-                    std::cout << *location << std::endl;
-
-                int locationId;
-
-                std::cout << "Enter Location id:" << std::endl;
-                std::cin >> locationId;
-
-                auto        location = DataBase::Get().GetFromFile<Location>(locationId);
-                std::string name;
-                float       area;
-                int         monstersMaxCount;
-
-                std::cout << "Get location: " << location << std::endl;
-
-                std::cout << "Enter location name:" << std::endl;
-                std::cin >> name;
-
-                std::cout << "Enter location area:" << std::endl;
-                std::cin >> area;
-
-                std::cout << "Enter location monstersMaxCount:" << std::endl;
-                std::cin >> monstersMaxCount;
-
-                location.SetName(std::move(name));
-                location.SetArea(area);
-                location.SetMonstersMaxCount(monstersMaxCount);
-
-                DataBase::Get().Update(location);
-            }
-            
-        } // namespace Locations
         
         namespace Monsters {
 
@@ -363,10 +169,11 @@ namespace RefactoredProject {
         cout << "07 - Delete Location from file     | 27 - Delete Monster from file   " << endl;
         cout << "08 - Delete Locations from memory  | 28 - Delete Monsters from memory" << endl;
         cout << "09 - Delete Locations from file    | 29 - Delete Monsters from file  " << endl;
-        cout << "10 - Update Location in memory     | 30 - Update Monster in memory   " << endl;
-        cout << "11 - Update Location in file       | 31 - Update Monster in file     " << endl;
-        cout << "12 - Search Locations in memory    | 32 - Search Monsters in memory  " << endl;
-        cout << "13 - Search Locations in file      | 33 - Search Monsters in file    " << endl;
+        cout << "10 - Truncate Locations            | 30 - Truncate Monsters          " << endl;
+        cout << "11 - Update Location in memory     | 31 - Update Monster in memory   " << endl;
+        cout << "12 - Update Location in file       | 32 - Update Monster in file     " << endl;
+        cout << "13 - Search Locations in memory    | 33 - Search Monsters in memory  " << endl;
+        cout << "14 - Search Locations in file      | 34 - Search Monsters in file    " << endl;
         cout << "40 - Exit                                                          :)" << endl;
         cout << "60 - Print RelationTable                                             " << endl;
         cout << "80 - Print IndexTable" << endl;
@@ -375,27 +182,22 @@ namespace RefactoredProject {
     }
 
     InteractiveMode_Impl::InteractiveMode_Impl()
-        : m_Command(-1) {}
+        : m_Command(-1) {
+
+        LocationManager::Create();
+    }
+
+    InteractiveMode_Impl::~InteractiveMode_Impl() noexcept {
+        LocationManager::Destroy();
+    }
 
     bool InteractiveMode_Impl::ParseCommand() const {
         switch (m_Command / 20) {
-            case 0:
-                ParseLocationsCommand();
-                break;
-
-            case 1:
-                ParseMonstersCommand();
-                break;
-
-            case 2:
-                return false;
-
-            case 3:
-                DataBase::Get().PrintRelationTable();
-                break;
-
-            case 4:
-                DataBase::Get().PrintIndexTable();
+            case 0: LocationManager::Get().Run(m_Command); break;
+            case 1: ParseMonstersCommand();                break;
+            case 2: return false;
+            case 3: DataBase::Get().PrintRelationTable();  break;
+            case 4: DataBase::Get().PrintIndexTable();     break;
 
             default:
                 std::cout << "No such command. Try again!" << std::endl;
@@ -405,64 +207,6 @@ namespace RefactoredProject {
         std::cout << std::endl;
 
         return true;
-    }
-
-    void InteractiveMode_Impl::ParseLocationsCommand() const {
-        using namespace Internal::Locations;
-        
-        switch (m_Command % 20) {
-            case 0:
-                Create();
-                break;
-
-            case 1:
-                CreateRandom();
-                break;
-
-            case 2:
-                PrintFromMemory();
-                break;
-
-            case 3:
-                PrintFromFile();
-                break;
-
-            case 4:
-                Load();
-                break;
-
-            case 5:
-                Save();
-                break;
-
-            case 6:
-                DeleteFromMemory(true);
-                break;
-
-            case 7:
-                DeleteFromFile(true);
-                break;
-
-            case 8:
-                DeleteFromMemory(false);
-                break;
-                
-            case 9:
-                DeleteFromFile(false);
-                break;
-
-            case 10:
-                UpdateInMemory();
-                break;
-
-            case 11:
-                UpdateInFile();
-                break;
-
-            default:
-                std::cout << "No such command. Try again!" << std::endl;
-                break;
-        }
     }
 
     void InteractiveMode_Impl::ParseMonstersCommand() const {

@@ -29,14 +29,25 @@ namespace RefactoredProject {
         template <Entity T> [[nodiscard]] bool IsMajor() const;
         template <Entity T> [[nodiscard]] bool IsMinor() const;
 
+        template <Entity T> [[nodiscard]] std::vector<TypeInfo> GetMinorTypes() const;
+
         void DeleteMajor(const Relation& relation, int id);
         void DeleteMinor(const Relation& relation, int majorId, int minorId);
+
+        template <Entity T> void DeleteMajor();
+        template <Entity T> void DeleteMajor(int id);
+
+        template <Entity T> void DeleteMinor();
+        template <Entity T> void DeleteMinor(int id);
 
         template <Entity T, Entity U> void CreateRelation();
         template <Entity T, Entity U> void DeleteRelation();
 
         template <Entity T, Entity U> void CreateConnection(int tId, int uId);
         template <Entity T, Entity U> void DeleteConnection(int tId, int UId);
+
+        void CreateConnection(const Relation& relation, int majorId, int minorId);
+        void DeleteConnection(const Relation& relation, int majorId, int minorId);
 
         template <Entity T> std::map<TypeInfo, std::vector<int>> GetMinorIds(int id);
 
@@ -95,6 +106,46 @@ namespace RefactoredProject {
         return std::ranges::any_of(m_Table.begin(), m_Table.end(), [](const auto& pair) {
             return pair.first.second == TypeInfo::Get<T>();
         });
+    }
+
+    template <Entity T>
+    std::vector<TypeInfo> RelationTable::GetMinorTypes() const {
+        std::vector<TypeInfo> result;
+
+        for (const auto& [relation, connections] : m_Table)
+            if (relation.first == TypeInfo::Get<T>())
+                result.emplace_back(relation.second);
+
+        return result;
+    }
+
+    template <Entity T>
+    void RelationTable::DeleteMajor() {
+        for (auto& [relation, connections] : m_Table)
+            if (relation.first == TypeInfo::Get<T>())
+                connections.clear();
+    }
+
+    template <Entity T>
+    void RelationTable::DeleteMajor(int id) {
+        for (auto& [relation, connections] : m_Table)
+            if (relation.first == TypeInfo::Get<T>())
+                connections.erase(id);
+    }
+
+    template <Entity T>
+    void RelationTable::DeleteMinor() {
+        for (auto& [relation, connections] : m_Table)
+            if (relation.second == TypeInfo::Get<T>())
+                connections.clear();
+    }
+
+    template <Entity T>
+    void RelationTable::DeleteMinor(int id) {
+        for (auto& [relation, connections] : m_Table)
+            if (relation.second == TypeInfo::Get<T>())
+                for (auto& [majorId, minorIds] : connections)
+                    minorIds.erase(std::find(minorIds.begin(), minorIds.end(), id));
     }
 
     template <Entity T, Entity U>

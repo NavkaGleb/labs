@@ -43,6 +43,16 @@ namespace RefactoredProject {
         minorIds.erase(std::find(minorIds.begin(), minorIds.end(), minorId));
     }
 
+    void RelationTable::CreateConnection(const Relation& relation, int majorId, int minorId) {
+        m_Table[relation][majorId].emplace_back(minorId);
+    }
+
+    void RelationTable::DeleteConnection(const Relation& relation, int majorId, int minorId) {
+        auto& connections = m_Table[relation][majorId];
+
+        connections.erase(std::find(connections.begin(), connections.end(), minorId));
+    }
+
     void RelationTable::Print() const {
         for (const auto& [relation, connections] : m_Table) {
             std::cout << "Relation: " << relation.first.GetHash() << " -> " << relation.second.GetHash() << std::endl;

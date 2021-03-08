@@ -10,6 +10,9 @@ namespace RefactoredProject {
     template <typename T>
     class Singleton : public NonCopyable, public NonMoveable {
     public:
+        using Type = T;
+        using TypeRef = T&;
+
         template <typename... Args>
         static T& Create(Args&&... args) {
             if (s_Instance) {

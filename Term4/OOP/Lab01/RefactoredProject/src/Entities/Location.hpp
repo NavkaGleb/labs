@@ -6,6 +6,14 @@
 
 namespace RefactoredProject {
 
+    struct LocationProps {
+        std::string Name;
+        float       Area             = 0.0f;
+        int         MonstersCount    = 0;
+        int         MonstersMaxCount = 0;
+
+    }; // struct LocationProps
+
     class Location : public IDataBaseEntity {
     public:
         explicit Location(int id = -1);
