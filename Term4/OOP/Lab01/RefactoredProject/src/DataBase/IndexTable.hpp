@@ -19,7 +19,8 @@ namespace RefactoredProject {
             int       Id        = -1;
             uintmax_t Position  = 0;
             bool      IsDeleted = false;
-        };
+
+        }; // struct EntityData
 
         using EntityDataContainer = std::vector<EntityData>;
 
@@ -39,9 +40,9 @@ namespace RefactoredProject {
         [[nodiscard]] EntityDataContainer& GetData(const TypeInfo& typeInfo) { return m_Table[typeInfo]; }
         [[nodiscard]] const EntityDataContainer& GetData(const TypeInfo& typeInfo) const { return m_Table.at(typeInfo); }
 
-        template <Entity T> void SetIsDeleted(int id, bool isDeleted);
+        void SetIsDeleted(const TypeInfo& typeInfo, int id, bool isDeleted);
 
-        template <Entity T> void Push(int id, uintmax_t position);
+        void Push(const TypeInfo& typeInfo, int id, uintmax_t position);
 
         void Print() const;
 
@@ -83,21 +84,6 @@ namespace RefactoredProject {
         m_BytesCount[TypeInfo::Get<T>()] = T::GetBytesCount();
 
         infile.close();
-    }
-
-
-
-    template <Entity T>
-    void IndexTable::SetIsDeleted(int id, bool isDeleted) {
-        auto* entityData = GetEntityData(TypeInfo::Get<T>(), id);
-
-        if (entityData)
-            entityData->IsDeleted = isDeleted;
-    }
-
-    template <Entity T>
-    void IndexTable::Push(int id, uintmax_t position) {
-        m_Table[TypeInfo::Get<T>()].emplace_back(id, position);
     }
 
 } // namespace RefactoredProject

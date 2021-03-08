@@ -85,10 +85,8 @@ namespace RefactoredProject {
 
     void LocationManager_Impl::DeleteFromMemory(CountType countType) {
         if (countType == CountType::Single) {
-            if (!PrintFromMemory()) {
+            if (!PrintFromMemory())
                 std::cout << "No Locations in memory!" << std::endl;
-                return;
-            }
 
             int locationId;
 
@@ -107,10 +105,8 @@ namespace RefactoredProject {
 
     void LocationManager_Impl::DeleteFromFile(CountType countType) {
         if (countType == CountType::Single) {
-            if (!PrintFromFile()) {
-                std::cout << "No Locations in file!" << std::endl;
+            if (!PrintFromFile())
                 return;
-            }
 
             int locationId;
 

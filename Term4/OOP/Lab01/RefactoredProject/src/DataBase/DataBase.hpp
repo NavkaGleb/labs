@@ -117,8 +117,6 @@ namespace RefactoredProject {
             );
         }
 
-        m_IndexTable.Print();
-
         auto entityPosition = m_IndexTable.GetPosition(TypeInfo::Get<T>(), id);
 
         if (!entityPosition.has_value()) {
@@ -165,24 +163,21 @@ namespace RefactoredProject {
     template <Entity T>
     void DataBase_Impl::DeleteFromFile(int id) {
         if (m_RelationTable.IsMajor<T>()) {
-            m_FileManager.Delete<T>(id);
+            m_FileManager.Delete(TypeInfo::Get<T>(), id);
             m_MemoryManager.Delete<T>(id);
 
             auto toDelete = m_RelationTable.GetMinorIds<T>(id);
 
             for (const auto& [typeInfo, minorIds] : toDelete) {
-                RelationTable::Relation relation = { TypeInfo::Get<T>(), typeInfo };
-
-                m_RelationTable.DeleteMajor(relation, id);
+                m_RelationTable.DeleteMajor({ TypeInfo::Get<T>(), typeInfo }, id);
 
                 for (const auto& minorId : minorIds) {
                     m_FileManager.Delete(typeInfo, minorId);
                     m_MemoryManager.Delete(typeInfo, minorId);
-                    m_RelationTable.DeleteMinor(relation, id, minorId);
                 }
             }
         } else {
-            m_FileManager.Delete<T>(id);
+            m_FileManager.Delete(TypeInfo::Get<T>(), id);
 //            m_MemoryManager.Delete<T>(id);
 //            m_RelationTable.DeleteMinor<T>(id);
         }
@@ -211,7 +206,7 @@ namespace RefactoredProject {
             m_RelationTable.DeleteMinor<T>();
         }
 
-        return m_FileManager.Delete<T>();
+        return m_FileManager.Delete(TypeInfo::Get<T>());
     }
 
     template <Entity T>
@@ -224,7 +219,7 @@ namespace RefactoredProject {
             }
         }
 
-        return m_FileManager.Delete<T>();
+        return m_FileManager.Delete(TypeInfo::Get<T>());
     }
 
     template <Entity T>

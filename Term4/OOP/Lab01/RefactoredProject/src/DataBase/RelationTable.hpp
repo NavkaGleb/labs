@@ -181,7 +181,8 @@ namespace RefactoredProject {
             if (relation.first == TypeInfo::Get<T>()) {
                 auto& resultIds = result[relation.second];
 
-                resultIds.insert(resultIds.end(), connections.at(id).begin(), connections.at(id).end());
+                if (connections.contains(id))
+                    resultIds.insert(resultIds.end(), connections.at(id).begin(), connections.at(id).end());
             }
         }
 

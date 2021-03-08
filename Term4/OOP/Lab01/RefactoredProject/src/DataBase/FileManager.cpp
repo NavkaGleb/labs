@@ -10,7 +10,7 @@ namespace RefactoredProject {
     }
 
     void FileManager::Delete(const TypeInfo& typeInfo, int id) {
-
+        m_IndexTable.SetIsDeleted(typeInfo, id, true);
     }
 
     void FileManager::Truncate(const TypeInfo& typeInfo) {

@@ -23,14 +23,8 @@ namespace RefactoredProject {
         template <Entity T> std::vector<std::shared_ptr<T>> Get() const;
         template <Entity T> T Get(uintmax_t pos) const;
 
-        template <Entity T> void Delete();
-        template <Entity T> void Delete(int id);
-
         void Delete(const TypeInfo& typeInfo);
         void Delete(const TypeInfo& typeInfo, int id);
-
-        template <Entity T> void Truncate();
-
         void Truncate(const TypeInfo& typeInfo);
 
         template <Entity T> void Update(const T& entity, uintmax_t position) const;
@@ -77,41 +71,6 @@ namespace RefactoredProject {
         infile.close();
 
         return entity;
-    }
-
-    template <Entity T>
-    void FileManager::Delete() {
-
-    }
-
-    template <Entity T>
-    void FileManager::Delete(int id) {
-        m_IndexTable.SetIsDeleted<T>(id, true);
-    }
-
-    template <Entity T>
-    void FileManager::Truncate() {
-        std::ifstream     infile(GetBinaryDataPath<T>(), std::fstream::in | std::fstream::binary);
-        std::vector<char>                    mainBuffer;
-        std::array<char, T::GetBytesCount()> subBuffer;
-        auto&                       data = m_IndexTable.GetData(TypeInfo::Get<T>());
-
-        for (auto it = data.begin(); it != data.end(); ++it) {
-            if (it->IsDeleted) {
-                data.erase(it--);
-                continue;
-            }
-
-            infile.read(subBuffer.data(), subBuffer.size());
-            mainBuffer.insert(mainBuffer.end(), subBuffer.begin(), subBuffer.end());
-        }
-
-        infile.close();
-
-        std::ofstream outfile(GetBinaryDataPath<T>(), std::fstream::out | std::fstream::binary);
-
-        outfile.write(mainBuffer.data(), mainBuffer.size());
-        outfile.close();
     }
 
     template <Entity T>

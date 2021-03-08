@@ -44,6 +44,17 @@ namespace RefactoredProject {
         }
     }
 
+    void IndexTable::SetIsDeleted(const TypeInfo& typeInfo, int id, bool isDeleted) {
+        auto* entityData = GetEntityData(typeInfo, id);
+
+        if (entityData)
+            entityData->IsDeleted = isDeleted;
+    }
+
+    void IndexTable::Push(const TypeInfo& typeInfo, int id, uintmax_t position) {
+        m_Table[typeInfo].emplace_back(EntityData{ id, position, false });
+    }
+
     IndexTable::EntityData* IndexTable::GetEntityData(const TypeInfo& typeInfo, int id) const {
         return static_cast<EntityData*>(
             std::bsearch(

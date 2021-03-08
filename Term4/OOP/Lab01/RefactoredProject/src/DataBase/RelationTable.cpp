@@ -38,6 +38,8 @@ namespace RefactoredProject {
         if (!IsExists(relation))
             return;
 
+        Print();
+
         auto& minorIds = m_Table[relation][majorId];
 
         minorIds.erase(std::find(minorIds.begin(), minorIds.end(), minorId));
