@@ -9,7 +9,6 @@ namespace RefactoredProject {
     struct LocationProps {
         std::string Name;
         float       Area             = 0.0f;
-        int         MonstersCount    = 0;
         int         MonstersMaxCount = 0;
 
     }; // struct LocationProps
@@ -26,6 +25,7 @@ namespace RefactoredProject {
         [[nodiscard]] inline int GetMonstersCount() const { return m_MonstersCount; }
         [[nodiscard]] inline int GetMonstersMaxCount() const { return m_MonstersMaxCount; }
 
+        void SetProps(LocationProps&& props);
         void SetName(const std::string& name);
         void SetName(std::string&& name);
         void SetArea(float area);

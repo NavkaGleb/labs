@@ -15,6 +15,9 @@ namespace RefactoredProject {
         template <Entity T, Entity U> void CreateRelation();
         template <Entity T, Entity U> void DeleteRelation();
 
+        template <Entity T, Entity U> void CreateConnection(int tId, int uId);
+        template <Entity T, Entity U> void DeleteConnection(int tId, int uId);
+
         template <Entity T> T& Create();
         template <Entity T, Entity U> std::pair<T, U&> Create(int tId);
 
@@ -70,6 +73,16 @@ namespace RefactoredProject {
     template <Entity T, Entity U>
     void DataBase_Impl::DeleteRelation() {
         return m_RelationTable.DeleteRelation<T, U>();
+    }
+
+    template <Entity T, Entity U>
+    void DataBase_Impl::CreateConnection(int tId, int uId) {
+        return m_RelationTable.CreateConnection<T, U>(tId, uId);
+    }
+
+    template <Entity T, Entity U>
+    void DataBase_Impl::DeleteConnection(int tId, int uId) {
+        return m_RelationTable.DeleteConnection<T, U>(tId, uId);
     }
 
     template <Entity T>
@@ -150,12 +163,8 @@ namespace RefactoredProject {
 
     template <Entity T>
     void DataBase_Impl::DeleteFromMemory(int id) {
-        if (!m_MemoryManager.IsInFile<T>(id)) {
-            if (m_RelationTable.IsMajor<T>())
-                m_RelationTable.DeleteMajor<T>(id);
-            else
-                m_RelationTable.DeleteMinor<T>(id);
-        }
+        if (!m_MemoryManager.IsInFile<T>(id))
+            m_RelationTable.DeleteMinor<T>(id);
 
         return m_MemoryManager.Delete<T>(id);
     }
@@ -178,8 +187,8 @@ namespace RefactoredProject {
             }
         } else {
             m_FileManager.Delete(TypeInfo::Get<T>(), id);
-//            m_MemoryManager.Delete<T>(id);
-//            m_RelationTable.DeleteMinor<T>(id);
+            m_MemoryManager.Delete<T>(id);
+            m_RelationTable.DeleteMinor<T>(id);
         }
     }
 

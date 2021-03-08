@@ -36,6 +36,17 @@ namespace RefactoredProject {
         return bytesCount;
     }
 
+    void Monster::SetProps(MonsterProps&& props) {
+        m_Name       = std::exchange(props.Name, {});
+        m_Health     = std::exchange(props.Health, 0);
+        m_Damage     = std::exchange(props.Damage, 0);
+        m_Attack     = std::exchange(props.Damage, 0.0f);
+        m_AttackType = std::exchange(props.AttackType, AttackType::None);
+        m_LocationId = std::exchange(props.LocationId, -1);
+
+        m_Name.resize(m_NameLength);
+    }
+
     void Monster::SetName(const std::string& name) {
         m_Name = name;
         m_Name.resize(m_NameLength);
@@ -108,6 +119,18 @@ namespace RefactoredProject {
         ostream << monster.m_Attack << " ";
         ostream << static_cast<int>(monster.m_AttackType) << " ";
         ostream << monster.m_LocationId;
+
+        return ostream;
+    }
+
+    std::ostream& operator <<(std::ostream& ostream, const Monster::AttackType& attackType) {
+        switch (attackType) {
+            case Monster::AttackType::IncreaseDamage: ostream << "IncreaseDamage"; break;
+            case Monster::AttackType::RepeatAttack:   ostream << "RepeatAttack";   break;
+            case Monster::AttackType::SelfCure:       ostream << "SelfCure";       break;
+            case Monster::AttackType::EnemyParalyze:  ostream << "EnemyParalyze";  break;
+            default:                                  ostream << "None";           break;
+        }
 
         return ostream;
     }

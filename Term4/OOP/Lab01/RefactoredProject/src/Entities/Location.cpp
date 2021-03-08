@@ -33,6 +33,14 @@ namespace RefactoredProject {
         return bytesCount;
     }
 
+    void Location::SetProps(LocationProps&& props) {
+        m_Name             = std::exchange(props.Name, std::string());
+        m_Area             = std::exchange(props.Area, 0.0f);
+        m_MonstersMaxCount = std::exchange(props.MonstersMaxCount, 0);
+
+        m_Name.resize(m_NameLength);
+    }
+
     void Location::SetName(const std::string& name) {
         m_Name = name;
         m_Name.resize(m_NameLength);

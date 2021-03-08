@@ -7,23 +7,19 @@
 namespace RefactoredProject {
         
     void LocationManager_Impl::Create() {
-        auto&       location = m_DataBase.Create<Location>();
-        std::string name;
-        float       area;
-        int         monstersMaxCount;
+        auto&         location = m_DataBase.Create<Location>();
+        LocationProps props;
 
         std::cout << "Enter location name:" << std::endl;
-        std::cin >> name;
+        std::cin >> props.Name;
 
         std::cout << "Enter location area:" << std::endl;
-        std::cin >> area;
+        std::cin >> props.Area;
 
         std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> monstersMaxCount;
+        std::cin >> props.MonstersMaxCount;
 
-        location.SetName(std::move(name));
-        location.SetArea(area);
-        location.SetMonstersMaxCount(monstersMaxCount);
+        location.SetProps(std::move(props));
 
         std::cout << "Location " << location.GetName() << " was successfully created!" << std::endl;
     }
@@ -37,9 +33,11 @@ namespace RefactoredProject {
         for (int i = 0; i < n; ++i) {
             auto& location = m_DataBase.Create<Location>();
 
-            location.SetName(Ng::Random::GetString(Ng::Random::Get(2, 7)));
-            location.SetArea(Ng::Random::Get(10.0f, 500.0f));
-            location.SetMonstersMaxCount(Ng::Random::Get(5, 100));
+            location.SetProps({
+                Ng::Random::GetString(Ng::Random::Get(2, 7)),
+                Ng::Random::Get(10.0f, 500.0f),
+                Ng::Random::Get(5, 100)
+            });
         }
 
         std::cout << n << " Locations was successfully added" << std::endl;
@@ -128,79 +126,61 @@ namespace RefactoredProject {
     }
 
     void LocationManager_Impl::UpdateInMemory() {
-        auto locations = m_DataBase.GetFromMemory<Location>();
-
-        if (locations.empty()) {
-            std::cout << "No Locations in memory!" << std::endl;
+        if (!PrintFromMemory())
             return;
-        }
-
-        for (const auto& location : locations)
-            std::cout << location << std::endl;
 
         int locationId;
 
         std::cout << "Enter Location id:" << std::endl;
         std::cin >> locationId;
 
-        auto&       location = m_DataBase.GetFromMemory<Location>(locationId);
-        std::string name;
-        float       area;
-        int         monstersMaxCount;
+        auto&         location = m_DataBase.GetFromMemory<Location>(locationId);
+        LocationProps props;
 
         std::cout << "Enter location name:" << std::endl;
-        std::cin >> name;
+        std::cin >> props.Name;
 
         std::cout << "Enter location area:" << std::endl;
-        std::cin >> area;
+        std::cin >> props.Area;
 
         std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> monstersMaxCount;
+        std::cin >> props.MonstersMaxCount;
 
-        location.SetName(std::move(name));
-        location.SetArea(area);
-        location.SetMonstersMaxCount(monstersMaxCount);
+        location.SetProps(std::move(props));
 
-        m_DataBase.Update(location);
+        m_DataBase.Update<Location>(location);
+
+        std::cout << "Location " << location.GetId() << " was successfully updated" << std::endl;
     }
 
     void LocationManager_Impl::UpdateInFile() {
-        auto locations = m_DataBase.GetFromFile<Location>();
-
-        if (locations.empty()) {
-            std::cout << "No Locations in file!" << std::endl;
+        if (!PrintFromFile())
             return;
-        }
-
-        for (const auto& location : locations)
-            std::cout << *location << std::endl;
 
         int locationId;
 
         std::cout << "Enter Location id:" << std::endl;
         std::cin >> locationId;
 
-        auto        location = m_DataBase.GetFromFile<Location>(locationId);
-        std::string name;
-        float       area;
-        int         monstersMaxCount;
+        auto          location = m_DataBase.GetFromFile<Location>(locationId);
+        LocationProps props;
 
         std::cout << "Get location: " << location << std::endl;
 
         std::cout << "Enter location name:" << std::endl;
-        std::cin >> name;
+        std::cin >> props.Name;
 
         std::cout << "Enter location area:" << std::endl;
-        std::cin >> area;
+        std::cin >> props.Area;
 
         std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> monstersMaxCount;
+        std::cin >> props.MonstersMaxCount;
 
-        location.SetName(std::move(name));
-        location.SetArea(area);
-        location.SetMonstersMaxCount(monstersMaxCount);
+        location.SetProps(std::move(props));
 
-        m_DataBase.Update(location);
+        m_DataBase.Update<Location>(location);
+
+        std::cout << "Location " << location.GetId() << " was successfully updated" << std::endl;
     }
     
     void LocationManager_Impl::SearchInMemory() {

@@ -148,8 +148,6 @@ namespace RefactoredProject {
             entity.WriteToBinary(binaryFile);
         }
 
-        m_IndexTable.Print();
-
         textFile.close();
         binaryFile.close();
     }
@@ -166,6 +164,8 @@ namespace RefactoredProject {
     void MemoryManager::Delete(int id) {
         if (!IsExists<T>(id))
             return;
+
+        std::cout << "fuck this shit" << std::endl;
 
         m_Entities[TypeInfo::Get<T>()].erase(id);
     }

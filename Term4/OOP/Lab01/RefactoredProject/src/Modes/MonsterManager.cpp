@@ -8,9 +8,7 @@
 namespace RefactoredProject {
 
     void MonsterManager_Impl::Create() {
-        using AttackType = Monster::AttackType;
-
-        auto locations = DataBase::Get().SearchInFile<Location>([](const Location& location) {
+        auto locations = m_DataBase.SearchInFile<Location>([](const Location& location) {
             return !location.IsFull();
         });
 
@@ -19,76 +17,75 @@ namespace RefactoredProject {
             return;
         }
 
-        int locationId;
+        MonsterProps props;
 
         for (const auto& location : locations)
             std::cout << *location << std::endl;
 
         std::cout << "Enter monster locationId:" << std::endl;
-        std::cin >> locationId;
+        std::cin >> props.LocationId;
 
-        auto [location, monster] = DataBase::Get().Create<Location, Monster>(locationId);
-        std::string name;
-        int         health;
-        int         damage;
-        float       attack;
-        AttackType  attackType;
+        auto [location, monster] = m_DataBase.Create<Location, Monster>(props.LocationId);
 
         std::cout << "Enter monster name:" << std::endl;
-        std::cin >> name;
+        std::cin >> props.Name;
 
         std::cout << "Enter monster health:" << std::endl;
-        std::cin >> health;
+        std::cin >> props.Health;
 
         std::cout << "Enter monster damage:" << std::endl;
-        std::cin >> damage;
+        std::cin >> props.Damage;
 
         std::cout << "Enter monster attack:" << std::endl;
-        std::cin >> attack;
+        std::cin >> props.Attack;
 
         std::cout << "Enter monster attackType:" << std::endl;
-        std::cin >> reinterpret_cast<int&>(attackType);
+        for (int i = 1; i < 5; ++i)
+            std::cout << i << " - " << static_cast<Monster::AttackType>(i) << std::endl;
+        std::cin >> reinterpret_cast<int&>(props.AttackType);
 
-        monster.SetName(name);
-        monster.SetHealth(health);
-        monster.SetDamage(damage);
-        monster.SetAttack(attack);
-        monster.SetAttackType(attackType);
-        monster.SetLocationId(locationId);
+        monster.SetProps(std::move(props));
 
         location.IncreaseMonsters();
 
-        DataBase::Get().Update<Location>(location);
+        m_DataBase.Update<Location>(location);
 
         std::cout << "Monster " << monster.GetName() << " was successfully created!" << std::endl;
     }
 
     void MonsterManager_Impl::CreateRandom() {
-        //                int n;
-//                std::vector<int> locationIds = DataBase::Get().GetIdsFromFile<Location>();
-//
-//                if (locationIds.empty()) {
-//                    std::cout << "No Locations in file!" << std::endl;
-//                    return;
-//                }
-//
-//                std::cout << "Enter amount of monsters:" << std::endl;
-//                std::cin >> n;
-//
-//                for (int i = 0; i < n; ++i) {
-//                    auto& monster = DataBase::Get().Create<Monster>();
-//
-//                    monster.SetName(Ng::Random::GetString(Ng::Random::Get(3, 7)));
-//                    monster.SetHealth(Ng::Random::Get(10, 100));
-//                    monster.SetDamage(Ng::Random::Get(15, 40));
-//                    monster.SetAttack(Ng::Random::Get(0.0f, 1.0f));
-//                    monster.SetAttackType(static_cast<Monster::AttackType>(Ng::Random::Get(1, 4)));
-//                    monster.SetLocationId(Ng::Random::Get(locationIds));
-//                }
+        int  n;
+        auto locations = m_DataBase.SearchInFile<Location>([](const Location& location) {
+            return !location.IsFull();
+        });
+
+        if (locations.empty()) {
+            std::cout << "No Location to add Monster! All Locations are full or there are no Location in file!";
+            return;
+        }
+
+        std::cout << "Enter amount of monsters:" << std::endl;
+        std::cin >> n;
+
+        for (int i = 0; i < n; ++i) {
+            auto& monster = m_DataBase.Create<Monster>();
+            auto location = Ng::Random::Get(locations);
+
+            monster.SetName(Ng::Random::GetString(Ng::Random::Get(3, 7)));
+            monster.SetHealth(Ng::Random::Get(10, 100));
+            monster.SetDamage(Ng::Random::Get(15, 40));
+            monster.SetAttack(Ng::Random::Get(0.0f, 1.0f));
+            monster.SetAttackType(static_cast<Monster::AttackType>(Ng::Random::Get(1, 4)));
+            monster.SetLocationId(location->GetId());
+
+            location->IncreaseMonsters();
+
+            m_DataBase.Update<Location>(*location);
+        }
     }
 
     bool MonsterManager_Impl::PrintFromMemory() {
-        auto monsters = DataBase::Get().GetFromMemory<Monster>();
+        auto monsters = m_DataBase.GetFromMemory<Monster>();
 
         if (monsters.empty()) {
             std::cout << "No Monsters in memory!" << std::endl;
@@ -102,7 +99,7 @@ namespace RefactoredProject {
     }
 
     bool MonsterManager_Impl::PrintFromFile() {
-        auto monsters = DataBase::Get().GetFromFile<Monster>();
+        auto monsters = m_DataBase.GetFromFile<Monster>();
 
         if (monsters.empty()) {
             std::cout << "No Monsters in file!" << std::endl;
@@ -116,32 +113,32 @@ namespace RefactoredProject {
     }
 
     void MonsterManager_Impl::Load() {
-        DataBase::Get().Load<Monster>();
+        m_DataBase.Load<Monster>();
         std::cout << "Monsters was successfully loaded from file" << std::endl;
     }
 
     void MonsterManager_Impl::Save() {
-        DataBase::Get().Save<Monster>();
+        m_DataBase.Save<Monster>();
         std::cout << "Monsters was successfully saved to file" << std::endl;
     }
 
     void MonsterManager_Impl::DeleteFromMemory(CountType countType) {
         if (countType == CountType::Single) {
             if (!PrintFromMemory()) {
-                std::cout << "No Locations in memory!" << std::endl;
+                std::cout << "No Monsters in memory!" << std::endl;
                 return;
             }
 
-            int locationId;
+            int monsterId;
 
-            std::cout << "Enter locationId:" << std::endl;
-            std::cin >> locationId;
+            std::cout << "Enter Monster id:" << std::endl;
+            std::cin >> monsterId;
 
-            m_DataBase.DeleteFromMemory<Location>(locationId);
+            m_DataBase.DeleteFromMemory<Monster>(monsterId);
 
-            std::cout << "Location " << locationId << " was successfully deleted from memory!" << std::endl;
+            std::cout << "Location " << monsterId << " was successfully deleted from memory!" << std::endl;
         } else {
-            DataBase::Get().DeleteFromMemory<Monster>();
+            m_DataBase.DeleteFromMemory<Monster>();
             std::cout << "Monsters was successfully deleted from memory" << std::endl;
         }
     }
@@ -149,20 +146,20 @@ namespace RefactoredProject {
     void MonsterManager_Impl::DeleteFromFile(CountType countType) {
         if (countType == CountType::Single) {
             if (!PrintFromFile()) {
-                std::cout << "No Locations in file!" << std::endl;
+                std::cout << "No Monsters in file!" << std::endl;
                 return;
             }
 
-            int locationId;
+            int monsterId;
 
-            std::cout << "Enter locationId:" << std::endl;
-            std::cin >> locationId;
+            std::cout << "Enter Monster id:" << std::endl;
+            std::cin >> monsterId;
 
-            m_DataBase.DeleteFromFile<Location>(locationId);
+            m_DataBase.DeleteFromFile<Monster>(monsterId);
 
-            std::cout << "Location " << locationId << " was successfully deleted from file!" << std::endl;
+            std::cout << "Monster " << monsterId << " was successfully deleted from file!" << std::endl;
         } else {
-            DataBase::Get().DeleteFromFile<Monster>();
+            m_DataBase.DeleteFromFile<Monster>();
 
             std::cout << "Monsters was successfully deleted from file" << std::endl;
         }
@@ -173,79 +170,127 @@ namespace RefactoredProject {
     }
 
     void MonsterManager_Impl::UpdateInMemory() {
-        auto locations = m_DataBase.GetFromMemory<Location>();
+        if (!PrintFromMemory())
+            return;
+
+        int monsterId;
+
+        std::cout << "Enter Monster id:" << std::endl;
+        std::cin >> monsterId;
+
+        auto&        monster = m_DataBase.GetFromMemory<Monster>(monsterId);
+        MonsterProps props;
+
+        std::cout << "Enter monster name:" << std::endl;
+        std::cin >> props.Name;
+
+        std::cout << "Enter monster health:" << std::endl;
+        std::cin >> props.Health;
+
+        std::cout << "Enter monster damage:" << std::endl;
+        std::cin >> props.Damage;
+
+        std::cout << "Enter monster attack:" << std::endl;
+        std::cin >> props.Attack;
+
+        std::cout << "Enter monster attackType:" << std::endl;
+        for (int i = 1; i < 5; ++i)
+            std::cout << i << " - " << static_cast<Monster::AttackType>(i) << std::endl;
+        std::cin >> reinterpret_cast<int&>(props.AttackType);
+
+        auto locations = m_DataBase.SearchInFile<Location>([](const Location& location) {
+            return !location.IsFull();
+        });
 
         if (locations.empty()) {
-            std::cout << "No Locations in memory!" << std::endl;
-            return;
+            std::cout << "No Location to add Monster! All Locations are full";
+        } else {
+            for (const auto& location : locations)
+                std::cout << *location << std::endl;
+
+            std::cout << "Enter Location id:" << std::endl;
+            std::cout << props.LocationId;
+
+            if (props.LocationId != monster.GetLocationId()) {
+                auto oldLocation = m_DataBase.GetFromFile<Location>(monster.GetLocationId());
+                auto newLocation = m_DataBase.GetFromFile<Location>(props.LocationId);
+
+                oldLocation.DecreaseMonsters();
+                newLocation.IncreaseMonsters();
+
+                m_DataBase.DeleteConnection<Location, Monster>(oldLocation.GetId(), monster.GetId());
+                m_DataBase.CreateConnection<Location, Monster>(newLocation.GetId(), monster.GetId());
+
+                m_DataBase.Update<Location>(oldLocation);
+                m_DataBase.Update<Location>(newLocation);
+            }
         }
 
-        for (const auto& location : locations)
-            std::cout << location << std::endl;
+        monster.SetProps(std::move(props));
 
-        int locationId;
-
-        std::cout << "Enter Location id:" << std::endl;
-        std::cin >> locationId;
-
-        auto&       location = m_DataBase.GetFromMemory<Location>(locationId);
-        std::string name;
-        float       area;
-        int         monstersMaxCount;
-
-        std::cout << "Enter location name:" << std::endl;
-        std::cin >> name;
-
-        std::cout << "Enter location area:" << std::endl;
-        std::cin >> area;
-
-        std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> monstersMaxCount;
-
-        location.SetName(std::move(name));
-        location.SetArea(area);
-        location.SetMonstersMaxCount(monstersMaxCount);
-
-        m_DataBase.Update(location);
+        m_DataBase.Update<Monster>(monster);
     }
 
     void MonsterManager_Impl::UpdateInFile() {
-        auto locations = m_DataBase.GetFromFile<Location>();
+        if (!PrintFromFile())
+            return;
+
+        int monsterId;
+
+        std::cout << "Enter Monster id:" << std::endl;
+        std::cin >> monsterId;
+
+        auto         monster = m_DataBase.GetFromFile<Monster>(monsterId);
+        MonsterProps props;
+
+        std::cout << "Enter monster name:" << std::endl;
+        std::cin >> props.Name;
+
+        std::cout << "Enter monster health:" << std::endl;
+        std::cin >> props.Health;
+
+        std::cout << "Enter monster damage:" << std::endl;
+        std::cin >> props.Damage;
+
+        std::cout << "Enter monster attack:" << std::endl;
+        std::cin >> props.Attack;
+
+        std::cout << "Enter monster attackType:" << std::endl;
+        for (int i = 1; i < 5; ++i)
+            std::cout << i << " - " << static_cast<Monster::AttackType>(i) << std::endl;
+        std::cin >> reinterpret_cast<int&>(props.AttackType);
+
+        auto locations = m_DataBase.SearchInFile<Location>([](const Location& location) {
+            return !location.IsFull();
+        });
 
         if (locations.empty()) {
-            std::cout << "No Locations in file!" << std::endl;
-            return;
+            std::cout << "No Location to add Monster! All Locations are full";
+        } else {
+            for (const auto& location : locations)
+                std::cout << *location << std::endl;
+
+            std::cout << "Enter Location id:" << std::endl;
+            std::cout << props.LocationId;
+
+            if (props.LocationId != monster.GetLocationId()) {
+                auto oldLocation = m_DataBase.GetFromFile<Location>(monster.GetLocationId());
+                auto newLocation = m_DataBase.GetFromFile<Location>(props.LocationId);
+
+                oldLocation.DecreaseMonsters();
+                newLocation.IncreaseMonsters();
+
+                m_DataBase.DeleteConnection<Location, Monster>(oldLocation.GetId(), monster.GetId());
+                m_DataBase.CreateConnection<Location, Monster>(newLocation.GetId(), monster.GetId());
+
+                m_DataBase.Update<Location>(oldLocation);
+                m_DataBase.Update<Location>(newLocation);
+            }
         }
 
-        for (const auto& location : locations)
-            std::cout << *location << std::endl;
+        monster.SetProps(std::move(props));
 
-        int locationId;
-
-        std::cout << "Enter Location id:" << std::endl;
-        std::cin >> locationId;
-
-        auto        location = m_DataBase.GetFromFile<Location>(locationId);
-        std::string name;
-        float       area;
-        int         monstersMaxCount;
-
-        std::cout << "Get location: " << location << std::endl;
-
-        std::cout << "Enter location name:" << std::endl;
-        std::cin >> name;
-
-        std::cout << "Enter location area:" << std::endl;
-        std::cin >> area;
-
-        std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> monstersMaxCount;
-
-        location.SetName(std::move(name));
-        location.SetArea(area);
-        location.SetMonstersMaxCount(monstersMaxCount);
-
-        m_DataBase.Update(location);
+        m_DataBase.Update<Monster>(monster);
     }
 
     void MonsterManager_Impl::SearchInMemory() {
