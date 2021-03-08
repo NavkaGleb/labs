@@ -4,13 +4,13 @@
 
 namespace RefactoredProject {
 
-    class LocationManager_Impl : public IEntityManager {
+    class MonsterManager_Impl : public IEntityManager {
     public:
-        friend class Singleton<LocationManager_Impl>;
+        friend class Singleton<MonsterManager_Impl>;
 
     private:
-        LocationManager_Impl() = default;
-        ~LocationManager_Impl() noexcept override = default;
+        MonsterManager_Impl() = default;
+        ~MonsterManager_Impl() noexcept override = default;
 
         void Create() override;
         void CreateRandom() override;
@@ -28,6 +28,6 @@ namespace RefactoredProject {
 
     }; // LocationManager_Impl
 
-    using LocationManager = Singleton<LocationManager_Impl>;
+    using MonsterManager = Singleton<MonsterManager_Impl>;
 
-} // RefactoredProject
+} // namespace RefactoredProject
