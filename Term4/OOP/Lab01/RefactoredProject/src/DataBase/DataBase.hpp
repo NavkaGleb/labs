@@ -29,9 +29,9 @@ namespace RefactoredProject {
         template <Entity T> void Load();
         template <Entity T> void Save();
 
-        template <Entity T> void DeleteFromMemory(int id);
+        template <Entity T> bool DeleteFromMemory(int id);
         template <Entity T> void DeleteFromFile(int id);
-        template <Entity T> void DeleteFromMemory();
+        template <Entity T> std::vector<T> DeleteFromMemory();
         template <Entity T> void DeleteFromFile();
 
         template <Entity T> void Truncate();
@@ -162,11 +162,17 @@ namespace RefactoredProject {
     }
 
     template <Entity T>
-    void DataBase_Impl::DeleteFromMemory(int id) {
-        if (!m_MemoryManager.IsInFile<T>(id))
-            m_RelationTable.DeleteMinor<T>(id);
+    bool DataBase_Impl::DeleteFromMemory(int id) {
+        bool isInFile = true;
 
-        return m_MemoryManager.Delete<T>(id);
+        if (!m_MemoryManager.IsInFile<T>(id)) {
+            m_RelationTable.DeleteMinor<T>(id);
+            isInFile = false;
+        }
+
+        m_MemoryManager.Delete<T>(id);
+
+        return isInFile;
     }
 
     template <Entity T>
@@ -193,25 +199,38 @@ namespace RefactoredProject {
     }
 
     template <Entity T>
-    void DataBase_Impl::DeleteFromMemory() {
-        if (m_RelationTable.IsMinor<T>())
+    std::vector<T> DataBase_Impl::DeleteFromMemory() {
+        std::vector<T> result;
+
+        if (m_RelationTable.IsMinor<T>()) {
             m_RelationTable.DeleteMinor<T>();
 
-        return m_MemoryManager.Delete<T>();
+            auto entities = m_MemoryManager.Get<T>();
+
+            for (const auto& entity : entities)
+                if (!m_MemoryManager.IsInFile<T>(entity->GetId()))
+                    result.emplace_back(*entity);
+        }
+
+        m_MemoryManager.Delete<T>();
+
+        return result;
     }
 
     template <Entity T>
     void DataBase_Impl::DeleteFromFile() {
         if (m_RelationTable.IsMajor<T>()) {
-            auto toDeleteTypes = m_RelationTable.GetMinorTypes<T>();
+            auto minorTypes = m_RelationTable.GetMinorTypes<T>();
 
             m_RelationTable.DeleteMajor<T>();
 
-            for (const auto& deleteType : toDeleteTypes) {
-                m_FileManager.Delete(deleteType);
-                m_MemoryManager.Delete(deleteType);
+            for (const auto& minorType : minorTypes) {
+                m_FileManager.Delete(minorType);
+                m_MemoryManager.Delete(minorType);
             }
         } else {
+            m_FileManager.Delete(TypeInfo::Get<T>());
+            m_MemoryManager.Delete(TypeInfo::Get<T>());
             m_RelationTable.DeleteMinor<T>();
         }
 

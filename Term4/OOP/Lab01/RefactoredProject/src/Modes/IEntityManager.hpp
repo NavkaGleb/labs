@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "DataBase/DataBase.hpp"
 
 namespace RefactoredProject {
@@ -10,7 +12,7 @@ namespace RefactoredProject {
         void Run(int command);
 
     protected:
-        IEntityManager();
+        IEntityManager(std::istream& istream, std::ostream& ostream);
         virtual ~IEntityManager() noexcept = default;
 
         virtual void Create()                              = 0;
@@ -27,9 +29,17 @@ namespace RefactoredProject {
         virtual void SearchInMemory()                      = 0;
         virtual void SearchInFile()                        = 0;
 
+        template <typename T>
+        void Get(std::function<void(T&)>&& inputFunc) {
+            inputFunc();
+        }
+
     protected:
         DataBase::TypeRef m_DataBase;
+        std::istream&     m_InputStream;
+        std::ostream&     m_OutputStream;
 
     }; // class IEntityManager
+    }
 
 } // namespace RefactoredProject

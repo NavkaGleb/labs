@@ -6,29 +6,32 @@
 
 namespace RefactoredProject {
         
+    LocationManager_Impl::LocationManager_Impl(std::istream& istream, std::ostream& ostream)
+        : IEntityManager(istream, ostream){}
+    
     void LocationManager_Impl::Create() {
         auto&         location = m_DataBase.Create<Location>();
         LocationProps props;
 
-        std::cout << "Enter location name:" << std::endl;
-        std::cin >> props.Name;
+        m_OutputStream << "Enter location name:" << std::endl;
+        Get(props.Name);
 
-        std::cout << "Enter location area:" << std::endl;
-        std::cin >> props.Area;
+        m_OutputStream << "Enter location area:" << std::endl;
+        m_InputStream >> props.Area;
 
-        std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> props.MonstersMaxCount;
+        m_OutputStream << "Enter location monstersMaxCount:" << std::endl;
+        m_InputStream >> props.MonstersMaxCount;
 
         location.SetProps(std::move(props));
 
-        std::cout << "Location " << location.GetName() << " was successfully created!" << std::endl;
+        m_OutputStream << "Location " << location.GetName() << " was successfully created!" << std::endl;
     }
 
     void LocationManager_Impl::CreateRandom() {
         int n;
 
-        std::cout << "Enter amount of locations:" << std::endl;
-        std::cin >> n;
+        m_OutputStream << "Enter amount of locations:" << std::endl;
+        m_InputStream >> n;
 
         for (int i = 0; i < n; ++i) {
             auto& location = m_DataBase.Create<Location>();
@@ -40,19 +43,19 @@ namespace RefactoredProject {
             });
         }
 
-        std::cout << n << " Locations was successfully added" << std::endl;
+        m_OutputStream << n << " Locations was successfully added" << std::endl;
     }
 
     bool LocationManager_Impl::PrintFromMemory() {
         auto locations = m_DataBase.GetFromMemory<Location>();
 
         if (locations.empty()) {
-            std::cout << "No Locations in memory!" << std::endl;
+            m_OutputStream << "No Locations in memory!" << std::endl;
             return false;
         }
 
         for (const auto& location : locations)
-            std::cout << *location << std::endl;
+            m_OutputStream << *location << std::endl;
 
         return true;
     }
@@ -61,43 +64,43 @@ namespace RefactoredProject {
         auto locations = m_DataBase.GetFromFile<Location>();
 
         if (locations.empty()) {
-            std::cout << "No Locations in file!" << std::endl;
+            m_OutputStream << "No Locations in file!" << std::endl;
             return false;
         }
 
         for (const auto& location : locations)
-            std::cout << *location << std::endl;
+            m_OutputStream << *location << std::endl;
 
         return true;
     }
 
     void LocationManager_Impl::Load() {
         m_DataBase.Load<Location>();
-        std::cout << "Locations was successfully loaded from file" << std::endl;
+        m_OutputStream << "Locations was successfully loaded from file" << std::endl;
     }
 
     void LocationManager_Impl::Save() {
         m_DataBase.Save<Location>();
-        std::cout << "Locations was successfully saved to file" << std::endl;
+        m_OutputStream << "Locations was successfully saved to file" << std::endl;
     }
 
     void LocationManager_Impl::DeleteFromMemory(CountType countType) {
         if (countType == CountType::Single) {
             if (!PrintFromMemory())
-                std::cout << "No Locations in memory!" << std::endl;
+                m_OutputStream << "No Locations in memory!" << std::endl;
 
             int locationId;
 
-            std::cout << "Enter locationId:" << std::endl;
-            std::cin >> locationId;
+            m_OutputStream << "Enter locationId:" << std::endl;
+            m_InputStream >> locationId;
 
             m_DataBase.DeleteFromMemory<Location>(locationId);
 
-            std::cout << "Location " << locationId << " was successfully deleted from memory!" << std::endl;
+            m_OutputStream << "Location " << locationId << " was successfully deleted from memory!" << std::endl;
         } else {
             m_DataBase.DeleteFromMemory<Location>();
 
-            std::cout << "Locations was successfully deleted from memory!" << std::endl;
+            m_OutputStream << "Locations was successfully deleted from memory!" << std::endl;
         }
     }
 
@@ -108,16 +111,16 @@ namespace RefactoredProject {
 
             int locationId;
 
-            std::cout << "Enter locationId:" << std::endl;
-            std::cin >> locationId;
+            m_OutputStream << "Enter locationId:" << std::endl;
+            m_InputStream >> locationId;
 
             m_DataBase.DeleteFromFile<Location>(locationId);
 
-            std::cout << "Location " << locationId << " was successfully deleted from file!" << std::endl;
+            m_OutputStream << "Location " << locationId << " was successfully deleted from file!" << std::endl;
         } else {
             m_DataBase.DeleteFromFile<Location>();
 
-            std::cout << "Locations was successfully deleted from file!" << std::endl;
+            m_OutputStream << "Locations was successfully deleted from file!" << std::endl;
         }
     }
     
@@ -131,26 +134,26 @@ namespace RefactoredProject {
 
         int locationId;
 
-        std::cout << "Enter Location id:" << std::endl;
-        std::cin >> locationId;
+        m_OutputStream << "Enter Location id:" << std::endl;
+        m_InputStream >> locationId;
 
         auto&         location = m_DataBase.GetFromMemory<Location>(locationId);
         LocationProps props;
 
-        std::cout << "Enter location name:" << std::endl;
-        std::cin >> props.Name;
+        m_OutputStream << "Enter location name:" << std::endl;
+        m_InputStream >> props.Name;
 
-        std::cout << "Enter location area:" << std::endl;
-        std::cin >> props.Area;
+        m_OutputStream << "Enter location area:" << std::endl;
+        m_InputStream >> props.Area;
 
-        std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> props.MonstersMaxCount;
+        m_OutputStream << "Enter location monstersMaxCount:" << std::endl;
+        m_InputStream >> props.MonstersMaxCount;
 
         location.SetProps(std::move(props));
 
         m_DataBase.Update<Location>(location);
 
-        std::cout << "Location " << location.GetId() << " was successfully updated" << std::endl;
+        m_OutputStream << "Location " << location.GetId() << " was successfully updated" << std::endl;
     }
 
     void LocationManager_Impl::UpdateInFile() {
@@ -159,28 +162,28 @@ namespace RefactoredProject {
 
         int locationId;
 
-        std::cout << "Enter Location id:" << std::endl;
-        std::cin >> locationId;
+        m_OutputStream << "Enter Location id:" << std::endl;
+        m_InputStream >> locationId;
 
         auto          location = m_DataBase.GetFromFile<Location>(locationId);
         LocationProps props;
 
-        std::cout << "Get location: " << location << std::endl;
+        m_OutputStream << "Get location: " << location << std::endl;
 
-        std::cout << "Enter location name:" << std::endl;
-        std::cin >> props.Name;
+        m_OutputStream << "Enter location name:" << std::endl;
+        m_InputStream >> props.Name;
 
-        std::cout << "Enter location area:" << std::endl;
-        std::cin >> props.Area;
+        m_OutputStream << "Enter location area:" << std::endl;
+        m_InputStream >> props.Area;
 
-        std::cout << "Enter location monstersMaxCount:" << std::endl;
-        std::cin >> props.MonstersMaxCount;
+        m_OutputStream << "Enter location monstersMaxCount:" << std::endl;
+        m_InputStream >> props.MonstersMaxCount;
 
         location.SetProps(std::move(props));
 
         m_DataBase.Update<Location>(location);
 
-        std::cout << "Location " << location.GetId() << " was successfully updated" << std::endl;
+        m_OutputStream << "Location " << location.GetId() << " was successfully updated" << std::endl;
     }
     
     void LocationManager_Impl::SearchInMemory() {

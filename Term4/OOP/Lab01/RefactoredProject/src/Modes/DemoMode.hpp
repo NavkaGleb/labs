@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 #include "IMode.hpp"
 
 namespace RefactoredProject {
@@ -11,8 +13,15 @@ namespace RefactoredProject {
         friend class Singleton<DemoMode_Impl>;
 
     private:
-        DemoMode_Impl() = default;
+        DemoMode_Impl();
         ~DemoMode_Impl() noexcept override = default;
+
+        void UpdateCommand();
+        [[nodiscard]] bool ParseCommand() const;
+
+    private:
+        std::basic_ifstream<char> m_InputStream;
+        int                       m_Command;
 
     }; // class DemoMode
 

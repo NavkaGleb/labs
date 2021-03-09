@@ -9,7 +9,7 @@ namespace RefactoredProject {
         friend class Singleton<MonsterManager_Impl>;
 
     private:
-        MonsterManager_Impl() = default;
+        MonsterManager_Impl(std::istream& istream, std::ostream& ostream);
         ~MonsterManager_Impl() noexcept override = default;
 
         void Create() override;

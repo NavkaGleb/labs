@@ -9,7 +9,7 @@ namespace RefactoredProject {
         friend class Singleton<LocationManager_Impl>;
 
     private:
-        LocationManager_Impl() = default;
+        LocationManager_Impl(std::istream& istream, std::ostream& ostream);
         ~LocationManager_Impl() noexcept override = default;
 
         void Create() override;
