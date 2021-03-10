@@ -40,6 +40,5 @@ namespace RefactoredProject {
         std::ostream&     m_OutputStream;
 
     }; // class IEntityManager
-    }
 
 } // namespace RefactoredProject
