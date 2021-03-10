@@ -86,35 +86,15 @@ namespace Ng {
     /// OptimalBinarySearchTree
     /////////////////////////////////////////////////////////////////////////////
     template <Comparable Key, typename Value>
-    OptimalBinarySearchTree<Key, Value>::OptimalBinarySearchTree(std::vector<float> probabilities, std::vector<Key> keys, std::vector<Value> values)
+    OptimalBinarySearchTree<Key, Value>::OptimalBinarySearchTree(
+        const std::vector<Key>& keys,
+        const std::vector<Value>& values,
+        const std::vector<float>& probabilities
+    )
         : m_Root(nullptr)
-        , m_Probabilities(std::move(probabilities)) {
+        , m_Size(keys.size()) {
 
-//        InitTable();
-        m_Table.resize(m_Probabilities.size() + 1);
-
-        for (std::size_t i = 0; i < m_Table.size(); ++i) {
-            m_Table[i].resize(m_Table.size());
-            m_Table[i][i].Cost = 0.0f;
-        }
-
-        for (std::size_t i = 0 ; i < m_Table.size(); ++i) {
-            for (std::size_t j = 0; j + 1 < m_Table.size() - i; ++j) {
-                std::size_t k = i + j + 1;
-
-                TablePair& currentCell = m_Table[j][k];
-
-                for (std::size_t l = j; l < k; ++l) {
-                    currentCell.Cost = std::min(currentCell.Cost, m_Table[j][l].Cost + m_Table[l + 1][k].Cost);
-
-                    if (currentCell.Cost == m_Table[j][l].Cost + m_Table[l + 1][k].Cost)
-                        currentCell.Pair = { keys[l], values[l] };
-                }
-
-                currentCell.Cost += std::accumulate(m_Probabilities.begin() + j, m_Probabilities.begin() + k, 0.0f);
-            }
-        }
-
+        InitTable(keys, values, probabilities);
         Build(m_Root, 0, m_Table.size() - 1);
     }
 
@@ -148,8 +128,12 @@ namespace Ng {
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::InitTable() {
-        m_Table.resize(m_Probabilities.size() + 1);
+    void OptimalBinarySearchTree<Key, Value>::InitTable(
+        const std::vector<Key>& keys,
+        const std::vector<Value>& values,
+        const std::vector<float>& probabilities
+    ) {
+        m_Table.resize(m_Size + 1);
 
         for (std::size_t i = 0; i < m_Table.size(); ++i) {
             m_Table[i].resize(m_Table.size());
@@ -162,10 +146,14 @@ namespace Ng {
 
                 TablePair& currentCell = m_Table[j][k];
 
-                for (std::size_t l = j; l < k; ++l)
+                for (std::size_t l = j; l < k; ++l) {
                     currentCell.Cost = std::min(currentCell.Cost, m_Table[j][l].Cost + m_Table[l + 1][k].Cost);
 
-                currentCell += std::accumulate(m_Probabilities.begin() + j, m_Probabilities.begin() + k, 0.0f);
+                    if (currentCell.Cost == m_Table[j][l].Cost + m_Table[l + 1][k].Cost)
+                        currentCell.Pair = { keys[l], values[l] };
+                }
+
+                currentCell.Cost += std::accumulate(probabilities.begin() + j, probabilities.begin() + k, 0.0f);
             }
         }
     }
@@ -210,10 +198,12 @@ namespace Ng {
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::Print(const Node* node,
-                                                    int level,
-                                                    const char* caption,
-                                                    std::ostream& ostream) const {
+    void OptimalBinarySearchTree<Key, Value>::Print(
+        const Node* node,
+        int level,
+        const char* caption,
+        std::ostream& ostream
+    ) const {
         if (!node) {
             ostream << caption << ": Null" << std::endl;
             return;

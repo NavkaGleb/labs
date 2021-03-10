@@ -3,8 +3,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "ITree.hpp"
-
 namespace Ng {
 
     template <typename T>
@@ -72,8 +70,14 @@ namespace Ng {
 
         }; // class Iterator
 
-        OptimalBinarySearchTree(std::vector<float> probabilities, std::vector<Key> keys, std::vector<Value> values);
+        OptimalBinarySearchTree(
+            const std::vector<Key>& keys,
+            const std::vector<Value>& values,
+            const std::vector<float>& probabilities
+        );
         ~OptimalBinarySearchTree();
+
+        [[nodiscard]] inline int GetSize() const { return m_Size; }
 
         void PrintTable() const;
 
@@ -89,7 +93,11 @@ namespace Ng {
             std::pair<Key, Value>  Pair;
         };
 
-        void InitTable();
+        void InitTable(
+            const std::vector<Key>& keys,
+            const std::vector<Value>& values,
+            const std::vector<float>& probabilities
+        );
         void Build(Node*& node, int left, int top);
 
         [[nodiscard]] Node* GetMinNode(Node* node) const;
@@ -98,9 +106,8 @@ namespace Ng {
         void Print(const Node* node, int level, const char* caption, std::ostream& ostream) const;
 
     private:
-        Node* m_Root;
-
-        std::vector<float>                  m_Probabilities;
+        Node*                               m_Root;
+        int                                 m_Size;
         std::vector<std::vector<TablePair>> m_Table;
 
     }; // class OptimalBinarySearchTree

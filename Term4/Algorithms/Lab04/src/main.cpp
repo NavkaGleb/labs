@@ -1,13 +1,15 @@
 #include <iostream>
 
-#include <OptimalBinarySearchTree.hpp>
+#include <Random/Random.hpp>
+
+#include "OptimalBinarySearchTree.hpp"
 
 int main() {
-    std::vector keys = { 1,    2,    3,     4,   };
-    std::vector values = { 1, 2, 3, 4 };
-    std::vector prob = { 4.0f, 2.0f, 6.0f, 3.0f };
+    std::vector keys          = { 1,    2,    3,    4,   };
+    std::vector values        = { 1,    2,    3,    4    };
+    std::vector probabilities = { 0.3f, 0.2f, 0.1f, 0.5f };
 
-    Ng::OptimalBinarySearchTree<int, int> tree(prob, keys, values);
+    Ng::OptimalBinarySearchTree<int, int> tree(keys, values, probabilities);
 
     tree.PrintTable();
 

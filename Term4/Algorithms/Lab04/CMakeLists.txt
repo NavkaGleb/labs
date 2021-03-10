@@ -14,4 +14,8 @@ file(GLOB SOURCE_FILES
 
 include_directories(src)
 
-add_executable(Lab04 ${HEADER_FILES} ${SOURCE_FILES})
+add_subdirectory(lib/Random)
+
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} NgRandom)
