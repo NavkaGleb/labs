@@ -3,12 +3,14 @@
 #include <type_traits>
 #include <vector>
 
+#include "IteratorRange.hpp"
+
 namespace Ng {
 
     template <typename T>
     concept Comparable = requires(T lhs, T rhs) {
         { lhs < rhs } -> std::same_as<bool>;
-        { rhs < rhs } -> std::same_as<bool>;
+        { lhs > rhs } -> std::same_as<bool>;
     };
 
     template <Comparable KeyType, typename ValueType>
@@ -78,10 +80,58 @@ namespace Ng {
 
         }; // class Iterator
 
+        class ConstIterator : public IteratorBase {
+        public:
+            explicit ConstIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+            virtual ~ConstIterator() = default;
+
+            [[nodiscard]] inline const Pair& operator *() const { return this->GetNode()->m_Pair; }
+            [[nodiscard]] inline const Pair* operator ->() const { return &this->GetNode()->m_Pair; }
+
+        }; // class ConstIterator
+
+        class KeyIterator : public IteratorBase {
+        public:
+            explicit KeyIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+            virtual ~KeyIterator() = default;
+
+            [[nodiscard]] inline const Key& operator *() const { return this->GetNode()->m_Pair.first; }
+            [[nodiscard]] inline const Key* operator ->() const { return &this->GetNode()->m_Pair.first; }
+
+        }; // class KeyIterator
+
+        class ValueIterator : public IteratorBase {
+        public:
+            explicit ValueIterator(Node* node = nullptr)
+                : IteratorBase(node) {}
+            virtual ~ValueIterator() = default;
+
+            [[nodiscard]] inline Value& operator *() { return this->GetNode()->m_Pair.second; }
+            [[nodiscard]] inline Value* operator ->() { return &this->GetNode()->m_Pair.second; }
+
+        }; // class ValueIterator
+
          OptimalBinarySearchTree();
         ~OptimalBinarySearchTree();
 
+        [[nodiscard]] inline bool IsEmpty() const { return m_Size == 0; };
         [[nodiscard]] inline int GetSize() const { return m_Size; }
+
+        [[nodiscard]] bool IsExists(const Key& key) const;
+        [[nodiscard]] int GetHeight() const;
+
+        [[nodiscard]] const Value& GetMin() const;
+        [[nodiscard]] const Value& GetMax() const;
+
+        [[nodiscard]] Value& Get(const Key& key);
+        [[nodiscard]] const Value& Get(const Key& key) const;
+
+        [[nodiscard]] IteratorRange<KeyIterator> GetKeys() const;
+        [[nodiscard]] IteratorRange<ValueIterator> GetValues() const;
+
+        void Clear();
 
         void SetData(const std::vector<DataCell>& data);
 
@@ -91,6 +141,12 @@ namespace Ng {
         [[nodiscard]] Iterator begin() { return Iterator(GetMinNode(m_Root)); }
         [[nodiscard]] Iterator end() { return Iterator(); }
 
+        [[nodiscard]] ConstIterator begin() const { return ConstIterator(GetMinNode(m_Root)); }
+        [[nodiscard]] ConstIterator end() const { return ConstIterator(); }
+
+        [[nodiscard]] ConstIterator cbegin() const { return ConstIterator(GetMinNode(m_Root)); }
+        [[nodiscard]] ConstIterator cend() const { return ConstIterator(); }
+
     private:
         struct TablePair {
             float       Cost  = std::numeric_limits<float>::infinity();
@@ -99,6 +155,11 @@ namespace Ng {
 
         void InitTable(const std::vector<DataCell>& data);
         void Build(Node*& node, std::size_t row, std::size_t column, const std::vector<DataCell>& data);
+
+        [[nodiscard]] int GetHeight(Node* node) const;
+
+        [[nodiscard]] const Value& GetMin(Node* node) const;
+        [[nodiscard]] const Value& GetMax(Node* node) const;
 
         [[nodiscard]] Node* GetMinNode(Node* node) const;
         [[nodiscard]] Node* GetMaxNode(Node* node) const;

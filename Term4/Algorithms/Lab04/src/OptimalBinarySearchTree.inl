@@ -88,13 +88,91 @@ namespace Ng {
     template <Comparable Key, typename Value>
     OptimalBinarySearchTree<Key, Value>::OptimalBinarySearchTree()
         : m_Root(nullptr)
-        , m_Size(0) {
-
-    }
+        , m_Size(0) {}
 
     template <Comparable Key, typename Value>
     OptimalBinarySearchTree<Key, Value>::~OptimalBinarySearchTree() {
         delete m_Root;
+    }
+
+    template <Comparable Key, typename Value>
+    bool OptimalBinarySearchTree<Key, Value>::IsExists(const Key& key) const {
+        Node* node = m_Root;
+
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
+
+        return node;
+    }
+
+    template <Comparable Key, typename Value>
+    int OptimalBinarySearchTree<Key, Value>::GetHeight() const {
+        return GetHeight(m_Root);
+    }
+
+    template <Comparable Key, typename Value>
+    const Value& OptimalBinarySearchTree<Key, Value>::GetMin() const {
+        if (!m_Root)
+            throw std::out_of_range("Ng::SplayTree::GetMin: m_Root is nullptr!");
+
+        return GetMin(m_Root);
+    }
+
+    template <Comparable Key, typename Value>
+    Value& OptimalBinarySearchTree<Key, Value>::Get(const Key& key) {
+        Node* node = m_Root;
+
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
+
+        if (!node)
+            throw std::out_of_range("Ng::SplayTree::Get: key is not exists!");
+
+        return node->m_Pair.second;
+    }
+
+    template <Comparable Key, typename Value>
+    const Value& OptimalBinarySearchTree<Key, Value>::Get(const Key& key) const {
+        Node* node = m_Root;
+
+        while (node && key != node->m_Pair.first)
+            node = node->m_Pair.first > key ? node->m_Left : node->m_Right;
+
+        if (!node)
+            throw std::out_of_range("Ng::SplayTree::Get: key is not exists!");
+
+        return node->m_Pair.second;
+    }
+
+    template <Comparable Key, typename Value>
+    IteratorRange<
+        typename OptimalBinarySearchTree<Key, Value>::KeyIterator
+    > OptimalBinarySearchTree<Key, Value>::GetKeys() const {
+        return { KeyIterator(GetMinNode(m_Root)), KeyIterator() };
+    }
+
+    template <Comparable Key, typename Value>
+    IteratorRange<
+        typename OptimalBinarySearchTree<Key, Value>::ValueIterator
+    > OptimalBinarySearchTree<Key, Value>::GetValues() const {
+        return { ValueIterator(GetMinNode(m_Root)), ValueIterator() };
+    }
+
+    template <Comparable Key, typename Value>
+    const Value& OptimalBinarySearchTree<Key, Value>::GetMax() const {
+        if (!m_Root)
+            throw std::out_of_range("Ng::SplayTree::GetMax: m_Root is nullptr!");
+
+        return GetMax(m_Root);
+    }
+
+    template <Comparable Key, typename Value>
+    void OptimalBinarySearchTree<Key, Value>::Clear() {
+        delete m_Root;
+
+        m_Root = nullptr;
+        m_Size = 0;
+        m_Table.clear();
     }
 
     template <Comparable Key, typename Value>
@@ -192,6 +270,27 @@ namespace Ng {
 
         if (right)
             right->m_Parent = node;
+    }
+
+    template <Comparable Key, typename Value>
+    int OptimalBinarySearchTree<Key, Value>::GetHeight(Node* node) const {
+        return node ? std::max(GetHeight(node->m_Left), GetHeight(node->m_Right)) + 1 : 0;
+    }
+
+    template <Comparable Key, typename Value>
+    const Value& OptimalBinarySearchTree<Key, Value>::GetMin(Node* node) const {
+        while (node && node->m_Left)
+            node = node->m_Left;
+
+        return node->m_Pair.second;
+    }
+
+    template <Comparable Key, typename Value>
+    const Value& OptimalBinarySearchTree<Key, Value>::GetMax(Node* node) const {
+        while (node && node->m_Right)
+            node = node->m_Right;
+
+        return node->m_Pair.second;
     }
 
     template <Comparable Key, typename Value>

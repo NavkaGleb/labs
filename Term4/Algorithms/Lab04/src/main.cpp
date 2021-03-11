@@ -4,6 +4,26 @@
 
 #include "OptimalBinarySearchTree.hpp"
 
+enum class Category : int {
+    None = 0,
+    Sport,
+    Politics,
+    Science,
+    Economics
+};
+
+std::ostream& operator <<(std::ostream& ostream, const Category& category) {
+    switch (category) {
+        case Category::None:      ostream << "None";      break;
+        case Category::Sport:     ostream << "Sport";     break;
+        case Category::Politics:  ostream << "Politics";  break;
+        case Category::Science:   ostream << "Science";   break;
+        case Category::Economics: ostream << "Economics"; break;
+    }
+
+    return ostream;
+}
+
 template <typename Iterator>
 void PrintData(Iterator begin, Iterator end) {
     fort::char_table table;
@@ -19,23 +39,40 @@ void PrintData(Iterator begin, Iterator end) {
 int main() {
     const std::size_t size = 4;
 
-    Ng::OptimalBinarySearchTree<int, int> tree;
+    Ng::OptimalBinarySearchTree<int, Category> tree;
     std::vector<decltype(tree)::DataCell> data(size);
 
-    for (int i = 0; i < size; ++i)
-        data[i] = { (i + 1) * 10, (i + 1) * 10, Ng::Random::Get(0.0f, 1.0f) };
-
-    data[0].Probability = 4;
-    data[1].Probability = 2;
-    data[2].Probability = 6;
-    data[3].Probability = 3;
+    for (int i = 0; i < size; ++i) {
+        data[i] = {
+            i,
+            static_cast<Category>(Ng::Random::Get<int>(1, 4)),
+            Ng::Random::Get(0.0f, 1.0f)
+        };
+    }
 
     tree.SetData(data);
 
     PrintData(data.begin(), data.end());
 
+    // Range based for
     for (const auto& [key, value] : tree)
-        std::cout << key << " -> " << value << std::endl;
+        std::cout << "{ " << key << " -> " << value << " }" << std::endl;
+    std::cout << std::endl;
+
+    // Keys
+    std::cout << "Keys: ";
+    for (const auto& key : tree.GetKeys())
+        std::cout << key << " ";
+    std::cout << std::endl;
+
+    // Values
+    std::cout << "Values: ";
+    for (const auto& value : tree.GetValues())
+        std::cout << value << " ";
+    std::cout << std::endl;
+
+    std::cout << "Size: " << tree.GetSize() << std::endl;
+    std::cout << "Height: " << tree.GetHeight() << std::endl;
 
     tree.Print();
     tree.PrintTable();
