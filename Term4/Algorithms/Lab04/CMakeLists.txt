@@ -15,7 +15,8 @@ file(GLOB SOURCE_FILES
 include_directories(src)
 
 add_subdirectory(lib/Random)
+add_subdirectory(lib/libfort)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} NgRandom)
+target_link_libraries(${PROJECT_NAME} PRIVATE NgRandom libfort::fort)

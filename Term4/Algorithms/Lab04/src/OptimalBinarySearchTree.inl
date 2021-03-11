@@ -1,8 +1,8 @@
 #include <cmath>
 #include <numeric>
 #include <utility>
-#include "OptimalBinarySearchTree.hpp"
 
+#include <fort.hpp>
 
 namespace Ng {
 
@@ -13,8 +13,8 @@ namespace Ng {
     OptimalBinarySearchTree<Key, Value>::Node::Node(const Pair& pair, Node* parent, Node* left, Node* right)
         : m_Pair(pair)
         , m_Parent(parent)
-        , m_Left(parent)
-        , m_Right(parent) {}
+        , m_Left(left)
+        , m_Right(right) {}
 
     template <Comparable Key, typename Value>
     OptimalBinarySearchTree<Key, Value>::Node::~Node() {
@@ -23,16 +23,16 @@ namespace Ng {
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::Node::Print(std::ostream& ostream) const {
-        ostream << "<Key: " << m_Pair.first << ", Value: " << m_Pair.second << "> {L: ";
+    void OptimalBinarySearchTree<Key, Value>::Node::Print() const {
+        std::cout << "<Key: " << m_Pair.first << ", Value: " << m_Pair.second << "> {L: ";
 
-        if (m_Left) ostream << m_Left->m_Pair.first;
-        else        ostream << "Null";
-        ostream << ", R: ";
+        if (m_Left) std::cout << m_Left->m_Pair.first;
+        else        std::cout << "Null";
+        std::cout << ", R: ";
 
-        if (m_Right) ostream << m_Right->m_Pair.first;
-        else         ostream << "Null";
-        ostream << "}";
+        if (m_Right) std::cout << m_Right->m_Pair.first;
+        else         std::cout << "Null";
+        std::cout << "}";
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -86,16 +86,10 @@ namespace Ng {
     /// OptimalBinarySearchTree
     /////////////////////////////////////////////////////////////////////////////
     template <Comparable Key, typename Value>
-    OptimalBinarySearchTree<Key, Value>::OptimalBinarySearchTree(
-        const std::vector<Key>& keys,
-        const std::vector<Value>& values,
-        const std::vector<float>& probabilities
-    )
+    OptimalBinarySearchTree<Key, Value>::OptimalBinarySearchTree()
         : m_Root(nullptr)
-        , m_Size(keys.size()) {
+        , m_Size(0) {
 
-        InitTable(keys, values, probabilities);
-        Build(m_Root, 0, m_Table.size() - 1);
     }
 
     template <Comparable Key, typename Value>
@@ -104,35 +98,45 @@ namespace Ng {
     }
 
     template <Comparable Key, typename Value>
+    void OptimalBinarySearchTree<Key, Value>::SetData(const std::vector<DataCell>& data) {
+        m_Size = data.size();
+
+        InitTable(data);
+        Build(m_Root, 0, m_Size, data);
+    }
+
+    template <Comparable Key, typename Value>
     void OptimalBinarySearchTree<Key, Value>::PrintTable() const {
-        std::cout << "\t";
-        for (int i = 0; i < m_Table.size(); ++i)
-            std::cout << i << "\t";
-        std::cout << std::endl;
+        fort::char_table table;
+
+        table << fort::header << "N";
+
+        for (int i = 0 ; i < m_Table.size(); ++i) {
+            table.cur_cell().set_cell_text_align(fort::text_align::right);
+            table << i;
+        }
+
+        table << fort::endr;
 
         for (int i = 0; i < m_Table.size(); ++i) {
-            std::cout << i << "\t";
-            for (int j = 0; j < m_Table.size(); ++j) {
-                std::cout << m_Table[i][j].Cost << ": " << m_Table[i][j].Pair.first << "\t";
-            }
+            table << i;
 
-            std::cout << std::endl;
+            for (int j = 0; j < m_Table.size(); ++j)
+                table << std::to_string(m_Table[i][j].Cost) + ": " + std::to_string(m_Table[i][j].Index);
+
+            table << fort::endr;
         }
+
+        std::cout << table.to_string() << std::endl;
     }
 
     template <Comparable Key, typename Value>
-    std::ostream& operator <<(std::ostream& ostream, const OptimalBinarySearchTree<Key, Value>& tree) {
-        tree.Print(tree.m_Root, 1, "Root", ostream);
-
-        return ostream;
+    void OptimalBinarySearchTree<Key, Value>::Print() const {
+        return Print(m_Root, 1, "Root");
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::InitTable(
-        const std::vector<Key>& keys,
-        const std::vector<Value>& values,
-        const std::vector<float>& probabilities
-    ) {
+    void OptimalBinarySearchTree<Key, Value>::InitTable(const std::vector<DataCell>& data) {
         m_Table.resize(m_Size + 1);
 
         for (std::size_t i = 0; i < m_Table.size(); ++i) {
@@ -150,29 +154,44 @@ namespace Ng {
                     currentCell.Cost = std::min(currentCell.Cost, m_Table[j][l].Cost + m_Table[l + 1][k].Cost);
 
                     if (currentCell.Cost == m_Table[j][l].Cost + m_Table[l + 1][k].Cost)
-                        currentCell.Pair = { keys[l], values[l] };
+                        currentCell.Index = l;
                 }
 
-                currentCell.Cost += std::accumulate(probabilities.begin() + j, probabilities.begin() + k, 0.0f);
+                currentCell.Cost += std::accumulate(
+                    data.begin() + j,
+                    data.begin() + k,
+                    0.0f,
+                    [](float sum, const auto& cell) { return sum + cell.Probability; }
+                );
             }
         }
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::Build(Node*& node, int left, int top) {
-        if (left >= top)
+    void OptimalBinarySearchTree<Key, Value>::Build(
+        Node*&                       node,
+        std::size_t                  row,
+        std::size_t                  column,
+        const std::vector<DataCell>& data
+    ) {
+        if (row >= column)
             return;
 
-        node = new Node(m_Table[left][top].Pair);
+        std::size_t index = m_Table[row][column].Index;
 
-        Build(node->m_Left,  left,               node->m_Pair.first - 1);
-        Build(node->m_Right, node->m_Pair.first, top                   );
+        node = new Node({ data[index].Key, data[index].Value });
 
-        if (node->m_Left)
-            node->m_Left->m_Parent = node;
+        auto*& left  = node->m_Left;
+        auto*& right = node->m_Right;
 
-        if (node->m_Right)
-            node->m_Right->m_Parent = node;
+        Build(left,  row,       index,  data);
+        Build(right, index + 1, column, data);
+
+        if (left)
+            left->m_Parent = node;
+
+        if (right)
+            right->m_Parent = node;
     }
 
     template <Comparable Key, typename Value>
@@ -198,37 +217,32 @@ namespace Ng {
     }
 
     template <Comparable Key, typename Value>
-    void OptimalBinarySearchTree<Key, Value>::Print(
-        const Node* node,
-        int level,
-        const char* caption,
-        std::ostream& ostream
-    ) const {
+    void OptimalBinarySearchTree<Key, Value>::Print(const Node* node, int level, const std::string& caption) const {
         if (!node) {
-            ostream << caption << ": Null" << std::endl;
+            std::cout << caption << ": Null" << std::endl;
             return;
         }
 
-        ostream << caption << ": ";
-        node->Print(ostream);
+        std::cout << caption << ": ";
+        node->Print();
 
         if (node->m_Left || node->m_Right) {
-            ostream << " (" << std::endl;
+            std::cout << " (" << std::endl;
 
             for (int i = 0; i < level; i++)
-                ostream << "| ";
-            Print(node->m_Left, level + 1, "Left", ostream);
+                std::cout << "| ";
+            Print(node->m_Left, level + 1, "Left");
 
             for (int i = 0; i < level; i++)
-                ostream << "| ";
-            Print(node->m_Right, level + 1, "Right", ostream);
+                std::cout << "| ";
+            Print(node->m_Right, level + 1, "Right");
 
             for (int i = 0; i < level - 1; i++)
-                ostream << "| ";
-            ostream << ")";
+                std::cout << "| ";
+            std::cout << ")";
         }
 
-        ostream << std::endl;
+        std::cout << std::endl;
     }
 
 } // namespace Ng

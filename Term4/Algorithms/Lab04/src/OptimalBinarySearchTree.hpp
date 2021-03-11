@@ -11,10 +11,18 @@ namespace Ng {
         { rhs < rhs } -> std::same_as<bool>;
     };
 
-    template <Comparable Key, typename Value>
+    template <Comparable KeyType, typename ValueType>
     class OptimalBinarySearchTree {
     public:
+        using Key   = KeyType;
+        using Value = ValueType;
         using Pair = std::pair<const Key, Value>;
+
+        struct DataCell {
+            Key   Key         = KeyType();
+            Value Value       = ValueType();
+            float Probability = 0.0f;
+        };
 
         class Node {
         public:
@@ -30,7 +38,7 @@ namespace Ng {
             friend class OptimalBinarySearchTree;
 
         private:
-            void Print(std::ostream& ostream) const;
+            void Print() const;
 
         private:
             Pair  m_Pair;
@@ -70,40 +78,32 @@ namespace Ng {
 
         }; // class Iterator
 
-        OptimalBinarySearchTree(
-            const std::vector<Key>& keys,
-            const std::vector<Value>& values,
-            const std::vector<float>& probabilities
-        );
+         OptimalBinarySearchTree();
         ~OptimalBinarySearchTree();
 
         [[nodiscard]] inline int GetSize() const { return m_Size; }
 
+        void SetData(const std::vector<DataCell>& data);
+
         void PrintTable() const;
+        void Print() const;
 
         [[nodiscard]] Iterator begin() { return Iterator(GetMinNode(m_Root)); }
         [[nodiscard]] Iterator end() { return Iterator(); }
 
-        template <Comparable Key_, typename Value_>
-        friend std::ostream& operator <<(std::ostream& ostream, const OptimalBinarySearchTree<Key_, Value_>& tree);
-
     private:
         struct TablePair {
-            float Cost = std::numeric_limits<float>::infinity();
-            std::pair<Key, Value>  Pair;
+            float       Cost  = std::numeric_limits<float>::infinity();
+            std::size_t Index = 0;
         };
 
-        void InitTable(
-            const std::vector<Key>& keys,
-            const std::vector<Value>& values,
-            const std::vector<float>& probabilities
-        );
-        void Build(Node*& node, int left, int top);
+        void InitTable(const std::vector<DataCell>& data);
+        void Build(Node*& node, std::size_t row, std::size_t column, const std::vector<DataCell>& data);
 
         [[nodiscard]] Node* GetMinNode(Node* node) const;
         [[nodiscard]] Node* GetMaxNode(Node* node) const;
 
-        void Print(const Node* node, int level, const char* caption, std::ostream& ostream) const;
+        void Print(const Node* node, int level, const std::string& caption) const;
 
     private:
         Node*                               m_Root;
