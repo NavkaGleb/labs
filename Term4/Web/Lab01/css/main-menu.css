@@ -1,0 +1,36 @@
+#main-menu {
+	background: #1A1A1D;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.main-menu-align {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.main-menu-list {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.main-menu-list-item, .main-menu-list-item > a {
+	display: inline;
+	font-size: 20px;
+	font-weight: bold;
+	color: white;
+}
+
+.main-menu-list-hover-item:hover > a {
+	color: red;
+	transition: .5s all;
+}
+
+.main-menu-list-separator {
+	margin-left: 10px;
+	margin-right: 10px;
+}

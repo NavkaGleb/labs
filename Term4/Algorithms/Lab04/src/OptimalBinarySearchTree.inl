@@ -180,6 +180,9 @@ namespace Ng {
         m_Size = data.size();
 
         InitTable(data);
+
+        PrintTable();
+
         Build(m_Root, 0, m_Size, data);
     }
 
@@ -215,6 +218,8 @@ namespace Ng {
 
     template <Comparable Key, typename Value>
     void OptimalBinarySearchTree<Key, Value>::InitTable(const std::vector<DataCell>& data) {
+        std::vector<float> costs(data.size());
+
         m_Table.resize(m_Size + 1);
 
         for (std::size_t i = 0; i < m_Table.size(); ++i) {
@@ -222,9 +227,9 @@ namespace Ng {
             m_Table[i][i].Cost = 0.0f;
         }
 
-        for (std::size_t i = 0 ; i < m_Table.size(); ++i) {
-            for (std::size_t j = 0; j + 1 < m_Table.size() - i; ++j) {
-                std::size_t k = i + j + 1;
+        for (std::size_t i = 1; i < m_Table.size(); ++i) {
+            for (std::size_t j = 0; j < m_Table.size() - i; ++j) {
+                std::size_t k = i + j;
 
                 TablePair& currentCell = m_Table[j][k];
 
@@ -232,7 +237,7 @@ namespace Ng {
                     currentCell.Cost = std::min(currentCell.Cost, m_Table[j][l].Cost + m_Table[l + 1][k].Cost);
 
                     if (currentCell.Cost == m_Table[j][l].Cost + m_Table[l + 1][k].Cost)
-                        currentCell.Index = l;
+                          currentCell.Index = l;
                 }
 
                 currentCell.Cost += std::accumulate(

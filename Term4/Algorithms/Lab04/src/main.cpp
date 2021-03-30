@@ -37,7 +37,7 @@ void PrintData(Iterator begin, Iterator end) {
 }
 
 int main() {
-    const std::size_t size = 4;
+    const std::size_t size = 7;
 
     Ng::OptimalBinarySearchTree<int, Category> tree;
     std::vector<decltype(tree)::DataCell> data(size);
@@ -46,7 +46,7 @@ int main() {
         data[i] = {
             i,
             static_cast<Category>(Ng::Random::Get<int>(1, 4)),
-            Ng::Random::Get(0.0f, 1.0f)
+            1.0f / size
         };
     }
 
