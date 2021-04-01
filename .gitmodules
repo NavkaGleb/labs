@@ -22,3 +22,6 @@
 [submodule "Term4/Algorithms/Lab04/lib/libfort"]
 	path = Term4/Algorithms/Lab04/lib/libfort
 	url = https://github.com/seleznevae/libfort
+[submodule "Term4/Algorithms/Lab07/Dependencies/Random"]
+	path = Term4/Algorithms/Lab07/Dependencies/Random
+	url = https://github.com/NavkaGleb/Random
