@@ -34,8 +34,8 @@ std::ostream& operator <<(std::ostream& ostream, const News& news) {
 }
 
 struct Comparator {
-    bool operator ()(const News& lhs, const News& rhs) {
-        return std::stoi(lhs.Name) < std::stoi(rhs.Name);
+    bool operator ()(const News& lhs, const News& rhs) const {
+        return std::stoi(lhs.Name) > std::stoi(rhs.Name);
     }
 };
 
@@ -49,10 +49,12 @@ int main() {
 
     heap.Print();
 
-    while (!heap.IsEmpty())
+    while (!heap.IsEmpty()) {
+        std::cout << "Peak: " << heap.GetPeak() << std::endl;
         heap.PopPeak();
+    }
 
-    std::cout << "after" << std::endl;
+    std::cout << "After delete" << std::endl;
     heap.Print();
 
     return 0;
