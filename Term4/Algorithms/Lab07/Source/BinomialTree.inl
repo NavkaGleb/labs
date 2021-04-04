@@ -18,9 +18,6 @@ namespace Ng {
 
     template <typename T>
     typename BinomialTree<T>::Node* BinomialTree<T>::Node::Get(std::size_t index) {
-//        std::cout << "-- Enter Root = " << m_Value << std::endl;
-//        std::cout << "- index = " << index << std::endl;
-
         if (index == 0)
             return this;
 

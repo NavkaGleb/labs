@@ -25,3 +25,6 @@
 [submodule "Term4/Algorithms/Lab07/Dependencies/Random"]
 	path = Term4/Algorithms/Lab07/Dependencies/Random
 	url = https://github.com/NavkaGleb/Random
+[submodule "Term4/Algorithms/Lab06/external/Random"]
+	path = Term4/Algorithms/Lab06/external/Random
+	url = https://github.com/NavkaGleb/Random
