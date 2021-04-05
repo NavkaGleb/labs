@@ -4,106 +4,17 @@
 namespace Ng {
 
     template <typename Key, typename Value, int Degree>
-    BPlusTree<Key, Value, Degree>::Node::Node(bool isLeaf)
-        : m_Parent(nullptr)
-        , m_LeftSibling(nullptr)
-        , m_RightSibling(nullptr)
-        , m_IsLeaf(isLeaf) {}
-
-    template <typename Key, typename Value, int Degree>
-    typename BPlusTree<Key, Value, Degree>::Node::KeyIterator BPlusTree<Key, Value, Degree>::Node::GetKeyMedian() {
-        auto median = m_Keys.begin();
-        std::advance(median, m_Keys.size() / 2);
-
-        return median;
-    }
-
-    template <typename Key, typename Value, int Degree>
-    typename BPlusTree<
-        Key,
-        Value,
-        Degree
-    >::Node::ChildIterator BPlusTree<Key, Value, Degree>::Node::GetChildIterator(KeyIterator keyMedian) {
-        return m_Children.begin() + std::distance(m_Keys.begin(), keyMedian) + 1;
-    }
-
-    template <typename Key, typename Value, int Degree>
-    typename BPlusTree<Key, Value, Degree>::Node* BPlusTree<Key, Value, Degree>::Node::GetChild(const Key& key) {
-        if (m_IsLeaf)
-            return nullptr;
-
-        auto it    = --m_Keys.upper_bound(key);
-        auto index = key < *m_Keys.begin() ? 0 : std::distance(m_Keys.begin(), it) + 1;
-
-        return m_Children[index];
-    }
-
-    template <typename Key, typename Value, int Degree>
-    typename BPlusTree<
-        Key,
-        Value,
-        Degree
-    >::Node::KeyIterator BPlusTree<Key, Value, Degree>::Node::PushKey(const Key& key) {
-        return m_Keys.insert(key).first;
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PushKeys(KeyIterator begin, KeyIterator end) {
-        m_Keys.insert(begin, end);
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PushChild(Node* child) {
-        PushChild(m_Children.end(), child);
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PushChild(ChildIterator iterator, Node* child) {
-        iterator = m_Children.insert(iterator, child);
-
-        child->m_Parent = this;
-
-        Node* leftSibling  = iterator            == m_Children.begin() ? nullptr : *std::prev(iterator);
-        Node* rightSibling = std::next(iterator) == m_Children.end()   ? nullptr : *std::next(iterator);
-
-        child->m_LeftSibling  = leftSibling;
-        child->m_RightSibling = rightSibling;
-
-        if (leftSibling)
-            leftSibling->m_RightSibling = child;
-
-        if (rightSibling)
-            rightSibling->m_LeftSibling = child;
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PushChildren(ChildIterator begin, ChildIterator end) {
-        m_Children.reserve(std::distance(begin, end));
-
-        for (auto it = begin; it != end; ++it)
-            m_Children.emplace_back(*it)->m_Parent = this;
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PopChildren(ChildIterator begin, ChildIterator end) {
-        m_Children.erase(begin, end);
-    }
-
-    template <typename Key, typename Value, int Degree>
-    void BPlusTree<Key, Value, Degree>::Node::PopKeys(KeyIterator begin, KeyIterator end) {
-        m_Keys.erase(begin, end);
-    }
-
-    template <typename Key, typename Value, int Degree>
     BPlusTree<Key, Value, Degree>::BPlusTree()
-        : m_Root(nullptr) {
+        : m_Root(nullptr)
+        , m_Count(0) {
 
         static_assert(Degree > 1, "Given unacceptable tree Degree!");
     }
 
     template <typename Key, typename Value, int Degree>
     BPlusTree<Key, Value, Degree>::BPlusTree(BPlusTree<Key, Value, Degree>&& other) noexcept
-        : m_Root(std::exchange(other.m_Root, nullptr)) {}
+        : m_Root(std::exchange(other.m_Root, nullptr))
+        , m_Count(0) {}
 
     template <typename Key, typename Value, int Degree>
     BPlusTree<Key, Value, Degree>::~BPlusTree() {
@@ -115,20 +26,37 @@ namespace Ng {
         Node* node = m_Root;
 
         while (!node->IsLeaf())
-            node = node->GetChild(key);
+            node = INTERNAL_NODE(node)->GetChild(key);
 
         return node->IsContainsKey(key);
     }
 
     template <typename Key, typename Value, int Degree>
-    Value BPlusTree<Key, Value, Degree>::Search(const Key& key) const {
-        return Search(m_Root, key);
+    int BPlusTree<Key, Value, Degree>::GetHeight() const {
+        if (!m_Root)
+            return 0;
+
+        Node* node   = m_Root;
+        int   height = 0;
+
+        while (!node->IsLeaf()) {
+//            node = INTERNAL_NODE(node)->GetChildren.front();
+            ++height;
+        }
+
+        return height;
+    }
+
+    template <typename Key, typename Value, int Degree>
+    void BPlusTree<Key, Value, Degree>::Clear() {
+        delete m_Root;
+        m_Root = nullptr;
     }
 
     template <typename Key, typename Value, int Degree>
     Value& BPlusTree<Key, Value, Degree>::Push(const Key& key, const Value& value) {
         if (!m_Root)
-            m_Root = new Node;
+            m_Root = new LeafNode;
 
         Node* node = GetLeafNode(key);
 
@@ -137,10 +65,117 @@ namespace Ng {
 
         node->PushKey(key);
 
-        if (node->IsFull())
+        if (node->GetKeyCount() == Degree * 2)
             Split(node);
 
+        ++m_Count;
+
         return const_cast<Value&>(value);
+    }
+
+    template <typename Key, typename Value, int Degree>
+    void BPlusTree<Key, Value, Degree>::Pop(const Key& key) {
+        if (!m_Root)
+            return;
+
+        // Borrow from left
+        // Merge with left
+        // Borrow from right (if no left sibling)
+        // Merge with right
+
+//        Node* node   = GetLeafNode(key);
+//        Node* parent = node->m_Parent;
+//
+//        std::cout << "Leaf node: ";
+//        for (const auto& k : node->m_Keys)
+//            std::cout << k << " ";
+//        std::cout << std::endl;
+//
+//        std::cout << "Begin = " << *node->m_Keys.begin() << std::endl;
+//
+//        if (node->m_Keys.size() > Degree - 1) {
+//            std::cout << "Case 1" << std::endl;
+//
+//            if (*node->m_Keys.begin() == key) {
+//                node->m_Keys.erase(key);
+//                parent->m_Keys.erase(key);
+//                parent->m_Keys.insert(*node->m_Keys.begin());
+//
+//                std::cout << "new begin = " << *node->m_Keys.begin() << std::endl;
+//            } else {
+//                node->m_Keys.erase(key);
+//            }
+//        } else {
+//            Node* leftSibling = node->m_LeftSibling;
+//
+//            if (leftSibling->m_Parent == node->m_Parent && leftSibling->m_Keys.size() > Degree - 1) {
+//                // borrow
+//                auto borrowValue = *leftSibling->m_Keys.rbegin();
+//                parent->m_Keys.erase(*node->m_Keys.begin());
+//                parent->m_Keys.insert(borrowValue);
+//                node->m_Keys.erase(key);
+//                node->m_Keys.insert(borrowValue);
+//                leftSibling->m_Keys.erase(borrowValue);
+//                std::cout << "borrow left sibling" << std::endl;
+//            } else {
+//                // merge
+//                std::cout << "1 merging!" << std::endl;
+//
+//                if (node == *parent->m_Children.begin())
+//                    parent->m_Keys.erase(parent->m_Keys.begin());
+//                else
+//                    parent->m_Keys.erase(node->m_Keys.begin());
+//
+//                std::cout << "2 merging!" << std::endl;
+//
+//                std::cout << "Key = " << key << std::endl;
+//                for (const auto& k : node->m_Keys)
+//                    std::cout << key << " ";
+//                std::cout << std::endl;
+//
+//                node->m_Keys.erase(key);
+//
+//                std::cout << "-- erasing key from node" << std::endl;
+//
+//                leftSibling->m_Keys.insert(node->m_Keys.begin(), node->m_Keys.end());
+//
+//                std::cout << "3m erging!" << std::endl;
+//
+//                parent->m_Children.erase(
+//                    std::remove(
+//                        parent->m_Children.begin(),
+//                        parent->m_Children.end(),
+//                        node
+//                    )
+//                );
+//
+//                delete node;
+//
+//                std::cout << "merge left sibling" << std::endl;
+//            }
+//        }
+
+
+
+//        // Case 1
+//        if (node->m_Keys.size() > Degree - 2) {
+//            parent->m_Children.erase(
+//                std::remove(
+//                    parent->m_Children.begin(),
+//                    parent->m_Children.end(),
+//                    node
+//                )
+//            );
+//
+//            delete node;
+//        }
+//
+//        // Case 2
+//        if (node->m_Keys.size() == Degree - 2 )
+//        if (parent->m_Keys.empty() && !parent->m_Children.empty()) {
+//            std::cout << "push key to parent" << std::endl;
+//            parent->m_Keys.insert(*parent->m_Children.front()->GetKeyMedian());
+//        }
     }
 
     template <typename Key, typename Value, int Degree>
@@ -153,60 +188,47 @@ namespace Ng {
         Node* node = m_Root;
 
         while (!node->IsLeaf())
-            node = node->GetChild(key);
+            node = INTERNAL_NODE(node)->GetChild(key);
 
         return node;
     }
 
     template <typename Key, typename Value, int Degree>
     void BPlusTree<Key, Value, Degree>::Split(Node* node) {
-        auto parent      = node->GetParent();
-        auto keyMedian   = node->GetKeyMedian();
-        auto childMedian = node->GetChildIterator(keyMedian);
+        auto parent                      = INTERNAL_NODE(node->GetParent());
+        auto keyMedian                   = node->GetMedian();
+        auto [leftSibling, rightSibling] = node->Split(keyMedian);
 
-        Node* sibling = new Node(node->IsLeaf());
-
-        sibling->PushKeys(sibling->IsLeaf() ? keyMedian : std::next(keyMedian), node->GetEndKey());
-        node->PopKeys(keyMedian, node->GetEndKey());
-
-        if (!node->IsChildrenEmpty()) {
-            sibling->PushChildren(childMedian, node->GetEndChild());
-            node->PopChildren(childMedian, node->GetEndChild());
-        }
-
-        if (node == m_Root) {
-            Node* root = new Node(false);
+        if (leftSibling == m_Root) {
+            auto* root = new InternalNode;
 
             root->PushKey(*keyMedian);
-            root->PushChild(node);
-            root->PushChild(sibling);
+            root->PushChild(leftSibling);
+            root->PushChild(rightSibling);
 
             m_Root = root;
 
             return;
         }
 
-        auto keyIterator = parent->PushKey(*keyMedian);
+        parent->PushKey(*keyMedian);
+        parent->PushChild(rightSibling);
 
-        parent->PushChild(parent->GetChildIterator(keyIterator), sibling);
-
-        if (parent->IsFull())
+        if (parent->GetKeyCount() == Degree * 2)
             Split(parent);
     }
 
     template <typename Key, typename Value, int Degree>
-    Value BPlusTree<Key, Value, Degree>::Search(const Node* node, const Key& key) const {
-
-    }
-
-    template <typename Key, typename Value, int Degree>
     void BPlusTree<Key, Value, Degree>::Print(const Node* node, int level) const {
+        if (!node)
+            return;
+
         for (int i = 0; i < level; ++i)
             std::cout << "  ";
 
         for (const auto& key : node->GetKeys())
             std::cout << key << " ";
-        std::cout << "Left: " << node->IsLeaf() << ", P: ";
+        std::cout << "Leaf: " << node->IsLeaf() << ", P: ";
 
         if (node->GetParent())
             std::cout << *node->GetParent()->GetKeys().begin();
@@ -227,8 +249,9 @@ namespace Ng {
         else
             std::cout << "Null" << std::endl;
 
-        for (const auto& child : node->GetChildren())
-            Print(child, level + 1);
+        if (node->IsInternal())
+            for (const auto& child : CONST_INTERNAL_NODE(node)->GetChildren())
+                Print(child, level + 1);
     }
 
 } // namespace Ng
