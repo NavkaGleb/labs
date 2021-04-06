@@ -8,48 +8,115 @@ namespace Ng {
         , m_Type(type) {}
 
     template <typename Key, typename Value>
-    typename BPlusNode<Key, Value>::KeyIterator BPlusNode<Key, Value>::GetMedian() const {
-        auto median = m_Keys.begin();
-        std::advance(median, m_Keys.size() / 2);
+    std::size_t BPlusNode<Key, Value>::GetKeyIndex(const Key& key) const {
+        return std::distance(
+            m_Keys.begin(),
+            std::upper_bound(
+                m_Keys.begin(),
+                m_Keys.end(),
+                key
+            )
+        );
+    }
 
-        return median;
+    template <typename Key, typename Value>
+    bool BPlusNode<Key, Value>::IsContainsKey(const Key& key) const {
+        return std::binary_search(m_Keys.begin(), m_Keys.end(), key);
+    }
+
+    template <typename Key, typename Value>
+    typename BPlusNode<Key, Value>::KeyIterator BPlusNode<Key, Value>::GetMedian() {
+        return m_Keys.begin() + m_Keys.size() / 2;
     }
 
     template <typename Key, typename Value>
     typename BPlusNode<Key, Value>::KeyIterator BPlusNode<Key, Value>::PushKey(const Key& key) {
-        return m_Keys.insert(key).first;
+        if (m_Keys.empty())
+            return m_Keys.insert(m_Keys.end(), key);
+
+        return m_Keys.insert(
+            std::upper_bound(m_Keys.begin(), m_Keys.end(), key),
+            key
+        );
+    }
+
+    template <typename Key, typename Value>
+    void BPlusNode<Key, Value>::PopKey(const Key& key) {
+        m_Keys.erase(std::remove(m_Keys.begin(), m_Keys.end(), key));
     }
 
     template <typename Key, typename Value>
     BPlusInternalNode<Key, Value>::BPlusInternalNode()
         : BPlusNode<Key, Value>(BPlusNodeType::Internal) {}
 
-//    template <typename Key, typename Value>
-//    void BPlusInternalNode<Key, Value>::ReserveChildren(std::size_t count) {
-//        m_Children.reserve(count);
-//    }
-
     template <typename Key, typename Value>
     BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChild(const Key& key) const {
         if (this->m_Type == BPlusNodeType::Leaf)
             return nullptr;
 
-        auto it    = --this->m_Keys.upper_bound(key);
+        auto it    = std::prev(std::upper_bound(this->m_Keys.begin(), this->m_Keys.end(), key));
         auto index = key < *this->m_Keys.begin() ? 0 : std::distance(this->m_Keys.begin(), it) + 1;
 
         return m_Children[index];
     }
 
     template <typename Key, typename Value>
+    void BPlusInternalNode<Key, Value>::UpdateKeys() {
+        auto* node = static_cast<BPlusNode<Key, Value>*>(this);
+
+        while (node) {
+            if (node->IsInternal())
+                for (int i = 0; i < this->m_Keys.size(); ++i)
+                    this->m_Keys[i] = m_Children[i + 1]->GetMinNode()->GetMinKey();
+
+            node = node->m_Parent;
+        }
+    }
+
+    template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::PushChild(BPlusNode<Key, Value>* child) {
         child->m_Parent = this;
 
-        if (*child->m_Keys.begin() < *this->m_Keys.begin())
+        if (m_Children.empty() || *child->m_Keys.begin() < *this->m_Keys.begin())
             return PushChild(m_Children.begin(), child);
 
-        for (auto [it, i] = std::make_pair(this->m_Keys.begin(), 1); it != this->m_Keys.end(); ++it, ++i)
-            if (*it <= *child->m_Keys.begin())
-                return PushChild(m_Children.begin() + i, child);
+        for (auto it = this->m_Keys.begin(); it != this->m_Keys.end(); ++it)
+            if (*it >= child->m_Keys.front())
+                return PushChild(m_Children.begin() + std::distance(this->m_Keys.begin(), it) + 1, child);
+
+        return PushChild(m_Children.end(), child);
+    }
+
+    template <typename Key, typename Value>
+    Key BPlusInternalNode<Key, Value>::PopChild(BPlusNode<Key, Value>* child) {
+        auto index = std::distance(m_Children.begin(), std::find(m_Children.begin(), m_Children.end(), child));
+
+        m_Children.erase(m_Children.begin() + index);
+
+        if (index == 0) {
+            auto result = this->m_Keys.front();
+            this->m_Keys.erase(this->m_Keys.begin());
+            return result;
+        }
+
+        auto result = this->m_Keys[index - 1];
+        this->m_Keys.erase(this->m_Keys.begin() + index - 1);
+        return result;
+    }
+
+    template <typename Key, typename Value>
+    void BPlusInternalNode<Key, Value>::PopKey(const Key& key) {
+        auto index = std::distance(
+            this->m_Keys.begin(),
+            std::find(
+                this->m_Keys.begin(),
+                this->m_Keys.end(),
+                key
+            )
+        );
+
+        this->m_Keys.erase(this->m_Keys.begin() + index);
+        this->m_Children.erase(this->m_Children.begin() + index + 1);
     }
 
     template <typename Key, typename Value>
@@ -61,7 +128,7 @@ namespace Ng {
 
         sibling->m_Parent = this->m_Parent;
 
-        sibling->m_Keys.insert(std::next(separator), this->m_Keys.end());
+        sibling->m_Keys.insert(sibling->m_Keys.begin(), std::next(separator), this->m_Keys.end());
         this->m_Keys.erase(separator, this->m_Keys.end());
 
         auto* thisInternal    = static_cast<BPlusInternalNode<Key, Value>*>(this);
@@ -76,6 +143,74 @@ namespace Ng {
         thisInternal->m_Children.erase(childSeparator, thisInternal->m_Children.end());
 
         return { this, sibling };
+    }
+
+    template <typename Key, typename Value>
+    void BPlusInternalNode<Key, Value>::MergeLeft() {
+        auto* leftSibling = static_cast<BPlusInternalNode<Key, Value>*>(this->m_LeftSibling);
+
+        leftSibling->m_Keys.insert(
+            leftSibling->m_Keys.end(),
+            this->m_Keys.begin(),
+            this->m_Keys.end()
+        );
+
+        leftSibling->m_Children.insert(
+            leftSibling->m_Children.end(),
+            m_Children.begin(),
+            m_Children.end()
+        );
+
+        for (auto& child : leftSibling->m_Children)
+            child->m_Parent = leftSibling;
+
+//        leftSibling->m_Parent = this->m_Parent;
+
+        if (this->m_RightSibling)
+            this->m_RightSibling->m_LeftSibling = this->m_LeftSibling;
+
+        this->m_LeftSibling->m_RightSibling = this->m_RightSibling;
+
+//        PopChild(this);
+    }
+
+    template <typename Key, typename Value>
+    void BPlusInternalNode<Key, Value>::MergeRight() {
+        auto* rightSibling = static_cast<BPlusInternalNode<Key, Value>*>(this->m_RightSibling);
+
+        this->m_Keys.insert(
+            this->m_Keys.end(),
+            rightSibling->m_Keys.begin(),
+            rightSibling->m_Keys.end()
+        );
+
+        m_Children.insert(
+            m_Children.end(),
+            rightSibling->m_Children.begin(),
+            rightSibling->m_Children.end()
+        );
+
+        for (auto& child : this->m_Children)
+            child->m_Parent = this;
+
+//        this->m_Parent = rightSibling->m_Parent;
+
+        if (rightSibling->m_RightSibling)
+            rightSibling->m_RightSibling->m_LeftSibling = this;
+
+        this->m_RightSibling = rightSibling->m_RightSibling;
+
+//        PopChild(rightSibling);
+    }
+
+    template <typename Key, typename Value>
+    const BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMinNode() const {
+        return m_Children.front()->IsLeaf() ? m_Children.front() : m_Children.front()->GetMinNode();
+    }
+
+    template <typename Key, typename Value>
+    const BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMaxNode() const {
+        return m_Children.front()->IsLeaf() ? m_Children.back() : m_Children.back()->GetMaxNode();
     }
 
     template <typename Key, typename Value>
@@ -110,6 +245,11 @@ namespace Ng {
         : BPlusNode<Key, Value>(BPlusNodeType::Leaf) {}
 
     template <typename Key, typename Value>
+    void BPlusLeafNode<Key, Value>::PopKey(const Key& key) {
+        this->m_Keys.erase(std::remove(this->m_Keys.begin(), this->m_Keys.end(), key));
+    }
+
+    template <typename Key, typename Value>
     std::pair<
         BPlusNode<Key, Value>*,
         BPlusNode<Key, Value>*
@@ -118,10 +258,56 @@ namespace Ng {
 
         sibling->m_Parent = this->m_Parent;
 
-        sibling->m_Keys.insert(separator, this->m_Keys.end());
+        sibling->m_Keys.insert(sibling->m_Keys.begin(), separator, this->m_Keys.end());
         this->m_Keys.erase(separator, this->m_Keys.end());
 
         return { this, sibling };
+    }
+
+    template <typename Key, typename Value>
+    void BPlusLeafNode<Key, Value>::MergeLeft() {
+        auto* leftSibling = static_cast<BPlusLeafNode<Key, Value>*>(this->m_LeftSibling);
+
+        leftSibling->m_Keys.insert(
+            leftSibling->m_Keys.end(),
+            this->m_Keys.begin(),
+            this->m_Keys.end()
+        );
+
+//        leftSibling->m_Parent = this->m_Parent;
+
+        if (this->m_RightSibling)
+            this->m_RightSibling->m_LeftSibling = this->m_LeftSibling;
+
+        this->m_LeftSibling->m_RightSibling = this->m_RightSibling;
+    }
+
+    template <typename Key, typename Value>
+    void BPlusLeafNode<Key, Value>::MergeRight() {
+        auto* rightSibling = static_cast<BPlusLeafNode<Key, Value>*>(this->m_RightSibling);
+
+        this->m_Keys.insert(
+            this->m_Keys.end(),
+            rightSibling->m_Keys.begin(),
+            rightSibling->m_Keys.end()
+        );
+
+//        this->m_Parent = rightSibling->m_Parent;
+
+        if (rightSibling->m_RightSibling)
+            rightSibling->m_RightSibling->m_LeftSibling = this;
+
+        this->m_RightSibling = rightSibling->m_RightSibling;
+    }
+
+    template <typename Key, typename Value>
+    const BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMinNode() const {
+        return this;
+    }
+
+    template <typename Key, typename Value>
+    const BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMaxNode() const {
+        return this;
     }
 
 } // namespace Ng

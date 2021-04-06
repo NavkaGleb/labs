@@ -44,6 +44,7 @@ namespace Ng {
         [[nodiscard]] Node* GetLeafNode(const Key& key);
 
         void Split(Node* node);
+        void Pop(Node* node, const Key& key);
 
         void Print(const Node* node, int level = 0) const;
 
