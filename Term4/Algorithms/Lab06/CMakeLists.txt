@@ -9,6 +9,9 @@ file(GLOB SOURCE_FILES src/*.cpp)
 include_directories(src)
 
 add_subdirectory(external/Random)
+add_subdirectory(external/doctest)
+
+add_subdirectory(tests)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 

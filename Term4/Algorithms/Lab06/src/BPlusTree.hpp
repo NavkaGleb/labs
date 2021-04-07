@@ -3,7 +3,8 @@
 #include <set>
 #include <vector>
 
-#include "BPlusNode.hpp"
+#include "BPlusInternalNode.hpp"
+#include "BPlusLeafNode.hpp"
 
 namespace Ng {
 
@@ -21,6 +22,30 @@ namespace Ng {
         using Node         = BPlusNode<Key, Value>;
         using InternalNode = BPlusInternalNode<Key, Value>;
         using LeafNode     = BPlusLeafNode<Key, Value>;
+
+    public:
+        class Iterator {
+        public:
+            using Pair = std::pair<Key, Value>;
+
+        public:
+            explicit Iterator(Node* node = nullptr);
+            ~Iterator() = default;
+
+            Iterator& operator ++();
+
+            const Key& operator *();
+
+            bool operator !=(const Iterator& other) const;
+            bool operator ==(const Iterator& other) const;
+
+        private:
+            Node*       m_Node;
+            std::size_t m_Index;
+
+        }; // class Iterator
+
+    public:
 
         BPlusTree();
         BPlusTree(BPlusTree&& other) noexcept;
@@ -40,8 +65,13 @@ namespace Ng {
 
         void Print() const;
 
+        inline Iterator Begin() { return Iterator(GetMinNode()); }
+        inline Iterator End() { return Iterator(); }
+
     private:
         [[nodiscard]] Node* GetLeafNode(const Key& key);
+        [[nodiscard]] Node* GetMinNode();
+        [[nodiscard]] Node* GetMaxNode();
 
         void Split(Node* node);
         void Pop(Node* node, const Key& key);
@@ -53,6 +83,16 @@ namespace Ng {
         int   m_Count;
 
     }; // class BPlusTree
+
+    template <typename Key, typename Value, int Degree>
+    auto begin(Ng::BPlusTree<Key, Value, Degree>& tree) {
+        return tree.Begin();
+    }
+
+    template <typename Key, typename Value, int Degree>
+    auto end(Ng::BPlusTree<Key, Value, Degree>& tree) {
+        return tree.End();
+    }
 
 } // namespace Ng
 
