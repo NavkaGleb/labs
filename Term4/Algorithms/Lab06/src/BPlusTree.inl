@@ -119,7 +119,7 @@ namespace Ng {
         if (!node->IsContainsKey(key))
             return;
 
-        std::cout << "-------- Key is exists = " << key << std::endl;
+        --m_Count;
 
         Pop(node, key);
     }
@@ -133,14 +133,8 @@ namespace Ng {
     typename BPlusTree<Key, Value, Degree>::Node* BPlusTree<Key, Value, Degree>::GetLeafNode(const Key& key) {
         Node* node = m_Root;
 
-//        std::cout << "Key = " << key << std::endl;
-
-        while (!node->IsLeaf()) {
-//            std::cout << "-- CUrrent node: " << node->GetMinKey() << std::endl;
+        while (node && !node->IsLeaf())
             node = INTERNAL_NODE(node)->GetChild(key);
-        }
-
-//        std::cout << std::endl;
 
         return node;
     }
@@ -157,7 +151,7 @@ namespace Ng {
 
     template <typename Key, typename Value, int Degree>
     typename BPlusTree<Key, Value, Degree>::Node* BPlusTree<Key, Value, Degree>::GetMaxNode() {
-        Node* const node = m_Root;
+        Node* node = m_Root;
 
         while (node && !node->IsLeaf())
             node = node->GetMaxNode();
@@ -168,7 +162,7 @@ namespace Ng {
     template <typename Key, typename Value, int Degree>
     void BPlusTree<Key, Value, Degree>::Split(Node* node) {
         auto* parent    = node->GetParent();
-        auto keyMedian = node->GetMedian();
+        auto keyMedian  = node->GetMedian();
         auto* sibling   = node->Split(keyMedian);
 
         if (node == m_Root) {
@@ -192,9 +186,6 @@ namespace Ng {
 
     template <typename Key, typename Value, int Degree>
     void BPlusTree<Key, Value, Degree>::Pop(Node* node, const Key& key) {
-//        std::cout << "Node: " << node->GetMinKey() << ", key: " << key << std::endl;
-//        Print();
-
         auto* parent = node->GetParent();
 
         node->PopKey(key);
@@ -208,77 +199,67 @@ namespace Ng {
                     m_Root->GetParent() = nullptr;
                 }
             }
-        } else if (node->GetKeyCount() < Degree - 1) {
-            auto  index  = parent->GetKeyIndex(node->GetMinKey());
 
-            if (node->IsInternal()) {
-                auto* internalNode = INTERNAL_NODE(node);
-                auto* leftSibling  = INTERNAL_NODE(node->GetLeftSibling());
-                auto* rightSibling = INTERNAL_NODE(node->GetRightSibling());
+            return;
+        }
 
-                if (leftSibling && leftSibling->GetKeyCount() > Degree - 1) {
-//                    std::cout << "Is Internal left sibling borrow" << std::endl;
+        if (node->GetKeyCount() >= Degree - 1)
+            return;
 
-                    node->BorrowLeft();
-                    parent->UpdateKeys();
-                } else if (rightSibling && rightSibling->GetKeyCount() > Degree - 1) {
-//                    std::cout << "Is Internal right sibling borrow" << std::endl;
+        auto  index        = parent->GetKeyIndex(node->GetMinKey());
+        auto* leftSibling  = node->GetLeftSibling();
+        auto* rightSibling = node->GetRightSibling();
 
-                    node->BorrowRight();
-                    parent->UpdateKeys();
-                } else if (leftSibling) {
-//                    std::cout << "Is Internal merge with left sibling" << std::endl;
+        std::cout << "------- Index = " << index << ", Parent keys = ";
+        for (const auto& k : parent->GetKeys())
+            std::cout << k << " ";
+        std::cout << std::endl;
 
-                    leftSibling->PushKey(parent->GetKey(index - 1));
-                    internalNode->MergeLeft();
+        if (node->IsInternal()) {
+            if (leftSibling && leftSibling->GetKeyCount() > Degree - 1) {
+                node->BorrowLeft();
+            } else if (rightSibling && rightSibling->GetKeyCount() > Degree - 1) {
+                node->BorrowRight();
+            } else if (leftSibling) {
+                leftSibling->PushKey(parent->GetKey(index - 1));
+                node->MergeLeft();
+
+//                std::cout << "Index = " << index << "Parent keys = ";
+//                for (const auto& k : parent->GetKeys())
+//                    std::cout << k << " ";
+//                std::cout << std::endl;
+
+                Pop(parent, parent->GetKey(index - 1));
+            } else if (rightSibling) {
+                node->PushKey(parent->GetKey(index));
+                node->MergeRight();
+
+//                std::cout << "Index = " << index << "Parent keys = ";
+//                for (const auto& k : parent->GetKeys())
+//                    std::cout << k << " ";
+//                std::cout << std::endl;
+
+                Pop(parent, parent->GetKey(index));
+            }
+        } else if (node->IsLeaf()) {
+            if (leftSibling && leftSibling->GetKeyCount() > Degree - 1) {
+                node->BorrowLeft();
+            } else if (rightSibling && rightSibling->GetKeyCount() > Degree - 1) {
+                node->BorrowRight();
+            } else if (leftSibling) {
+                node->MergeLeft();
+
+                if (parent == leftSibling->GetParent())
                     Pop(parent, parent->GetKey(index - 1));
-                } else if (rightSibling) {
-//                    std::cout << "Is Internal merge with right sibling" << std::endl;
+                else
+                    Pop(parent, parent->GetMinKey());
+            } else if (rightSibling) {
+                node->MergeRight();
 
-                    rightSibling->PushKey(parent->GetKey(index));
-                    internalNode->MergeRight();
+                if (parent == rightSibling->GetParent())
                     Pop(parent, parent->GetKey(index));
-                }
-            } else if (node->IsLeaf()) {
-                auto* leafNode     = LEAF_NODE(node);
-                auto* leftSibling  = LEAF_NODE(node->GetLeftSibling());
-                auto* rightSibling = LEAF_NODE(node->GetRightSibling());
-
-                if (leftSibling && leftSibling->GetKeyCount() > Degree - 1) {
-//                    std::cout << "Is leaf left sibling borrow" << std::endl;
-
-                    node->BorrowLeft();
-
-                    INTERNAL_NODE(node->GetLeftSibling()->GetParent())->UpdateKeys();
-
-                    if (parent != node->GetLeftSibling()->GetParent())
-                        parent->UpdateKeys();
-                } else if (rightSibling && rightSibling->GetKeyCount() > Degree - 1) {
-//                    std::cout << "Is leaf right sibling borrow" << std::endl;
-
-                    node->BorrowRight();
-
-                    parent->UpdateKeys();
-
-                    if (parent != node->GetRightSibling()->GetParent())
-                        INTERNAL_NODE(node->GetRightSibling()->GetParent())->UpdateKeys();
-                } else if (leftSibling) {
-//                    std::cout << "Is leaf merge with left sibling" << std::endl;
-
-                    leafNode->MergeLeft();
-                    Pop(parent, leftSibling->GetParent() == parent ? parent->GetKey(index - 1) : parent->GetMinKey());
-                } else if (rightSibling) {
-//                    std::cout << "Is leaf merge with right sibling" << std::endl;
-
-                    auto* rightSiblingParent = INTERNAL_NODE(rightSibling->GetParent());
-
-                    leafNode->MergeRight();
-
-                    if (parent == rightSiblingParent)
-                        Pop(parent, parent->GetKey(index));
-                    else
-                        Pop(rightSiblingParent, rightSiblingParent->GetMinKey());
-                }
+                else
+                    Pop(rightSibling->GetParent(), rightSibling->GetParent()->GetMinKey());
             }
         }
     }

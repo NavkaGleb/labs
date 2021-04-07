@@ -84,6 +84,7 @@ namespace Ng {
 
     }; // class BPlusTree
 
+    // Free functions for range based for!
     template <typename Key, typename Value, int Degree>
     auto begin(Ng::BPlusTree<Key, Value, Degree>& tree) {
         return tree.Begin();

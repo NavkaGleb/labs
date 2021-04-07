@@ -10,7 +10,7 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-     BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::Split(typename BPlusNode::KeyIterator separator) {
+    BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::Split(typename BPlusNode::KeyIterator separator) {
         auto* sibling = new BPlusLeafNode<Key, Value>;
 
         sibling->m_Parent = this->m_Parent;
@@ -26,15 +26,32 @@ namespace Ng {
         auto borrowValue = this->m_LeftSibling->GetMaxKey();
 
         this->PushKey(borrowValue);
-        this->m_LeftSibling->PopKey(borrowValue);
+//        this->m_LeftSibling->PopKey(borrowValue);
+
+        this->m_Keys.insert(this->m_Keys.begin(), borrowValue);
+
+        this->m_LeftSibling->m_Keys.pop_back();
+
+        this->m_LeftSibling->m_Parent->UpdateKeys();
+
+        if (this->m_Parent != this->m_LeftSibling->m_Parent)
+            this->m_Parent->UpdateKeys();
     }
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::BorrowRight() {
-        auto  borrowValue        = this->m_RightSibling->GetMinKey();
+        auto borrowValue = this->m_RightSibling->GetMinKey();
 
-        this->PushKey(borrowValue);
-        this->m_RightSibling->PopKey(borrowValue);
+        this->m_Keys.push_back(borrowValue);
+//        this->PushKey(borrowValue);
+//        this->m_RightSibling->PopKey(borrowValue);
+
+        this->m_RightSibling->m_Keys.erase(this->m_RightSibling->m_Keys.begin());
+
+        this->m_Parent->UpdateKeys();
+
+        if (this->m_Parent != this->m_RightSibling->m_Parent)
+            this->m_RightSibling->m_Parent->UpdateKeys();
     }
 
     template <typename Key, typename Value>
@@ -48,9 +65,9 @@ namespace Ng {
         );
 
         if (this->m_RightSibling)
-            this->m_RightSibling->m_LeftSibling = this->m_LeftSibling;
+            this->m_RightSibling->m_LeftSibling = leftSibling;
 
-        this->m_LeftSibling->m_RightSibling = this->m_RightSibling;
+        leftSibling->m_RightSibling = this->m_RightSibling;
     }
 
     template <typename Key, typename Value>
