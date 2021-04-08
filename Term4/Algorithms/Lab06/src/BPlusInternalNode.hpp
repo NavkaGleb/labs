@@ -23,7 +23,9 @@ namespace Ng {
         [[nodiscard]] inline BPlusNode* GetMinChild() const { return m_Children.front(); }
         [[nodiscard]] inline BPlusNode* GetMaxChild() const { return m_Children.back(); }
 
-        [[nodiscard]] BPlusNode* GetChild(const Key& key) const;
+        [[nodiscard]] BPlusNode* GetChildByKey(const Key& key) const;
+        [[nodiscard]] std::size_t GetChildIndex(const Key& key) const;
+        [[nodiscard]] BPlusNode* GetChildByIndex(std::size_t index) const;
 
         void UpdateKeys();
 
@@ -34,11 +36,10 @@ namespace Ng {
 
         BPlusNode* Split(typename BPlusNode::KeyIterator separator) override;
 
-        void MergeLeft() override;
-        void MergeRight() override;
-
         void BorrowLeft() override;
         void BorrowRight() override;
+        void MergeLeft() override;
+        void MergeRight() override;
 
         BPlusNode* GetMinNode() override;
         const BPlusNode* GetMinNode() const override;

@@ -5,38 +5,55 @@ namespace Ng {
         : BPlusNode(BPlusNodeType::Internal) {}
 
     template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChild(const Key& key) const {
-        if (this->m_Type == BPlusNodeType::Leaf)
-            return nullptr;
+    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChildByKey(const Key& key) const {
+        BPlusNode* result = nullptr;
 
-//        if (key < this->m_Keys.front())
-//            return GetMinChild();
-//
-//        for (auto it = this->m_Keys.begin(); it != this->m_Keys.end(); ++it) {
-//            if (*it >= key) {
-//                auto index = std::distance(this->m_Keys.begin(), it) + 1;
-//                return m_Children[std::distance(this->m_Keys.begin(), it) + 1];
-//            }
-//        }
+        for (int i = 0; i <= this->m_Keys.size(); ++i) {
+            if (i == this->m_Keys.size() || key < this->m_Keys[i]) {
+                result = m_Children[i];
+                break;
+            }
+        }
 
-        auto it    = std::upper_bound(this->m_Keys.begin(), this->m_Keys.end(), key);
+        return result;
+    }
 
-//        std::cout << "-- Searched key = " << *it << std::endl;
+    template <typename Key, typename Value>
+    std::size_t BPlusInternalNode<Key, Value>::GetChildIndex(const Key& key) const {
+        std::size_t index;
 
-        auto index = key < this->m_Keys.front() ? 0 : std::distance(this->m_Keys.begin(), it);
+        for (int i = 0; i <= this->m_Keys.size(); ++i) {
+            if (i == this->m_Keys.size() || key < this->m_Keys[i]) {
+                index = i;
+                break;
+            }
+        }
 
+        return index;
+    }
+
+    template <typename Key, typename Value>
+    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChildByIndex(std::size_t index) const {
         return m_Children[index];
-//        return GetMaxChild();
     }
 
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::UpdateKeys() {
-        auto* node = static_cast<BPlusNode*>(this);
+        auto* node = this;
 
         while (node) {
-            if (node->IsInternal())
-                for (int i = 0; i < this->m_Keys.size(); ++i)
-                    this->m_Keys[i] = m_Children[i + 1]->GetMinNode()->GetMinKey();
+//            std::cout << "---------------- Current node in update = ";
+//            for (const auto& k : node->GetKeys())
+//                std::cout << k << " ";
+//            std::cout << std::endl;
+
+            for (int i = 0; i < node->m_Keys.size(); ++i)
+                node->m_Keys[i] = node->m_Children[i + 1]->GetMinNode()->GetMinKey();
+
+//            std::cout << "---------------- after update Current node in update = ";
+//            for (const auto& k : node->GetKeys())
+//                std::cout << k << " ";
+//            std::cout << std::endl;
 
             node = node->m_Parent;
         }
@@ -82,19 +99,17 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::PopKey(const Key& key) {
-//        auto keyIterator = std::find(this->m_Keys.begin(), this->m_Keys.end(), key);
-//
-//        if (keyIterator == this->m_Keys.end())
-//            return;
-//
-//        auto index = std::distance(this->m_Keys.begin(), keyIterator);
-//
-//        this->m_Keys.erase(this->m_Keys.begin() + index);
+//        std::cout << "----- Pop key in Internal Node = " << key << ", size = " << this->m_Keys.size() << ", index = ";
 
+        std::size_t index = 0;
 
-//        this->m_Children.erase(this->m_Children.begin() + index + 1);
+        while (index < this->m_Keys.size() - 1 && key > this->m_Keys[index])
+            ++index;
 
-        this->m_Keys.erase(std::remove(this->m_Keys.begin(), this->m_Keys.end(), key));
+//        std::cout << index << std::endl;
+
+        this->m_Keys.erase(this->m_Keys.begin() + index);
+        this->m_Children.erase(this->m_Children.begin() + index + 1);
     }
 
     template <typename Key, typename Value>
@@ -123,67 +138,71 @@ namespace Ng {
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::BorrowLeft() {
         auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
-        auto* borrowChild = leftSibling->GetMaxChild();
 
-        this->PushKey(GetMinChild()->GetMinKey());
-        m_Children.insert(m_Children.begin(), borrowChild);
-        borrowChild->m_Parent = this;
-
-//        leftSibling->PopChild(borrowChild);
-//        leftSibling->PopKey(leftSibling->GetMaxKey());
-
-        leftSibling->m_Children.pop_back();
+        this->m_Keys.insert(this->m_Keys.begin(), leftSibling->GetMaxKey());
         leftSibling->m_Keys.pop_back();
 
-        this->m_Parent->UpdateKeys();
+        (*this->m_Children.insert(this->m_Children.begin(), leftSibling->GetMaxChild()))->m_Parent = this;
+        leftSibling->m_Children.pop_back();
+
+        this->UpdateKeys();
     }
 
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::BorrowRight() {
         auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
-        auto* borrowChild  = rightSibling->GetMinChild();
 
-        this->PushKey(borrowChild->GetMinKey());
-        m_Children.emplace_back(borrowChild);
-        borrowChild->m_Parent = this;
-
-//        rightSibling->PopChild(borrowChild);
-//        rightSibling->PopKey(rightSibling->GetMinKey());
-
-        rightSibling->m_Children.erase(rightSibling->m_Children.begin());
+        this->m_Keys.emplace_back(rightSibling->GetMinKey());
         rightSibling->m_Keys.erase(rightSibling->m_Keys.begin());
 
-        this->m_Parent->UpdateKeys();
+        this->m_Children.emplace_back(rightSibling->GetMinChild())->m_Parent = this;
+        rightSibling->m_Children.erase(rightSibling->m_Children.begin());
+
+        this->UpdateKeys();
     }
 
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::MergeLeft() {
-        auto* leftSibling = static_cast<BPlusInternalNode<Key, Value>*>(this->m_LeftSibling);
+        auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
 
-        leftSibling->m_Keys.insert(
-            leftSibling->m_Keys.end(),
+//        std::cout << "Before merging: " << this->m_Keys.size() << ", " << this->m_Children.size() << std::endl;
+
+        this->m_Keys.insert(this->m_Keys.begin(), leftSibling->GetMinKey());
+
+        this->m_Keys.insert(
             this->m_Keys.begin(),
-            this->m_Keys.end()
+            leftSibling->m_Keys.begin(),
+            leftSibling->m_Keys.end()
         );
 
-        leftSibling->m_Children.insert(
-            leftSibling->m_Children.end(),
-            m_Children.begin(),
-            m_Children.end()
+        this->m_Children.insert(
+            this->m_Children.begin(),
+            leftSibling->m_Children.begin(),
+            leftSibling->m_Children.end()
         );
 
-        for (auto& child : leftSibling->m_Children)
-            child->m_Parent = leftSibling;
+//        std::cout << "After merging: " << this->m_Keys.size() << ", " << this->m_Children.size() << std::endl;
 
-        if (this->m_RightSibling)
-            this->m_RightSibling->m_LeftSibling = leftSibling;
+        for (auto& child : this->m_Children)
+            child->m_Parent = this;
 
-        leftSibling->m_RightSibling = this->m_RightSibling;
+        if (leftSibling->m_LeftSibling)
+            leftSibling->m_LeftSibling->m_RightSibling = this;
+
+        this->m_LeftSibling = leftSibling->m_LeftSibling;
+
+        this->UpdateKeys();
+
+//        leftSibling->m_Parent->PopKey(leftSibling->GetMinKey());
     }
 
     template <typename Key, typename Value>
     void BPlusInternalNode<Key, Value>::MergeRight() {
-        auto* rightSibling = static_cast<BPlusInternalNode<Key, Value>*>(this->m_RightSibling);
+        auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
+
+//        std::cout << "Before merging: " << this->m_Keys.size() << ", " << this->m_Children.size() << std::endl;
+
+        this->m_Keys.push_back(rightSibling->GetMinKey());
 
         this->m_Keys.insert(
             this->m_Keys.end(),
@@ -191,11 +210,13 @@ namespace Ng {
             rightSibling->m_Keys.end()
         );
 
-        m_Children.insert(
-            m_Children.end(),
+        this->m_Children.insert(
+            this->m_Children.end(),
             rightSibling->m_Children.begin(),
             rightSibling->m_Children.end()
         );
+
+//        std::cout << "After merging: " << this->m_Keys.size() << ", " << this->m_Children.size() << std::endl;
 
         for (auto& child : this->m_Children)
             child->m_Parent = this;
@@ -204,6 +225,10 @@ namespace Ng {
             rightSibling->m_RightSibling->m_LeftSibling = this;
 
         this->m_RightSibling = rightSibling->m_RightSibling;
+
+        this->UpdateKeys();
+
+//        rightSibling->m_Parent->PopKey(rightSibling->GetMinKey());
     }
 
     template <typename Key, typename Value>

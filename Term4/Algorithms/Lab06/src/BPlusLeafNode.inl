@@ -6,7 +6,13 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::PopKey(const Key& key) {
-        this->m_Keys.erase(std::remove(this->m_Keys.begin(), this->m_Keys.end(), key));
+        std::size_t index = 0;
+
+        while (index < this->m_Keys.size() && key > this->m_Keys[index])
+            ++index;
+
+        this->m_Keys.erase(this->m_Keys.begin() + index);
+//        this->m_Data.erase(index);
     }
 
     template <typename Key, typename Value>
@@ -23,56 +29,43 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::BorrowLeft() {
-        auto borrowValue = this->m_LeftSibling->GetMaxKey();
+        auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
 
-        this->PushKey(borrowValue);
-//        this->m_LeftSibling->PopKey(borrowValue);
+        this->m_Keys.insert(this->m_Keys.begin(), leftSibling->GetMaxKey());
+        leftSibling->m_Keys.pop_back();
 
-        this->m_Keys.insert(this->m_Keys.begin(), borrowValue);
-
-        this->m_LeftSibling->m_Keys.pop_back();
-
-        this->m_LeftSibling->m_Parent->UpdateKeys();
-
-        if (this->m_Parent != this->m_LeftSibling->m_Parent)
-            this->m_Parent->UpdateKeys();
+        this->m_Parent->UpdateKeys();
     }
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::BorrowRight() {
-        auto borrowValue = this->m_RightSibling->GetMinKey();
+        auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
 
-        this->m_Keys.push_back(borrowValue);
-//        this->PushKey(borrowValue);
-//        this->m_RightSibling->PopKey(borrowValue);
-
-        this->m_RightSibling->m_Keys.erase(this->m_RightSibling->m_Keys.begin());
+        this->m_Keys.push_back(rightSibling->GetMinKey());
+        rightSibling->m_Keys.erase(rightSibling->m_Keys.begin());
 
         this->m_Parent->UpdateKeys();
-
-        if (this->m_Parent != this->m_RightSibling->m_Parent)
-            this->m_RightSibling->m_Parent->UpdateKeys();
     }
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::MergeLeft() {
-        auto* leftSibling = static_cast<BPlusLeafNode<Key, Value>*>(this->m_LeftSibling);
+        auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
 
-        leftSibling->m_Keys.insert(
-            leftSibling->m_Keys.end(),
+        this->m_Keys.insert(
             this->m_Keys.begin(),
-            this->m_Keys.end()
+            leftSibling->m_Keys.begin(),
+            leftSibling->m_Keys.end()
         );
 
-        if (this->m_RightSibling)
-            this->m_RightSibling->m_LeftSibling = leftSibling;
+        if (leftSibling->m_LeftSibling)
+            leftSibling->m_LeftSibling->m_RightSibling = this;
 
-        leftSibling->m_RightSibling = this->m_RightSibling;
+        this->m_LeftSibling = leftSibling->m_LeftSibling;
     }
 
     template <typename Key, typename Value>
     void BPlusLeafNode<Key, Value>::MergeRight() {
-        auto* rightSibling = static_cast<BPlusLeafNode<Key, Value>*>(this->m_RightSibling);
+        auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
 
         this->m_Keys.insert(
             this->m_Keys.end(),

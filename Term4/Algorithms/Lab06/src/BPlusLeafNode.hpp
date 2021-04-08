@@ -20,11 +20,10 @@ namespace Ng {
 
         BPlusNode* Split(typename BPlusNode::KeyIterator separator) override;
 
-        void MergeLeft() override;
-        void MergeRight() override;
-
         void BorrowLeft() override;
         void BorrowRight() override;
+        void MergeLeft() override;
+        void MergeRight() override;
 
         BPlusNode* GetMinNode() override;
         const BPlusNode* GetMinNode() const override;

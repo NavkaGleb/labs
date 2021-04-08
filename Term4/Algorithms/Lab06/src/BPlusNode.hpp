@@ -57,7 +57,6 @@ namespace Ng {
 
         virtual void BorrowLeft() = 0;
         virtual void BorrowRight() = 0;
-
         virtual void MergeLeft() = 0;
         virtual void MergeRight() = 0;
 
