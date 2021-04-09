@@ -76,7 +76,7 @@ namespace Ng {
         [[nodiscard]] inline int GetCount() const { return m_Count; }
         [[nodiscard]] inline bool IsEmpty() const { return m_Count == 0; }
 
-        [[nodiscard]] bool IsExists(const Key& key) const;
+        [[nodiscard]] bool IsContains(const Key& key) const;
         [[nodiscard]] int GetHeight() const;
 
         [[nodiscard]] const Key& GetMinKey() const;
@@ -86,6 +86,9 @@ namespace Ng {
 
         bool Push(const Key& key, const Value& value);
         bool Pop(const Key& key);
+
+        Value& Get(const Key& key);
+        const Value& Get(const Key& key) const;
 
         void Print() const;
 
@@ -97,6 +100,7 @@ namespace Ng {
 
     private:
         [[nodiscard]] LeafNode* GetLeafNode(const Key& key);
+        [[nodiscard]] const LeafNode* GetLeafNode(const Key& key) const;
 
         [[nodiscard]] LeafNode* GetMinNode();
         [[nodiscard]] LeafNode* GetMaxNode();
@@ -107,7 +111,7 @@ namespace Ng {
         void Split(Node* node);
         void Pop(Node* node, const Key& key);
 
-        void Print(const Node* node, int level = 0) const;
+        void Print(const Node* node, int level = 1) const;
 
     private:
         Node* m_Root;

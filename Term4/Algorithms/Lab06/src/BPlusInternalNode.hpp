@@ -17,8 +17,8 @@ namespace Ng {
         BPlusInternalNode();
         ~BPlusInternalNode() override = default;
 
-        [[nodiscard]] const ChildContainer& GetChildren() const { return m_Children; }
-
+        [[nodiscard]] inline std::size_t GetChildCount() const { return m_Children.size(); }
+        [[nodiscard]] inline BPlusNode* GetChildByIndex(std::size_t index) const { return m_Children[index]; }
         [[nodiscard]] inline BPlusNode* GetMinChild() const { return m_Children.front(); }
         [[nodiscard]] inline BPlusNode* GetMaxChild() const { return m_Children.back(); }
 

@@ -96,7 +96,7 @@ namespace Ng {
     }
 
     template <typename Key, typename Value, int Degree>
-    bool BPlusTree<Key, Value, Degree>::IsExists(const Key& key) const {
+    bool BPlusTree<Key, Value, Degree>::IsContains(const Key& key) const {
         if (!m_Root)
             return false;
 
@@ -190,6 +190,16 @@ namespace Ng {
     }
 
     template <typename Key, typename Value, int Degree>
+    Value& BPlusTree<Key, Value, Degree>::Get(const Key& key) {
+        return GetLeafNode(key)->GetData(key);
+    }
+
+    template <typename Key, typename Value, int Degree>
+    const Value& BPlusTree<Key, Value, Degree>::Get(const Key& key) const {
+        return GetLeafNode(key)->GetData(key);
+    }
+
+    template <typename Key, typename Value, int Degree>
     typename BPlusTree<Key, Value, Degree>::LeafNode* BPlusTree<Key, Value, Degree>::GetLeafNode(const Key& key) {
         Node* node = m_Root;
 
@@ -197,6 +207,20 @@ namespace Ng {
             node = INTERNAL_NODE(node)->GetChildByKey(key);
 
         return LEAF_NODE(node);
+    }
+
+    template <typename Key, typename Value, int Degree>
+    const typename BPlusTree<
+        Key,
+        Value,
+        Degree
+    >::LeafNode* BPlusTree<Key, Value, Degree>::GetLeafNode(const Key& key) const {
+        Node* node = m_Root;
+
+        while (node && !node->IsLeaf())
+            node = INTERNAL_NODE(node)->GetChildByKey(key);
+
+        return CONST_LEAF_NODE(node);
     }
 
     template <typename Key, typename Value, int Degree>
@@ -245,85 +269,38 @@ namespace Ng {
 
     template <typename Key, typename Value, int Degree>
     void BPlusTree<Key, Value, Degree>::Pop(Node* node, const Key& key) {
-//        std::cout << "-- Current Node " << node->IsLeaf() << " in deletion = ";
-//        for (const auto& k : node->GetKeys())
-//            std::cout << k << " ";
-//        std::cout << ", Key to delete = " << key << ", Parent: ";
-//
-//        if (node->GetParent())
-//            std::cout << node->GetParent()->GetMinKey() << std::endl;
-//        else
-//            std::cout << "Null" << std::endl;
-
         node->PopKey(key);
 
-//        std::cout << "CUrrent node print = " << std::endl;
-//        Print(node, 1);
-
         if (node == m_Root) {
-            if (node->GetKeyCount() == 0 && node->IsLeaf()) {
-                m_Root = nullptr;
-            } else if (node->GetKeyCount() == 0 && node->IsInternal()) {
-                m_Root = INTERNAL_NODE(node)->GetMinChild();
-                m_Root->GetParent() = nullptr;
+            if (node->GetKeyCount() == 0) {
+                if (node->IsLeaf()) {
+                    m_Root = nullptr;
+                } else {
+                    m_Root = INTERNAL_NODE(node)->GetMinChild();
+                    m_Root->GetParent() = nullptr;
+                }
             }
 
             return;
         }
 
-        if (node->GetKeyCount() < Degree - 1) {
+        if (node->GetKeyCount() >= Degree - 1) {
+            node->GetParent()->UpdateKeys();
+        } else {
             auto* leftSibling = node->GetLeftSibling();
             auto* rightSibling = node->GetRightSibling();
 
             if (leftSibling && leftSibling->GetKeyCount() > Degree - 1) {
-
-//                std::cout << node->IsLeaf() << " borrow left" << std::endl;
-
                 node->BorrowLeft();
-
-//                std::cout << "after: " << std::endl;
-//                Print(node, 1);
-
             } else if (rightSibling && rightSibling->GetKeyCount() > Degree - 1) {
-
-//                std::cout << node->IsLeaf() << " borrow right" << std::endl;
-
                 node->BorrowRight();
-
-//                std::cout << "after: " << std::endl;
-//                Print(node, 1);
-
             } else if (leftSibling) {
-
-//                std::cout << node->IsLeaf() << " merge left" << std::endl;
-
                 node->MergeLeft();
-
-//                std::cout << "after: " << std::endl;
-//                Print(node, 1);
-
                 Pop(leftSibling->GetParent(), node->GetMinNode()->GetMinKey());
-
             } else if (rightSibling) {
-
-//                std::cout << node->IsLeaf() << " merge right" << std::endl;
-
                 node->MergeRight();
-
-//                std::cout << "after: " << std::endl;
-//                Print(node, 1);
-
                 Pop(node->GetParent(), rightSibling->GetMinNode()->GetMinKey());
-
             }
-
-//            if (m_Root->GetKeyCount() == 0)
-//                m_Root = INTERNAL_NODE(m_Root)->GetMaxChild();
-
-        } else {
-
-            node->GetParent()->UpdateKeys();
-
         }
     }
 
@@ -332,35 +309,33 @@ namespace Ng {
         if (!node)
             return;
 
-        for (int i = 0; i < level; ++i)
-            std::cout << "  ";
+        if (node == m_Root)
+            std::cout << "Root: ";
 
-        for (const auto& key : node->GetKeys())
-            std::cout << key << " ";
-        std::cout << " (" << node->IsLeaf() << ") |  P: ";
+        if (node->IsInternal()) {
+            for (std::size_t j = 0; j < node->GetKeyCount(); ++j)
+                std::cout << node->GetKey(j) << " ";
 
-        if (node->GetParent())
-            std::cout << *node->GetParent()->GetKeys().begin();
-        else
-            std::cout << "Null";
-        std::cout << ", ";
+            std::cout << std::endl;
 
-        std::cout << "LS: ";
-        if (node->GetLeftSibling())
-            std::cout << *node->GetLeftSibling()->GetKeys().begin();
-        else
-            std::cout << "Null";
-        std::cout << ", ";
+            for (std::size_t j = 0; j < CONST_INTERNAL_NODE(node)->GetChildCount(); ++j) {
+                for (int i = 0; i < level; ++i)
+                    std::cout << "  ";
 
-        std::cout << "RS: ";
-        if (node->GetRightSibling())
-            std::cout << *node->GetRightSibling()->GetKeys().begin() << std::endl;
-        else
-            std::cout << "Null" << std::endl;
+                std::cout << j << ". ";
 
-        if (node->IsInternal())
-            for (const auto& child : CONST_INTERNAL_NODE(node)->GetChildren())
-                Print(child, level + 1);
+                Print(CONST_INTERNAL_NODE(node)->GetChildByIndex(j), level + 1);
+            }
+        }
+
+        if (node->IsLeaf()) {
+            for (std::size_t j = 0; j < node->GetKeyCount(); ++j) {
+                auto pair = CONST_LEAF_NODE(node)->GetDataByIndex(j);
+                std::cout << "{ " << pair.first << ", " << pair.second << " } ";
+            }
+
+            std::cout << std::endl;
+        }
     }
 
 } // namespace Ng

@@ -8,11 +8,6 @@ namespace Ng {
 
     template <typename Key, typename Value>
     Value& BPlusLeafNode<Key, Value>::GetData(const Key& key) {
-        std::cout << "Keys: ";
-        for (const auto& k : this->m_Keys)
-            std::cout << k << " ";
-        std::cout << std::endl;
-        std::cout << "Key = " << key << std::endl;
         auto keyIterator = std::find(this->m_Keys.begin(), this->m_Keys.end(), key);
 
         if (keyIterator == this->m_Keys.end())

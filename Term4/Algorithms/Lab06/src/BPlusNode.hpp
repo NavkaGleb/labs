@@ -39,6 +39,7 @@ namespace Ng {
         [[nodiscard]] inline bool IsInternal() const { return m_Type == BPlusNodeType::Internal; }
         [[nodiscard]] inline bool IsLeaf() const { return m_Type == BPlusNodeType::Leaf; }
 
+        [[nodiscard]] inline const Key& GetKey(std::size_t index) const { return m_Keys[index]; }
         [[nodiscard]] inline std::size_t GetKeyCount() const { return m_Keys.size(); }
         [[nodiscard]] inline const Key& GetMinKey() const { return m_Keys.front(); }
         [[nodiscard]] inline const Key& GetMaxKey() const { return m_Keys.back(); }

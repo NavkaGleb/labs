@@ -1,75 +1,45 @@
-#include <iostream>
-
 #include <Random/Random.hpp>
 
 #include "BPlusTree.hpp"
 
-constexpr int COUNT = 100;
-
 int main() {
-//    Ng::BPlusTree<int, int, 3> tree;
-//    std::set<int> set;
-//
-//    std::vector<int> data;
-//
-//    data.reserve(COUNT);
-//
-//    for (int i = 0; i < COUNT; ++i) {
-//        auto key = Ng::Random::Get(0, 1000);
-//
-//        data.push_back(key);
-//
-//        set.insert(key);
-//        tree.Push(key, 1);
-////        tree.Print();
-////        std::cout << " - -- - --------------------------------- -- - --  - -- " << std::endl;
-////        std::cout << std::endl;
-//    }
-//
-//    tree.Print();
-//    std::cout << " - -- - - -- - --  - -- " << std::endl;
-//
-//    while (!data.empty()) {
-//        auto index = Ng::Random::Get<decltype(data)::difference_type>(0, data.size() - 1);
-//        auto key   = data[index];
-//
-//        data.erase(data.begin() + index);
-//
-//        std::cout << "-- pop = " << key << std::endl;
-//        tree.Pop(key);
-//        std::cout << "---------------------" << std::endl;
-//        tree.Print();
-//        std::cout << "--------------------- end" << std::endl;
-//        set.erase(key);
-//        std::cout << std::endl;
-//    }
-//
-//    tree.Print();
-//
-//    std::cout << "Keys: ";
-//    for (const auto& key : tree) {
-//        std::cout << key << " ";
-//    }
-//    std::cout << std::endl;
-//
-//    std::cout << "Set:  ";
-//    for (const auto& key : set) {
-//        std::cout << key << " ";
-//    }
-//    std::cout << std::endl;
+    constexpr int count = 20;
 
-    Ng::BPlusTree<int, int, 3> tree;
+    Ng::BPlusTree<int, int, 2> tree;
+    std::vector<int>           keys;
 
-    for (int i = 0; i < 40; ++i) {
+    keys.reserve(count);
+
+    for (int i = 0; i < count; ++i) {
         auto key = Ng::Random::Get(0, 100);
 
+        keys.push_back(key);
         tree.Push(key, 1);
-
     }
+
+    std::sort(keys.begin(), keys.end());
+    keys.erase(std::unique(keys.begin(), keys.end()), keys.end());
+
+    tree.Print();
+
+    tree.Get(keys[Ng::Random::Get<std::size_t>(0, keys.size() - 1)]) = 228;
+
+    std::cout << "Count: " << tree.GetCount() << ", Height: " << tree.GetHeight() << std::endl;
 
     for (auto&& [key, value] : tree) {
-        std::cout << "Key: " << key << ", Value: " << (value = 123) << std::endl;
+        std::cout << "{ " << key << ", " << value << " }" << std::endl;
     }
+
+    while (!keys.empty()) {
+        auto index = Ng::Random::Get<std::size_t>(0, keys.size() - 1);
+
+        tree.Pop(keys[index]);
+        keys.erase(keys.begin() + static_cast<decltype(keys)::difference_type>(index));
+    }
+
+    std::cout << "After Clearing!" << std::endl;
+
+    tree.Print();
 
     return 0;
 }
