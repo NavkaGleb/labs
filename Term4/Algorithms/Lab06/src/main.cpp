@@ -1,9 +1,11 @@
+#include <iomanip>
+
 #include <Random/Random.hpp>
 
 #include "BPlusTree.hpp"
 
 int main() {
-    constexpr int count = 20;
+    constexpr int count = 100;
 
     Ng::BPlusTree<int, int, 2> tree;
     std::vector<int>           keys;
@@ -27,7 +29,7 @@ int main() {
     std::cout << "Count: " << tree.GetCount() << ", Height: " << tree.GetHeight() << std::endl;
 
     for (auto&& [key, value] : tree) {
-        std::cout << "{ " << key << ", " << value << " }" << std::endl;
+        std::cout << "{ " << std::setw(3) << std::setfill('0') << key << ", " << value << " }" << std::endl;
     }
 
     while (!keys.empty()) {
