@@ -3,32 +3,13 @@
 namespace Ng {
 
     template <typename Key, typename Value>
-    BPlusNode<Key, Value>::BPlusNode(BPlusNodeType type)
-        : m_Parent(nullptr)
-        , m_LeftSibling(nullptr)
-        , m_RightSibling(nullptr)
-        , m_Type(type) {}
-
-    template <typename Key, typename Value>
-    std::size_t BPlusNode<Key, Value>::GetKeyIndex(const Key& key) const {
-        return std::distance(
-            m_Keys.begin(),
-            std::upper_bound(
-                m_Keys.begin(),
-                m_Keys.end(),
-                key
-            )
-        );
-    }
-
-    template <typename Key, typename Value>
     bool BPlusNode<Key, Value>::IsContainsKey(const Key& key) const {
         return std::binary_search(m_Keys.begin(), m_Keys.end(), key);
     }
 
     template <typename Key, typename Value>
-    typename BPlusNode<Key, Value>::KeyIterator BPlusNode<Key, Value>::GetMedian() {
-        return m_Keys.begin() + m_Keys.size() / 2;
+    const Key& BPlusNode<Key, Value>::GetMedian() const {
+        return m_Keys[m_Keys.size() / 2];
     }
 
     template <typename Key, typename Value>
@@ -44,7 +25,19 @@ namespace Ng {
 
     template <typename Key, typename Value>
     void BPlusNode<Key, Value>::PopKey(const Key& key) {
-        m_Keys.erase(std::remove(m_Keys.begin(), m_Keys.end(), key));
+        m_Keys.erase(std::find(m_Keys.begin(), m_Keys.end(), key));
     }
+
+    template <typename Key, typename Value>
+    typename BPlusNode<Key, Value>::KeyIterator BPlusNode<Key, Value>::GetKeyMedianIterator() {
+        return m_Keys.begin() + m_Keys.size() / 2;
+    }
+
+    template <typename Key, typename Value>
+    BPlusNode<Key, Value>::BPlusNode(BPlusNodeType type)
+        : m_Parent(nullptr)
+        , m_LeftSibling(nullptr)
+        , m_RightSibling(nullptr)
+        , m_Type(type) {}
 
 } // namespace Ng

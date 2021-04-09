@@ -22,7 +22,6 @@ namespace Ng {
     public:
         using KeyContainer      = std::vector<Key>;
         using KeyIterator       = typename KeyContainer::iterator;
-        using KeyConstIterator  = typename KeyContainer::const_iterator;
 
     protected:
         using BPlusInternalNode = BPlusInternalNode<Key, Value>;
@@ -41,19 +40,17 @@ namespace Ng {
         [[nodiscard]] inline bool IsLeaf() const { return m_Type == BPlusNodeType::Leaf; }
 
         [[nodiscard]] inline std::size_t GetKeyCount() const { return m_Keys.size(); }
-        [[nodiscard]] inline const Key& GetKey(std::size_t index) const { return m_Keys[index]; }
         [[nodiscard]] inline const Key& GetMinKey() const { return m_Keys.front(); }
         [[nodiscard]] inline const Key& GetMaxKey() const { return m_Keys.back(); }
 
-        [[nodiscard]] std::size_t GetKeyIndex(const Key& key) const;
         [[nodiscard]] bool IsContainsKey(const Key& key) const;
 
-        [[nodiscard]] KeyIterator GetMedian();
+        [[nodiscard]] inline const Key& GetMedian() const;
 
         KeyIterator PushKey(const Key& key);
-        virtual void PopKey(const Key& key) = 0;
+        void PopKey(const Key& key);
 
-        virtual BPlusNode* Split(KeyIterator separator) = 0;
+        virtual BPlusNode* Split() = 0;
 
         virtual void BorrowLeft() = 0;
         virtual void BorrowRight() = 0;
@@ -61,13 +58,15 @@ namespace Ng {
         virtual void MergeRight() = 0;
 
         virtual BPlusNode* GetMinNode() = 0;
-        virtual const BPlusNode* GetMinNode() const = 0;
-
         virtual BPlusNode* GetMaxNode() = 0;
+
+        virtual const BPlusNode* GetMinNode() const = 0;
         virtual const BPlusNode* GetMaxNode() const = 0;
 
     protected:
         explicit BPlusNode(BPlusNodeType type);
+
+        [[nodiscard]] KeyIterator GetKeyMedianIterator();
 
     protected:
         KeyContainer       m_Keys;

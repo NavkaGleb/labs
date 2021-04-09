@@ -19,7 +19,7 @@ TEST_CASE("BPlusTree Push") {
 
         auto currentKey = keys.begin();
 
-        for (const auto& key : tree)
+        for (const auto& [key, value] : tree)
             actual.insert(key);
 
         CHECK(actual == keys);
@@ -82,32 +82,10 @@ TEST_CASE("BPlusTree Pop") {
 
             tree.Pop(key);
             keys.erase(key);
-
-            for (auto [vectorIt, keyIt] = std::make_pair(vector.begin(), keys.begin());
-                vectorIt != vector.end() && keyIt != keys.end(); ++vectorIt, ++keyIt) {
-
-                if (*vectorIt != *keyIt) {
-                    std::cout << "Pop Key = " << key << std::endl;
-                    tree.Print();
-                    return;
-                }
-            }
         }
 
-        for (const auto& key : tree)
+        for (const auto& [key, value] : tree)
             actual.insert(key);
-
-        tree.Print();
-
-        std::cout << "Actual:   ";
-        for (const auto& key : actual)
-            std::cout << key << " ";
-        std::cout << std::endl;
-
-        std::cout << "Expected: ";
-        for (const auto& key : keys)
-            std::cout << key << " ";
-        std::cout << std::endl;
 
         CHECK(actual == keys);
     }

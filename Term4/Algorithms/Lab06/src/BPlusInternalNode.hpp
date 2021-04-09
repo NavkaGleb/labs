@@ -9,7 +9,6 @@ namespace Ng {
     public:
         using ChildContainer     = std::vector<BPlusNode<Key, Value>*>;
         using ChildIterator      = typename ChildContainer::iterator;
-        using ChildConstIterator = typename ChildContainer::const_iterator;
 
     private:
         using BPlusNode = BPlusNode<Key, Value>;
@@ -24,17 +23,13 @@ namespace Ng {
         [[nodiscard]] inline BPlusNode* GetMaxChild() const { return m_Children.back(); }
 
         [[nodiscard]] BPlusNode* GetChildByKey(const Key& key) const;
-        [[nodiscard]] std::size_t GetChildIndex(const Key& key) const;
-        [[nodiscard]] BPlusNode* GetChildByIndex(std::size_t index) const;
 
         void UpdateKeys();
 
         void PushChild(BPlusNode* child);
         void PopChild(BPlusNode* child);
 
-        void PopKey(const Key& key) override;
-
-        BPlusNode* Split(typename BPlusNode::KeyIterator separator) override;
+        BPlusNode* Split() override;
 
         void BorrowLeft() override;
         void BorrowRight() override;
@@ -42,9 +37,9 @@ namespace Ng {
         void MergeRight() override;
 
         BPlusNode* GetMinNode() override;
-        const BPlusNode* GetMinNode() const override;
-
         BPlusNode* GetMaxNode() override;
+
+        const BPlusNode* GetMinNode() const override;
         const BPlusNode* GetMaxNode() const override;
 
     private:

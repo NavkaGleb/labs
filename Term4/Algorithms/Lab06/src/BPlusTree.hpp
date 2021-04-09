@@ -26,24 +26,45 @@ namespace Ng {
     public:
         class Iterator {
         public:
-            using Pair = std::pair<Key, Value>;
+            using Pair = typename LeafNode::Pair;
 
         public:
-            explicit Iterator(Node* node = nullptr);
+            explicit Iterator(LeafNode* node = nullptr);
             ~Iterator() = default;
 
             Iterator& operator ++();
 
-            const Key& operator *();
+            Pair operator *();
 
             bool operator !=(const Iterator& other) const;
             bool operator ==(const Iterator& other) const;
 
         private:
-            Node*       m_Node;
+            LeafNode*   m_Node;
             std::size_t m_Index;
 
         }; // class Iterator
+
+        class ConstIterator {
+        public:
+            using Pair = typename LeafNode::ConstPair;
+
+        public:
+            explicit ConstIterator(const LeafNode* node = nullptr);
+            ~ConstIterator() = default;
+
+            ConstIterator& operator ++();
+
+            Pair operator *() const;
+
+            bool operator !=(const ConstIterator& other) const;
+            bool operator ==(const ConstIterator& other) const;
+
+        private:
+            const LeafNode* m_Node;
+            std::size_t     m_Index;
+
+        }; // class ConstIterator
 
     public:
 
@@ -58,20 +79,30 @@ namespace Ng {
         [[nodiscard]] bool IsExists(const Key& key) const;
         [[nodiscard]] int GetHeight() const;
 
+        [[nodiscard]] const Key& GetMinKey() const;
+        [[nodiscard]] const Key& GetMaxKey() const;
+
         void Clear();
 
-        Value& Push(const Key& key, const Value& value);
-        void Pop(const Key& key);
+        bool Push(const Key& key, const Value& value);
+        bool Pop(const Key& key);
 
         void Print() const;
 
         inline Iterator Begin() { return Iterator(GetMinNode()); }
         inline Iterator End() { return Iterator(); }
 
+        inline ConstIterator Begin() const { return ConstIterator(GetMinNode()); }
+        inline ConstIterator End() const { return ConstIterator(); }
+
     private:
-        [[nodiscard]] Node* GetLeafNode(const Key& key);
-        [[nodiscard]] Node* GetMinNode();
-        [[nodiscard]] Node* GetMaxNode();
+        [[nodiscard]] LeafNode* GetLeafNode(const Key& key);
+
+        [[nodiscard]] LeafNode* GetMinNode();
+        [[nodiscard]] LeafNode* GetMaxNode();
+
+        [[nodiscard]] const LeafNode* GetMinNode() const;
+        [[nodiscard]] const LeafNode* GetMaxNode() const;
 
         void Split(Node* node);
         void Pop(Node* node, const Key& key);
@@ -86,14 +117,16 @@ namespace Ng {
 
     // Free functions for range based for!
     template <typename Key, typename Value, int Degree>
-    auto begin(Ng::BPlusTree<Key, Value, Degree>& tree) {
-        return tree.Begin();
-    }
+    inline auto begin(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.Begin(); }
 
     template <typename Key, typename Value, int Degree>
-    auto end(Ng::BPlusTree<Key, Value, Degree>& tree) {
-        return tree.End();
-    }
+    inline auto end(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.End(); }
+
+    template <typename Key, typename Value, int Degree>
+    inline auto cbegin(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.ConstBegin(); }
+
+    template <typename Key, typename Value, int Degree>
+    inline auto cend(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.End(); }
 
 } // namespace Ng
 

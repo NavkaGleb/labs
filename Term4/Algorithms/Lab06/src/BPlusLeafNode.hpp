@@ -8,6 +8,10 @@ namespace Ng {
     class BPlusLeafNode : public BPlusNode<Key, Value> {
     public:
         using DataContainer = std::vector<Value>;
+        using DataIterator  = typename DataContainer::iterator;
+
+        using Pair          = std::pair<const Key&, Value&>;
+        using ConstPair     = std::pair<const Key&, const Value&>;
 
     private:
         using BPlusNode = BPlusNode<Key, Value>;
@@ -16,9 +20,15 @@ namespace Ng {
         BPlusLeafNode();
         ~BPlusLeafNode() override = default;
 
-        void PopKey(const Key& key) override;
+        Value& GetData(const Key& key);
+        const Value& GetData(const Key& key) const;
 
-        BPlusNode* Split(typename BPlusNode::KeyIterator separator) override;
+        Pair GetDataByIndex(std::size_t index);
+        ConstPair GetDataByIndex(std::size_t index) const;
+
+        void PushData(const Key& key, const Value& value);
+
+        BPlusNode* Split() override;
 
         void BorrowLeft() override;
         void BorrowRight() override;
@@ -26,10 +36,13 @@ namespace Ng {
         void MergeRight() override;
 
         BPlusNode* GetMinNode() override;
-        const BPlusNode* GetMinNode() const override;
-
         BPlusNode* GetMaxNode() override;
+
+        const BPlusNode* GetMinNode() const override;
         const BPlusNode* GetMaxNode() const override;
+
+    private:
+        [[nodiscard]] DataIterator GetDataMedianIterator();
 
     private:
         DataContainer m_Data;
