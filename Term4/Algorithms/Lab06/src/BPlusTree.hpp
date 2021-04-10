@@ -127,6 +127,12 @@ namespace Ng {
     inline auto end(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.End(); }
 
     template <typename Key, typename Value, int Degree>
+    inline auto begin(const Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.Begin(); }
+
+    template <typename Key, typename Value, int Degree>
+    inline auto end(const Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.End(); }
+
+    template <typename Key, typename Value, int Degree>
     inline auto cbegin(Ng::BPlusTree<Key, Value, Degree>& tree) { return tree.ConstBegin(); }
 
     template <typename Key, typename Value, int Degree>

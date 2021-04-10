@@ -297,9 +297,13 @@ namespace Ng {
             } else if (leftSibling) {
                 node->MergeLeft();
                 Pop(leftSibling->GetParent(), node->GetMinNode()->GetMinKey());
+
+                delete leftSibling;
             } else if (rightSibling) {
                 node->MergeRight();
                 Pop(node->GetParent(), rightSibling->GetMinNode()->GetMinKey());
+
+                delete rightSibling;
             }
         }
     }

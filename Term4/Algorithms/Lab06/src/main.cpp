@@ -7,8 +7,8 @@
 int main() {
     constexpr int count = 100;
 
-    Ng::BPlusTree<int, int, 2> tree;
-    std::vector<int>           keys;
+    Ng::BPlusTree<int, std::string, 3> tree;
+    std::vector<int>                   keys;
 
     keys.reserve(count);
 
@@ -16,7 +16,7 @@ int main() {
         auto key = Ng::Random::Get(0, 100);
 
         keys.push_back(key);
-        tree.Push(key, 1);
+        tree.Push(key, std::to_string(i));
     }
 
     std::sort(keys.begin(), keys.end());
@@ -24,7 +24,7 @@ int main() {
 
     tree.Print();
 
-    tree.Get(keys[Ng::Random::Get<std::size_t>(0, keys.size() - 1)]) = 228;
+    tree.Get(keys[Ng::Random::Get<std::size_t>(0, keys.size() - 1)]) = "Updated String";
 
     std::cout << "Count: " << tree.GetCount() << ", Height: " << tree.GetHeight() << std::endl;
 

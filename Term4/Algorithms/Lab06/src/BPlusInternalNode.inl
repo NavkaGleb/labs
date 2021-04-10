@@ -1,8 +1,14 @@
 namespace Ng {
 
     template <typename Key, typename Value>
-    BPlusInternalNode<Key, Value>::BPlusInternalNode()
-        : BPlusNode(BPlusNodeType::Internal) {}
+    BPlusInternalNode<Key, Value>::BPlusInternalNode(BPlusInternalNode* parent)
+        : BPlusNode(BPlusNodeType::Internal, parent) {}
+
+    template <typename Key, typename Value>
+    BPlusInternalNode<Key, Value>::~BPlusInternalNode() {
+        for (auto& child : this->m_Children)
+            delete child;
+    }
 
     template <typename Key, typename Value>
     BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChildByKey(const Key& key) const {
@@ -10,7 +16,7 @@ namespace Ng {
 
         for (int i = 0; i <= this->m_Keys.size(); ++i) {
             if (i == this->m_Keys.size() || key < this->m_Keys[i]) {
-                result = m_Children[i];
+                result = this->m_Children[i];
                 break;
             }
         }
@@ -52,23 +58,22 @@ namespace Ng {
 
     template <typename Key, typename Value>
     BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::Split() {
-        auto* sibling = new BPlusInternalNode<Key, Value>;
+        auto* sibling = new BPlusInternalNode(this->m_Parent);
 
-        sibling->m_Parent = this->m_Parent;
+        sibling->m_Keys.insert(
+            sibling->m_Keys.begin(),
+            std::move_iterator(std::next(this->GetKeyMedianIterator())),
+            std::move_iterator(this->m_Keys.end())
+        );
 
-        sibling->m_Keys.insert(sibling->m_Keys.begin(), std::next(this->GetKeyMedianIterator()), this->m_Keys.end());
         this->m_Keys.erase(this->GetKeyMedianIterator(), this->m_Keys.end());
 
-        auto* thisInternal    = static_cast<BPlusInternalNode<Key, Value>*>(this);
-        auto* siblingInternal = static_cast<BPlusInternalNode<Key, Value>*>(sibling);
-        auto  childSeparator  = thisInternal->m_Children.begin() + this->m_Keys.size() + 1;
+        sibling->m_Children.reserve(std::distance(this->GetChildMedianIterator(), this->m_Children.end()));
 
-        siblingInternal->m_Children.reserve(std::distance(childSeparator, thisInternal->m_Children.end()));
+        for (auto it = this->GetChildMedianIterator(); it != this->m_Children.end(); ++it)
+            sibling->m_Children.emplace_back(std::move(*it))->m_Parent = sibling;
 
-        for (auto it = childSeparator; it != thisInternal->m_Children.end(); ++it)
-            siblingInternal->m_Children.emplace_back(*it)->m_Parent = siblingInternal;
-
-        thisInternal->m_Children.erase(childSeparator, thisInternal->m_Children.end());
+        this->m_Children.erase(this->GetChildMedianIterator(), this->m_Children.end());
 
         return sibling;
     }
@@ -107,27 +112,24 @@ namespace Ng {
 
         this->m_Keys.insert(
             this->m_Keys.begin(),
-            leftSibling->m_Keys.begin(),
-            leftSibling->m_Keys.end()
+            std::move_iterator(leftSibling->m_Keys.begin()),
+            std::move_iterator(leftSibling->m_Keys.end())
         );
 
         this->m_Children.insert(
             this->m_Children.begin(),
-            leftSibling->m_Children.begin(),
-            leftSibling->m_Children.end()
+            std::move_iterator(leftSibling->m_Children.begin()),
+            std::move_iterator(leftSibling->m_Children.end())
         );
 
-        for (auto& child : this->m_Children)
-            child->m_Parent = this;
+        for (std::size_t i = 0; i < leftSibling->m_Children.size(); ++i)
+            this->m_Children[i]->m_Parent = this;
 
-        if (leftSibling->m_LeftSibling)
-            leftSibling->m_LeftSibling->m_RightSibling = this;
-
-        this->m_LeftSibling = leftSibling->m_LeftSibling;
-
+        this->PopLeftSibling();
         this->UpdateKeys();
 
         leftSibling->m_Parent->PopChild(leftSibling);
+        leftSibling->m_Children.clear();
     }
 
     template <typename Key, typename Value>
@@ -138,27 +140,24 @@ namespace Ng {
 
         this->m_Keys.insert(
             this->m_Keys.end(),
-            rightSibling->m_Keys.begin(),
-            rightSibling->m_Keys.end()
+            std::move_iterator(rightSibling->m_Keys.begin()),
+            std::move_iterator(rightSibling->m_Keys.end())
         );
 
         this->m_Children.insert(
             this->m_Children.end(),
-            rightSibling->m_Children.begin(),
-            rightSibling->m_Children.end()
+            std::move_iterator(rightSibling->m_Children.begin()),
+            std::move_iterator(rightSibling->m_Children.end())
         );
 
-        for (auto& child : this->m_Children)
-            child->m_Parent = this;
+        for (std::size_t i = this->m_Children.size() - rightSibling->m_Children.size(); i < this->m_Children.size(); ++i)
+            this->m_Children[i]->m_Parent = this;
 
-        if (rightSibling->m_RightSibling)
-            rightSibling->m_RightSibling->m_LeftSibling = this;
-
-        this->m_RightSibling = rightSibling->m_RightSibling;
-
+        this->PopRightSibling();
         this->UpdateKeys();
 
         rightSibling->m_Parent->PopChild(rightSibling);
+        rightSibling->m_Children.clear();
     }
 
     template <typename Key, typename Value>
@@ -193,10 +192,18 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::PushChild(ChildIterator it, BPlusNode* child) {
-        it = m_Children.insert(it, child);
+    typename BPlusInternalNode<
+        Key,
+        Value
+    >::ChildIterator BPlusInternalNode<Key, Value>::GetChildMedianIterator() {
+        return this->m_Children.begin() + this->m_Children.size() / 2 + 1;
+    }
 
-        if (m_Children.size() == 1)
+    template <typename Key, typename Value>
+    void BPlusInternalNode<Key, Value>::PushChild(ChildIterator it, BPlusNode* child) {
+        it = this->m_Children.insert(it, child);
+
+        if (this->m_Children.size() == 1)
             return;
 
         auto* leftSibling  = GetLeftSibling(it);

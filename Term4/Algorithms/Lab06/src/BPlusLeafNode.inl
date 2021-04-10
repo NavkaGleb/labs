@@ -3,8 +3,8 @@
 namespace Ng {
 
     template <typename Key, typename Value>
-    BPlusLeafNode<Key, Value>::BPlusLeafNode()
-        : BPlusNode(BPlusNodeType::Leaf) {}
+    BPlusLeafNode<Key, Value>::BPlusLeafNode(BPlusInternalNode* parent)
+        : BPlusNode(BPlusNodeType::Leaf, parent) {}
 
     template <typename Key, typename Value>
     Value& BPlusLeafNode<Key, Value>::GetData(const Key& key) {
@@ -54,22 +54,20 @@ namespace Ng {
 
     template <typename Key, typename Value>
     BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::Split() {
-        auto* sibling = new BPlusLeafNode<Key, Value>;
-
-        sibling->m_Parent = this->m_Parent;
+        auto* sibling = new BPlusLeafNode(this->m_Parent);
 
         sibling->m_Keys.insert(
             sibling->m_Keys.begin(),
-            this->GetKeyMedianIterator(),
-            this->m_Keys.end()
+            std::move_iterator(this->GetKeyMedianIterator()),
+            std::move_iterator(this->m_Keys.end())
         );
 
         this->m_Keys.erase(this->GetKeyMedianIterator(), this->m_Keys.end());
 
         sibling->m_Data.insert(
             sibling->m_Data.begin(),
-            this->GetDataMedianIterator(),
-            this->m_Data.end()
+            std::move_iterator(this->GetDataMedianIterator()),
+            std::move_iterator(this->m_Data.end())
         );
 
         this->m_Data.erase(this->GetDataMedianIterator(), this->m_Data.end());
@@ -109,23 +107,22 @@ namespace Ng {
 
         this->m_Keys.insert(
             this->m_Keys.begin(),
-            leftSibling->m_Keys.begin(),
-            leftSibling->m_Keys.end()
+            std::move_iterator(leftSibling->m_Keys.begin()),
+            std::move_iterator(leftSibling->m_Keys.end())
         );
 
         this->m_Data.insert(
             this->m_Data.begin(),
-            leftSibling->m_Data.begin(),
-            leftSibling->m_Data.end()
+            std::move_iterator(leftSibling->m_Data.begin()),
+            std::move_iterator(leftSibling->m_Data.end())
         );
 
-        if (leftSibling->m_LeftSibling)
-            leftSibling->m_LeftSibling->m_RightSibling = this;
-
-        this->m_LeftSibling = leftSibling->m_LeftSibling;
+        this->PopLeftSibling();
 
         this->m_Parent->UpdateKeys();
-        leftSibling->m_Parent->UpdateKeys();
+
+        if (this->m_Parent != leftSibling->m_Parent)
+            leftSibling->m_Parent->UpdateKeys();
 
         leftSibling->m_Parent->PopChild(leftSibling);
     }
@@ -136,23 +133,22 @@ namespace Ng {
 
         this->m_Keys.insert(
             this->m_Keys.end(),
-            rightSibling->m_Keys.begin(),
-            rightSibling->m_Keys.end()
+            std::move_iterator(rightSibling->m_Keys.begin()),
+            std::move_iterator(rightSibling->m_Keys.end())
         );
 
         this->m_Data.insert(
             this->m_Data.end(),
-            rightSibling->m_Data.begin(),
-            rightSibling->m_Data.end()
+            std::move_iterator(rightSibling->m_Data.begin()),
+            std::move_iterator(rightSibling->m_Data.end())
         );
 
-        if (rightSibling->m_RightSibling)
-            rightSibling->m_RightSibling->m_LeftSibling = this;
-
-        this->m_RightSibling = rightSibling->m_RightSibling;
+        this->PopRightSibling();
 
         this->m_Parent->UpdateKeys();
-        rightSibling->m_Parent->UpdateKeys();
+
+        if (this->m_Parent != rightSibling->m_Parent)
+            rightSibling->m_Parent->UpdateKeys();
 
         rightSibling->m_Parent->PopChild(rightSibling);
     }

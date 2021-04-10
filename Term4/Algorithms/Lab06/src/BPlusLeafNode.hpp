@@ -14,10 +14,11 @@ namespace Ng {
         using ConstPair     = std::pair<const Key&, const Value&>;
 
     private:
-        using BPlusNode = BPlusNode<Key, Value>;
+        using BPlusNode         = BPlusNode<Key, Value>;
+        using BPlusInternalNode = BPlusInternalNode<Key, Value>;
 
     public:
-        BPlusLeafNode();
+        BPlusLeafNode(BPlusInternalNode* parent = nullptr);
         ~BPlusLeafNode() override = default;
 
         Value& GetData(const Key& key);

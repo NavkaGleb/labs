@@ -14,8 +14,8 @@ namespace Ng {
         using BPlusNode = BPlusNode<Key, Value>;
 
     public:
-        BPlusInternalNode();
-        ~BPlusInternalNode() override = default;
+        BPlusInternalNode(BPlusInternalNode* parent = nullptr);
+        ~BPlusInternalNode() override;
 
         [[nodiscard]] inline std::size_t GetChildCount() const { return m_Children.size(); }
         [[nodiscard]] inline BPlusNode* GetChildByIndex(std::size_t index) const { return m_Children[index]; }
@@ -45,6 +45,7 @@ namespace Ng {
     private:
         [[nodiscard]] BPlusNode* GetLeftSibling(ChildIterator it) const;
         [[nodiscard]] BPlusNode* GetRightSibling(ChildIterator it) const;
+        [[nodiscard]] ChildIterator GetChildMedianIterator();
 
         void PushChild(ChildIterator it, BPlusNode* child);
 

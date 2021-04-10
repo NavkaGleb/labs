@@ -48,7 +48,7 @@ namespace Ng {
 
         [[nodiscard]] inline const Key& GetMedian() const;
 
-        KeyIterator PushKey(const Key& key);
+        void PushKey(const Key& key);
         void PopKey(const Key& key);
 
         virtual BPlusNode* Split() = 0;
@@ -65,9 +65,12 @@ namespace Ng {
         virtual const BPlusNode* GetMaxNode() const = 0;
 
     protected:
-        explicit BPlusNode(BPlusNodeType type);
+        explicit BPlusNode(BPlusNodeType type, BPlusInternalNode* parent);
 
         [[nodiscard]] KeyIterator GetKeyMedianIterator();
+
+        void PopLeftSibling();
+        void PopRightSibling();
 
     protected:
         KeyContainer       m_Keys;

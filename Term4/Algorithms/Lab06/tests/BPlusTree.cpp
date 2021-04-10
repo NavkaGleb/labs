@@ -61,7 +61,7 @@ TEST_CASE("BPlusTree Pop") {
     for (int i = 0; i < 100; ++i) {
         const int count = Ng::Random::Get(1000, 10000);
 
-        Ng::BPlusTree<int, int, 2> tree;
+        Ng::BPlusTree<int, int, 100> tree;
 
         std::vector<int>           keys;
         std::vector<int>           actual;
