@@ -1,17 +1,17 @@
 namespace Ng {
 
-    template <typename Key, typename Value>
-    BPlusInternalNode<Key, Value>::BPlusInternalNode(BPlusInternalNode* parent)
+    template <typename Key>
+    BPlusInternalNode<Key>::BPlusInternalNode(BPlusInternalNode* parent)
         : BPlusNode(BPlusNodeType::Internal, parent) {}
 
-    template <typename Key, typename Value>
-    BPlusInternalNode<Key, Value>::~BPlusInternalNode() {
+    template <typename Key>
+    BPlusInternalNode<Key>::~BPlusInternalNode() {
         for (auto& child : this->m_Children)
             delete child;
     }
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetChildByKey(const Key& key) const {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::GetChildByKey(const Key& key) const {
         BPlusNode* result = nullptr;
 
         for (int i = 0; i <= this->m_Keys.size(); ++i) {
@@ -24,8 +24,8 @@ namespace Ng {
         return result;
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::UpdateKeys() {
+    template <typename Key>
+    void BPlusInternalNode<Key>::UpdateKeys() {
         auto* node = this;
 
         while (node) {
@@ -36,8 +36,8 @@ namespace Ng {
         }
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::PushChild(BPlusNode* child) {
+    template <typename Key>
+    void BPlusInternalNode<Key>::PushChild(BPlusNode* child) {
         child->m_Parent = this;
 
         if (m_Children.empty() || child->GetMinKey() < m_Children.front()->GetMinKey())
@@ -51,13 +51,13 @@ namespace Ng {
                 return PushChild(it, child);
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::PopChild(BPlusNode* child) {
+    template <typename Key>
+    void BPlusInternalNode<Key>::PopChild(BPlusNode* child) {
         m_Children.erase(std::find(m_Children.begin(), m_Children.end(), child));
     }
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::Split() {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::Split() {
         auto* sibling = new BPlusInternalNode(this->m_Parent);
 
         sibling->m_Keys.insert(
@@ -78,8 +78,8 @@ namespace Ng {
         return sibling;
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::BorrowLeft() {
+    template <typename Key>
+    void BPlusInternalNode<Key>::BorrowLeft() {
         auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
 
         this->m_Keys.insert(this->m_Keys.begin(), leftSibling->GetMaxKey());
@@ -91,8 +91,8 @@ namespace Ng {
         this->UpdateKeys();
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::BorrowRight() {
+    template <typename Key>
+    void BPlusInternalNode<Key>::BorrowRight() {
         auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
 
         this->m_Keys.emplace_back(rightSibling->GetMinKey());
@@ -104,8 +104,8 @@ namespace Ng {
         this->UpdateKeys();
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::MergeLeft() {
+    template <typename Key>
+    void BPlusInternalNode<Key>::MergeLeft() {
         auto* leftSibling = static_cast<decltype(this)>(this->m_LeftSibling);
 
         this->m_Keys.insert(this->m_Keys.begin(), leftSibling->GetMinKey());
@@ -132,8 +132,8 @@ namespace Ng {
         leftSibling->m_Children.clear();
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::MergeRight() {
+    template <typename Key>
+    void BPlusInternalNode<Key>::MergeRight() {
         auto* rightSibling = static_cast<decltype(this)>(this->m_RightSibling);
 
         this->m_Keys.push_back(rightSibling->GetMinKey());
@@ -160,47 +160,44 @@ namespace Ng {
         rightSibling->m_Children.clear();
     }
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMinNode() {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::GetMinNode() {
         return m_Children.front()->IsLeaf() ? m_Children.front() : m_Children.front()->GetMinNode();
     }
 
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMaxNode() {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::GetMaxNode() {
         return m_Children.front()->IsLeaf() ? m_Children.back() : m_Children.back()->GetMaxNode();
     }
 
-    template <typename Key, typename Value>
-    const BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMinNode() const {
+    template <typename Key>
+    const BPlusNode<Key>* BPlusInternalNode<Key>::GetMinNode() const {
         return m_Children.front()->IsLeaf() ? m_Children.front() : m_Children.front()->GetMinNode();
     }
 
-    template <typename Key, typename Value>
-    const BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetMaxNode() const {
+    template <typename Key>
+    const BPlusNode<Key>* BPlusInternalNode<Key>::GetMaxNode() const {
         return m_Children.front()->IsLeaf() ? m_Children.back() : m_Children.back()->GetMaxNode();
     }
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetLeftSibling(ChildIterator it) const {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::GetLeftSibling(ChildIterator it) const {
         return it == m_Children.begin() ? (*std::next(it))->m_LeftSibling : *std::prev(it);
     }
 
-    template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusInternalNode<Key, Value>::GetRightSibling(ChildIterator it) const {
+    template <typename Key>
+    BPlusNode<Key>* BPlusInternalNode<Key>::GetRightSibling(ChildIterator it) const {
         return std::next(it) == m_Children.end() ? (*std::prev(it))->m_RightSibling : *std::next(it);
     }
 
-    template <typename Key, typename Value>
-    typename BPlusInternalNode<
-        Key,
-        Value
-    >::ChildIterator BPlusInternalNode<Key, Value>::GetChildMedianIterator() {
+    template <typename Key>
+    typename BPlusInternalNode<Key>::ChildIterator BPlusInternalNode<Key>::GetChildMedianIterator() {
         return this->m_Children.begin() + this->m_Children.size() / 2 + 1;
     }
 
-    template <typename Key, typename Value>
-    void BPlusInternalNode<Key, Value>::PushChild(ChildIterator it, BPlusNode* child) {
+    template <typename Key>
+    void BPlusInternalNode<Key>::PushChild(ChildIterator it, BPlusNode* child) {
         it = this->m_Children.insert(it, child);
 
         if (this->m_Children.size() == 1)

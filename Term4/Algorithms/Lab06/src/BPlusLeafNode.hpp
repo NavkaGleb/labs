@@ -5,7 +5,7 @@
 namespace Ng {
 
     template <typename Key, typename Value>
-    class BPlusLeafNode : public BPlusNode<Key, Value> {
+    class BPlusLeafNode final : public BPlusNode<Key> {
     public:
         using DataContainer = std::vector<Value>;
         using DataIterator  = typename DataContainer::iterator;
@@ -14,11 +14,11 @@ namespace Ng {
         using ConstPair     = std::pair<const Key&, const Value&>;
 
     private:
-        using BPlusNode         = BPlusNode<Key, Value>;
-        using BPlusInternalNode = BPlusInternalNode<Key, Value>;
+        using BPlusNode         = BPlusNode<Key>;
+        using BPlusInternalNode = BPlusInternalNode<Key>;
 
     public:
-        BPlusLeafNode(BPlusInternalNode* parent = nullptr);
+        explicit BPlusLeafNode(BPlusInternalNode* parent = nullptr);
         ~BPlusLeafNode() override = default;
 
         Value& GetData(const Key& key);

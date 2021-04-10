@@ -8,19 +8,19 @@
 
 namespace Ng {
 
-#define INTERNAL_NODE(node)       static_cast<BPlusInternalNode<Key, Value>*>(node)
-#define LEAF_NODE(node)           static_cast<BPlusLeafNode<Key, Value>*>(node)
+#define INTERNAL_NODE(node)       (static_cast<BPlusInternalNode<Key>*>(node))
+#define LEAF_NODE(node)           (static_cast<BPlusLeafNode<Key, Value>*>(node))
 
-#define CONST_INTERNAL_NODE(node) static_cast<const BPlusInternalNode<Key, Value>*>(node)
-#define CONST_LEAF_NODE(node)     static_cast<const BPlusLeafNode<Key, Value>*>(node)
+#define CONST_INTERNAL_NODE(node) (static_cast<const BPlusInternalNode<Key>*>(node))
+#define CONST_LEAF_NODE(node)     (static_cast<const BPlusLeafNode<Key, Value>*>(node))
 
     template <typename Key, typename Value, int Degree>
     class BPlusTree {
     public:
         using KeyType      = Key;
         using ValueType    = Value;
-        using Node         = BPlusNode<Key, Value>;
-        using InternalNode = BPlusInternalNode<Key, Value>;
+        using Node         = BPlusNode<Key>;
+        using InternalNode = BPlusInternalNode<Key>;
         using LeafNode     = BPlusLeafNode<Key, Value>;
 
     public:

@@ -10,22 +10,26 @@ namespace Ng {
         Leaf
     };
 
-    template <typename Key, typename Value> class BPlusInternalNode;
+    template <typename Key> class BPlusInternalNode;
     template <typename Key, typename Value> class BPlusLeafNode;
 
-    template <typename Key, typename Value>
+    template <typename Key>
     class BPlusNode {
     public:
-        friend BPlusInternalNode<Key, Value>;
-        friend BPlusLeafNode<Key, Value>;
+        template <typename Key_, typename Value>
+        friend class BPlusLeafNode;
+
+        friend BPlusInternalNode<Key>;
 
     public:
         using KeyContainer      = std::vector<Key>;
         using KeyIterator       = typename KeyContainer::iterator;
 
     protected:
-        using BPlusInternalNode = BPlusInternalNode<Key, Value>;
+        template <typename Value>
         using BPlusLeafNode     = BPlusLeafNode<Key, Value>;
+
+        using BPlusInternalNode = BPlusInternalNode<Key>;
 
     public:
         virtual ~BPlusNode() = default;

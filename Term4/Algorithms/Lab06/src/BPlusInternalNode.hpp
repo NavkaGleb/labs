@@ -4,17 +4,17 @@
 
 namespace Ng {
 
-    template <typename Key, typename Value>
-    class BPlusInternalNode : public BPlusNode<Key, Value> {
+    template <typename Key>
+    class BPlusInternalNode final : public BPlusNode<Key> {
     public:
-        using ChildContainer     = std::vector<BPlusNode<Key, Value>*>;
+        using ChildContainer     = std::vector<BPlusNode<Key>*>;
         using ChildIterator      = typename ChildContainer::iterator;
 
     private:
-        using BPlusNode = BPlusNode<Key, Value>;
+        using BPlusNode = BPlusNode<Key>;
 
     public:
-        BPlusInternalNode(BPlusInternalNode* parent = nullptr);
+        explicit BPlusInternalNode(BPlusInternalNode* parent = nullptr);
         ~BPlusInternalNode() override;
 
         [[nodiscard]] inline std::size_t GetChildCount() const { return m_Children.size(); }

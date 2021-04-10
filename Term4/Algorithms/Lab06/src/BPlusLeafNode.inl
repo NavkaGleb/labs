@@ -53,7 +53,7 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::Split() {
+    BPlusNode<Key>* BPlusLeafNode<Key, Value>::Split() {
         auto* sibling = new BPlusLeafNode(this->m_Parent);
 
         sibling->m_Keys.insert(
@@ -154,22 +154,22 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMinNode() {
+    BPlusNode<Key>* BPlusLeafNode<Key, Value>::GetMinNode() {
         return this;
     }
 
     template <typename Key, typename Value>
-    BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMaxNode() {
+    BPlusNode<Key>* BPlusLeafNode<Key, Value>::GetMaxNode() {
         return this;
     }
 
     template <typename Key, typename Value>
-    const BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMinNode() const {
+    const BPlusNode<Key>* BPlusLeafNode<Key, Value>::GetMinNode() const {
         return this;
     }
 
     template <typename Key, typename Value>
-    const BPlusNode<Key, Value>* BPlusLeafNode<Key, Value>::GetMaxNode() const {
+    const BPlusNode<Key>* BPlusLeafNode<Key, Value>::GetMaxNode() const {
         return this;
     }
 
