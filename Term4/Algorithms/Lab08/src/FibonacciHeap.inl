@@ -1,5 +1,6 @@
 #include <utility>
 #include <cmath>
+#include <charconv>
 
 namespace Ng {
 
@@ -16,7 +17,7 @@ namespace Ng {
     template <typename T>
     const T& FibonacciHeap<T>::GetPeak() const {
         if (!m_Peak)
-            throw std::out_of_range("Ng::FibonacciHeap: Heap is emtpy!");
+            throw std::out_of_range("Ng::FibonacciHeap::GetPeak: Heap is emtpy!");
 
         return m_Peak->m_Value;
     }
@@ -46,6 +47,8 @@ namespace Ng {
         if (!m_Peak)
             return;
 
+        --m_Count;
+
         if (m_Peak->m_Child) {
             auto* child = m_Peak->m_Child;
 
@@ -68,7 +71,6 @@ namespace Ng {
             Consolidate();
         }
 
-        --m_Count;
     }
 
     template <typename T>
@@ -124,27 +126,20 @@ namespace Ng {
     void FibonacciHeap<T>::Push(Node* node) {
         node->m_Parent = nullptr;
 
-        if (!m_Peak) {
+        if (!m_Peak)
             m_Peak = node;
-            return;
-        }
-
-        m_Peak->PushSibling(node);
+        else
+            m_Peak->PushSibling(node);
     }
 
     template <typename T>
     void FibonacciHeap<T>::Consolidate() {
         std::vector<Node*> nodes(static_cast<std::size_t>(std::log2(m_Count)) + 1, nullptr);
 
-        Node* node = m_Peak;
-        Node* next = nullptr;
-
-        for (int i = 0; i < m_Count - 1; ++i) {
-            next = node->m_RightSibling;
-
+        for (Node* node = m_Peak; true;) {
             std::size_t degree = node->GetDegree();
 
-            while (nodes[degree]) {
+            while (nodes[degree] && nodes[degree] != node) {
                 if (node->m_Value > nodes[degree]->m_Value)
                     std::swap(node, nodes[degree]);
 
@@ -158,25 +153,19 @@ namespace Ng {
             while (m_Peak->HasParent())
                 m_Peak = m_Peak->m_Parent;
 
-            node = next;
+            node = node->m_RightSibling;
 
             if (node == m_Peak)
                 break;
         }
 
-        for (auto& n : nodes)
-            if (n && n->m_Value < m_Peak->m_Value)
-                m_Peak = n;
-
-        m_Peak = *std::min_element(nodes.begin(), nodes.end(), [](const auto& lhs, const auto& rhs) {
-            if (!lhs)
-                return false;
-
-            if (!rhs)
-                return true;
-
-            return lhs->m_Value < rhs->m_Value;
-        });
+        m_Peak = *std::min_element(
+            nodes.begin(),
+            nodes.end(),
+            [](const auto& lhs, const auto& rhs) {
+                return lhs && (!rhs || lhs->m_Value < rhs->m_Value);
+            }
+        );
     }
 
 } // namespace Ng

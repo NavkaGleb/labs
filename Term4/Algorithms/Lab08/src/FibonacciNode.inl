@@ -1,4 +1,5 @@
 #include <utility>
+#include <iostream>
 
 namespace Ng {
 
@@ -64,7 +65,7 @@ namespace Ng {
 
     template <typename T>
     void FibonacciNode<T>::Print(int level) const {
-        std::cout << m_Value << ", P: ";
+        std::cout << m_Value << " " << this << ", D: " << m_Degree << ", P: ";
 
         if (HasParent()) {
             std::cout << m_Parent->m_Value;
