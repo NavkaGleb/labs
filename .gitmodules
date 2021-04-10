@@ -31,3 +31,9 @@
 [submodule "Term4/Algorithms/Lab06/external/doctest"]
 	path = Term4/Algorithms/Lab06/external/doctest
 	url = https://github.com/onqtam/doctest
+[submodule "Term4/Algorithms/Lab08/external/Random"]
+	path = Term4/Algorithms/Lab08/external/Random
+	url = https://github.com/NavkaGleb/Random
+[submodule "Term4/Algorithms/Lab08/external/doctest"]
+	path = Term4/Algorithms/Lab08/external/doctest
+	url = https://github.com/onqtam/doctest
