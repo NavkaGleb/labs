@@ -113,7 +113,7 @@ namespace Ng {
             std::cout << indent << "+- " << node->m_Value << std::endl;
 
             if (node->m_Child)
-                node->m_Child->Print(indent + (node->m_RightSibling == node ? "   " : "|  "));
+                node->m_Child->Print(indent + (node->m_RightSibling == this ? "   " : "|  "));
 
             node = node->m_RightSibling;
 
