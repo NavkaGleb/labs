@@ -15,11 +15,43 @@ namespace Ng {
 
     template <typename T>
     FibonacciNode<T>::~FibonacciNode() {
+        delete m_Child;
 
+        if (!IsAlone()) {
+            delete m_LeftSibling;
+            delete m_RightSibling;
+        }
+    }
+
+    template <typename T>
+    FibonacciNode<T>* FibonacciNode<T>::GetHandle(const T& value) {
+        FibonacciNode* node   = this;
+        FibonacciNode* result = nullptr;
+
+        do {
+            if (node->m_Value == value)
+                return node;
+
+            if (node->m_Child)
+                result = node->m_Child->GetHandle(value);
+
+            if (result)
+                return result;
+
+            if (node->m_RightSibling == this)
+                return nullptr;
+
+            node = node->m_RightSibling;
+        } while (node != this);
+
+        return result;
     }
 
     template <typename T>
     void FibonacciNode<T>::StayAlone() {
+        m_IsMarked                    = false;
+        m_Parent                      = nullptr;
+
         m_LeftSibling->m_RightSibling = m_RightSibling;
         m_RightSibling->m_LeftSibling = m_LeftSibling;
 
@@ -64,31 +96,30 @@ namespace Ng {
     }
 
     template <typename T>
-    void FibonacciNode<T>::Print(int level) const {
-        std::cout << m_Value << " " << this << ", D: " << m_Degree << ", P: ";
+    void FibonacciNode<T>::PopChild(FibonacciNode* child) {
+        if (child->IsAlone())
+            m_Child = nullptr;
+        else
+            m_Child = child->m_RightSibling;
 
-        if (HasParent()) {
-            std::cout << m_Parent->m_Value;
-        } else {
-            std::cout << "Null";
+        --m_Degree;
+
+        child->StayAlone();
+    }
+
+    template <typename T>
+    void FibonacciNode<T>::Print(const std::string& indent) const {
+        for (const FibonacciNode* node = this; true;) {
+            std::cout << indent << "+- " << node->m_Value << std::endl;
+
+            if (node->m_Child)
+                node->m_Child->Print(indent + (node->m_RightSibling == node ? "   " : "|  "));
+
+            node = node->m_RightSibling;
+
+            if (node == this)
+                return;
         }
-
-        std::cout << ", L: " << m_LeftSibling->m_Value << ", R: "
-        << m_RightSibling->m_Value << std::endl;
-
-        if (m_Degree == 0)
-            return;
-
-        auto child = m_Child;
-
-        do {
-            for (int j = 0; j < level; ++j)
-                std::cout << "  ";
-
-            child->Print(level + 1);
-
-            child = child->m_RightSibling;
-        } while (child != m_Child);
     }
 
 } // namespace Ng

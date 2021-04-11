@@ -10,7 +10,7 @@ TEST_CASE("FibonacciHeap Push / Pop") {
         std::vector<int>       keys;
         std::vector<int>       actual;
 
-        const int count = Ng::Random::Get(100, 1000);
+        const int count = Ng::Random::Get(200, 1000);
 
         keys.reserve(count);
         actual.reserve(count);

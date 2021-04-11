@@ -6,13 +6,17 @@
 
 namespace Ng {
 
-    template <typename T>
+    template <typename T, typename Comparator = std::less<>>
     class FibonacciHeap {
     public:
         using InnerType = T;
 
     public:
+        static void Merge(FibonacciHeap& lhs, FibonacciHeap& rhs);
+
+    public:
         FibonacciHeap();
+        FibonacciHeap(const FibonacciHeap& other) = delete;
         FibonacciHeap(FibonacciHeap&& other) noexcept;
         ~FibonacciHeap() = default;
 
@@ -23,26 +27,33 @@ namespace Ng {
 
         void Clear();
         void Push(const T& value);
+        void Exchange(const T& oldValue, const T& newValue);
 
         void PopPeak();
+        void Pop(const T& value);
 
         void Print() const;
 
+        FibonacciHeap& operator =(const FibonacciHeap& other) = delete;
         FibonacciHeap& operator =(FibonacciHeap&& other) noexcept;
 
     private:
         using Node = FibonacciNode<T>;
 
     private:
-        static void Merge(FibonacciHeap& lhs, FibonacciHeap& rhs);
+        Node* GetHandle(const T& value);
 
-    private:
         void Push(Node* node);
+        void Pop(Node* node);
+
         void Consolidate();
+        void Cut(Node* parent, Node* child);
+        void CascadingCut(Node* node);
 
     private:
         Node*       m_Peak;
         std::size_t m_Count;
+        Comparator  m_Comparator;
 
     }; // class FibonacciHeap
 
