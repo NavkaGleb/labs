@@ -4,7 +4,7 @@
 
 #include "FibonacciHeap.hpp"
 
-TEST_CASE("FibonacciHeap Push / Pop") {
+TEST_CASE("FibonacciHeap Push / PopPeak") {
     for (int i = 0; i < 100; ++i) {
         Ng::FibonacciHeap<int> heap;
         std::vector<int>       keys;
@@ -33,7 +33,7 @@ TEST_CASE("FibonacciHeap Push / Pop") {
     }
 }
 
-TEST_CASE("FibonacciHeap Push / Pop / Exchange") {
+TEST_CASE("FibonacciHeap Push / PopPeak / Exchange") {
     for (int i = 0; i < 100; ++i) {
         Ng::FibonacciHeap<int> heap;
         std::vector<int>       keys;

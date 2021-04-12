@@ -15,7 +15,8 @@ int main() {
 
     heap.Print();
 
-    heap.Exchange(5, 228);
+    for (int i = 0; i < 4; ++i)
+        heap.Exchange(i, 228);
 
     std::cout << "After exchange!" << std::endl;
     heap.Print();
@@ -25,8 +26,15 @@ int main() {
     std::cout << "After PopPeak!" << std::endl;
     heap.Print();
 
-    while (!heap.IsEmpty())
+    heap.Pop(17);
+
+    std::cout << "After Pop!" << std::endl;
+    heap.Print();
+
+    while (!heap.IsEmpty()) {
+        std::cout << "Peak: " << heap.GetPeak() << std::endl;
         heap.PopPeak();
+    }
 
     std::cout << "After clearing!" << std::endl;
     heap.Print();
