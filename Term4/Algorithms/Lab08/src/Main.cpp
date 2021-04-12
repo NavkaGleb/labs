@@ -7,7 +7,7 @@
 int main() {
     Ng::FibonacciHeap<int, std::greater<>> heap;
 
-    for (int i = 0; i < 11; ++i)
+    for (int i = 0; i < 18; ++i)
         heap.Push(i);
 
     std::cout << "IsEmpty: " << heap.IsEmpty() << std::endl;

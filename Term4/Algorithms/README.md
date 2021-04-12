@@ -7,5 +7,5 @@
 - Persistent Tree             -
 - B Plus Tree                 +
 - Binomial Heap               +
-- Fibonacci Heap              -
+- Fibonacci Heap              +
 - Johnson's algorithm         -
