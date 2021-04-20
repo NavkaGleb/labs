@@ -15,17 +15,24 @@ namespace Ng {
         using NodePtr = typename Node::SmartPointer;
 
     public:
-        PersistentTree() = default;
-        explicit PersistentTree(NodePtr root);
+        PersistentTree();
+        explicit PersistentTree(NodePtr root, std::size_t count);
         ~PersistentTree() = default;
 
+        [[nodiscard]] inline std::size_t GetCount() const { return m_Count; }
+
+        [[nodiscard]] bool IsContains(const Key& key);
+
+        std::optional<std::reference_wrapper<const Value>> At(const Key& key) const;
+
         PersistentTree<Key, Value> Push(const Key& key, const Value& value);
-        void Pop(const Key& key);
+        PersistentTree<Key, Value> Pop(const Key& key);
 
         void Print() const;
 
     private:
-        NodePtr m_Root;
+        NodePtr     m_Root;
+        std::size_t m_Count;
 
     }; // class PersistentTree
 

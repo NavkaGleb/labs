@@ -1,3 +1,5 @@
+#include <cassert>
+
 namespace Ng {
 
     template <typename Key, typename Value>
@@ -137,27 +139,27 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    std::pair<PersistentNodePtr<Key, Value>, bool> PersistentNode<Key, Value>::Push(
+    std::pair<typename PersistentNode<Key, Value>::SmartPointer, bool> PersistentNode<Key, Value>::Push(
         const SmartPointer& node,
         const Key&          key,
         const Value&        value
     ) {
         if (node) {
             if (key < node->m_Pair.first) {
-                const auto [newLeft, response] = Push(node->m_Left, key, value);
+                const auto [newLeft, isPushed] = Push(node->m_Left, key, value);
                 const auto newNode             = node->CloneWithLeft(newLeft);
 
                 return std::make_pair(
-                    response ? newNode->Balance() : newNode,
-                    response
+                    isPushed ? newNode->Balance() : newNode,
+                    isPushed
                 );
             } else if (key > node->m_Pair.first) {
-                const auto [newRight, response] = Push(node->m_Right, key, value);
+                const auto [newRight, isPushed] = Push(node->m_Right, key, value);
                 const auto newNode              = node->CloneWithRight(newRight);
 
                 return std::make_pair(
-                    response ? newNode->Balance() : newNode,
-                    response
+                    isPushed ? newNode->Balance() : newNode,
+                    isPushed
                 );
             } else {
                 const auto newNode = node->CloneWithPair({ key, value });
@@ -167,6 +169,290 @@ namespace Ng {
             const auto newNode = std::make_shared<const PersistentNode>(std::make_pair(key, value));
             return std::make_pair(newNode, true);
         }
+    }
+
+    template <typename Key, typename Value>
+    std::pair<typename PersistentNode<Key, Value>::SmartPointer, bool> PersistentNode<Key, Value>::Pop(
+        const SmartPointer& node,
+        const Key&          key
+    ) {
+        if (!node)
+            return std::make_pair(nullptr, false);
+
+        if (key < node->m_Pair.first)
+            return PopLeft(node, key);
+
+        if (key > node->m_Pair.first)
+            return PopRight(node, key);
+
+        const auto newNode = Fuse(node->m_Left, node->m_Right);
+        return std::make_pair(newNode, true);
+    }
+
+    template <typename Key, typename Value>
+    std::pair<typename PersistentNode<Key, Value>::SmartPointer, bool> PersistentNode<Key, Value>::PopLeft(
+        const SmartPointer& node,
+        const Key&          key
+    ) {
+        const auto [newLeft, isPopped] = Pop(node->m_Left, key);
+        const auto newNode             = std::make_shared<const PersistentNode>(
+            node->m_Pair,
+            newLeft,
+            node->m_Right
+        );
+
+        const auto balancedNewNode = node->m_Left && node->m_Left->IsBlack() ? BalanceLeft(newNode) : newNode;
+
+        return std::make_pair(balancedNewNode, isPopped);
+    }
+
+    template <typename Key, typename Value>
+    std::pair<typename PersistentNode<Key, Value>::SmartPointer, bool> PersistentNode<Key, Value>::PopRight(
+        const SmartPointer& node,
+        const Key&          key
+    ) {
+        const auto [newRight, isPopped] = Pop(node->m_Right, key);
+        const auto newNode              = std::make_shared<const PersistentNode>(
+            node->m_Pair,
+            node->m_Left,
+            newRight
+        );
+
+        const auto bal_new_node = node->m_Right && node->m_Right->IsBlack() ? BalanceRight(newNode) : newNode;
+
+        return std::make_pair(bal_new_node, isPopped);
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentNode<Key, Value>::SmartPointer PersistentNode<Key, Value>::Fuse(
+        const SmartPointer& left,
+        const SmartPointer& right
+    ) {
+        // match: (left, right)
+
+        // case: (None, r)
+        if (!left)
+            return right;
+
+        // case: (l, None)
+        if (!right)
+            return left;
+
+        // case: (Some(l), Some(r))
+        // fall through
+        assert(left && right);
+
+        // match: (left.color, right.color)
+        // case: (B, R)
+        if (!left->IsRed() && right->IsRed()) {
+            return std::make_shared<const PersistentNode>(
+                right->m_Pair,
+                Fuse(left, right->m_Left),
+                right->m_Right
+            );
+
+            // case: (R, B)
+        } else if (left->IsRed() && right->IsBlack()) {
+            return std::make_shared<const PersistentNode>(
+                left->m_Pair,
+                left->m_Left,
+                Fuse(left->m_Right, right)
+            );
+
+            // case: (R, R)
+        } else if (left->IsRed() && right->IsRed()) {
+            const auto fused = Fuse(left->m_Right, right->m_Left);
+
+            if (fused && fused->IsRed()) {
+                const auto newLeft = std::make_shared<const PersistentNode>(
+                    left->m_Pair,
+                    left->m_Left,
+                    fused->m_Left
+                );
+
+                const auto newRight = std::make_shared<const PersistentNode>(
+                    right->m_Pair,
+                    fused->m_Right,
+                    right->m_Right
+                );
+
+                return std::make_shared<const PersistentNode>(fused->m_Pair, newLeft, newRight);
+            }
+
+            const auto newRight = std::make_shared<const PersistentNode>(
+                right->m_Pair,
+                fused,
+                right->m_Right
+            );
+
+            return std::make_shared<const PersistentNode>(left->m_Pair, left->m_Left, newRight);
+
+            // case: (B, B)
+        } else if (left->IsBlack() && right->IsBlack()) {
+            const auto fused = Fuse(left->m_Right, right->m_Left);
+
+            if (fused && fused->IsRed()) {
+                const auto newLeft = std::make_shared<const PersistentNode>(
+                    left->m_Pair,
+                    left->m_Left,
+                    fused->m_Left,
+                    Color::Black
+                );
+
+                const auto newRight = std::make_shared<const PersistentNode>(
+                    right->m_Pair,
+                    fused->m_Right,
+                    right->m_Right,
+                    Color::Black
+                );
+
+                return std::make_shared<const PersistentNode>(fused->m_Pair, newLeft, newRight);
+            }
+
+            const auto newRight = std::make_shared<const PersistentNode>(
+                right->m_Pair,
+                fused,
+                right->m_Right,
+                Color::Black
+            );
+
+            const auto newNode = std::make_shared<const PersistentNode>(
+                left->m_Pair,
+                left->m_Left,
+                newRight
+            );
+
+            return BalanceLeft(newNode);
+        }
+
+        assert(0); // LCOV_EXCL_LINE
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentNode<Key, Value>::SmartPointer PersistentNode<Key, Value>::Balance(const SmartPointer& node) {
+        if (node->m_Left && node->m_Left->IsRed() && node->m_Right && node->m_Right->IsRed()) {
+            const auto newLeft  = node->m_Left  ? node->m_Left->CloneAsBlack()  : node->m_Left;
+            const auto newRight = node->m_Right ? node->m_Right->CloneAsBlack() : node->m_Right;
+
+            return std::make_shared<const PersistentNode>(node->m_Pair, newLeft, newRight);
+        }
+
+        assert(node->IsBlack());
+        return node->Balance();
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentNode<Key, Value>::SmartPointer PersistentNode<Key, Value>::BalanceLeft(
+        const SmartPointer& node
+    ) {
+        // match: (color_l, color_r, color_r_l)
+        // case: (Some(R), ..)
+        if (node->m_Left && node->m_Left->IsRed()) {
+            const auto newLeft = std::make_shared<const PersistentNode>(
+                node->m_Left->m_Pair,
+                node->m_Left->m_Left,
+                node->m_Left->m_Right,
+                Color::Black
+            );
+
+            return std::make_shared<const PersistentNode>(node->m_Pair, newLeft, node->m_Right);
+
+            // case: (_, Some(B), _)
+        } else if (node->m_Right && node->m_Right->IsBlack()) {
+            const auto newRight = std::make_shared<const PersistentNode>(
+                node->m_Right->m_Pair,
+                node->m_Right->m_Left,
+                node->m_Right->m_Right
+            );
+
+            const auto newNode = std::make_shared<const PersistentNode>(
+                node->m_Pair,
+                node->m_Left,
+                newRight,
+                Color::Black
+            );
+
+            return Balance(newNode);
+
+            // case: (_, Some(R), Some(B))
+        } else if (node->m_Right         && node->m_Right->IsRed() &&
+                   node->m_Right->m_Left && node->m_Right->m_Left->IsBlack()) {
+
+            const auto newRight = Balance(std::make_shared<const PersistentNode>(
+                node->m_Right->m_Pair,
+                node->m_Right->m_Left->m_Right,
+                node->m_Right->m_Right->CloneAsRed(),
+                Color::Black
+            ));
+
+            const auto newLeft = std::make_shared<const PersistentNode>(
+                node->m_Pair,
+                node->m_Left,
+                node->m_Right->m_Left->m_Left,
+                Color::Black
+            );
+
+            return std::make_shared<const PersistentNode>(node->m_Right->m_Left->m_Pair, newLeft, newRight);
+        }
+
+        assert(0);
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentNode<Key, Value>::SmartPointer PersistentNode<Key, Value>::BalanceRight(
+        const SmartPointer& node
+    ) {
+        // match: (color_l, color_l_r, color_r)
+        // case: (.., Some(R))
+        if (node->m_Right && node->m_Right->IsRed()) {
+            const auto newRight = std::make_shared<const PersistentNode>(
+                node->m_Right->m_Pair,
+                node->m_Right->m_Left,
+                node->m_Right->m_Right,
+                Color::Black
+            );
+
+            return std::make_shared<const PersistentNode>(node->m_Pair, node->m_Left, newRight);
+
+            // case: (Some(B), ..)
+        } else if (node->m_Left && !node->m_Left->IsRed()) {
+            const auto newLeft = std::make_shared<const PersistentNode>(
+                node->m_Left->m_Pair,
+                node->m_Left->m_Left,
+                node->m_Left->m_Right
+            );
+
+            const auto newNode = std::make_shared<const PersistentNode>(
+                node->m_Pair,
+                newLeft,
+                node->m_Right,
+                Color::Black
+            );
+
+            return Balance(newNode);
+
+            // case: (Some(R), Some(B), _)
+        } else if (node->m_Left          && node->m_Left->IsRed() &&
+                   node->m_Left->m_Right && !node->m_Left->m_Right->IsRed()) {
+
+            const auto newLeft = Balance(std::make_shared<const PersistentNode>(
+                node->m_Left->m_Pair,
+                node->m_Left->m_Left->CloneAsRed(),
+                node->m_Left->m_Right->m_Left,
+                Color::Black
+            ));
+
+            const auto newRight = std::make_shared<const PersistentNode>(
+                node->m_Pair,
+                node->m_Left->m_Right->m_Right,
+                node->m_Right,
+                Color::Black
+            );
+
+            return std::make_shared<const PersistentNode>(node->m_Left->m_Right->m_Pair, newLeft, newRight);
+        }
+
+        assert(0);
     }
 
 } // namespace Ng

@@ -1,17 +1,36 @@
 #include <iostream>
+#include <numeric>
+
+#include <Random/Random.hpp>
 
 #include "PersistentTree.hpp"
 
 int main() {
-    Ng::PersistentTree<int, int> tree;
+    constexpr int count = 10000;
 
-    for (int i = 0; i < 1000; ++i) {
-        tree = tree.Push(i, 0);
-//        tree.Print();
+    Ng::PersistentTree<int, int> tree;
+    std::vector<int>             keys(count);
+
+    std::iota(keys.begin(), keys.end(), 0);
+
+    for (int i = 0; i < count; ++i) {
+        tree = tree.Push(i, i);
         std::cout << "-------" << std::endl;
     }
 
     tree.Print();
+
+    std::cout << "At1: " << *tree.At(32) << std::endl;
+    std::cout << "At2: " << tree.At(10001).has_value() << std::endl;
+
+//    for (int i = 0; i < count - 1; ++i) {
+//        auto index = Ng::Random::Get<std::size_t>(0, keys.size() - 1);
+//
+//        tree = tree.Pop(keys[index]);
+//        keys.erase(keys.begin() + index);
+//    }
+//
+//    tree.Print();
 
     return 0;
 }

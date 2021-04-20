@@ -51,6 +51,15 @@ namespace Ng {
 
     public:
         static std::pair<SmartPointer, bool> Push(const SmartPointer& node, const Key& key, const Value& value);
+        static std::pair<SmartPointer, bool> Pop(const SmartPointer& node, const Key& key);
+
+        static std::pair<SmartPointer, bool> PopLeft(const SmartPointer& node, const Key& key);
+        static std::pair<SmartPointer, bool> PopRight(const SmartPointer& node, const Key& key);
+
+        static SmartPointer Fuse(const SmartPointer& left, const SmartPointer& right);
+        static SmartPointer Balance(const SmartPointer& node);
+        static SmartPointer BalanceLeft(const SmartPointer& node);
+        static SmartPointer BalanceRight(const SmartPointer& node);
 
     private:
         Pair         m_Pair;
