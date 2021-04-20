@@ -1,12 +1,20 @@
 #pragma once
 
+#include <memory>
+
 namespace Ng {
 
     template <typename Key, typename Value>
     class PersistentTree;
 
     template <typename Key, typename Value>
-    class PersistentNode {
+    class PersistentNode;
+
+    template <typename Key, typename Value>
+    using PersistentNodePtr = std::shared_ptr<const PersistentNode<Key, Value>>;
+
+    template <typename Key, typename Value>
+    class PersistentNode : public std::enable_shared_from_this<const PersistentNode<Key, Value>> {
     public:
         friend class PersistentTree<Key, Value>;
 
@@ -14,30 +22,41 @@ namespace Ng {
         enum class Color { Red = 0, Black };
 
     public:
-        using Pair = std::pair<const Key, Value>;
+        using KeyType      = Key;
+        using ValueType    = Value;
+        using Pair         = std::pair<const Key, Value>;
+        using SmartPointer = PersistentNodePtr<Key, Value>;
 
     public:
-        static PersistentNode* Clone(PersistentNode* prototype, PersistentNode* parent = nullptr);
-
-    public:
-        explicit PersistentNode(const Pair& pair);
-        explicit PersistentNode(Pair&& pair);
-        ~PersistentNode();
-
-        [[nodiscard]] inline std::size_t GetCount() const { return m_Count; }
+        explicit PersistentNode(
+            const Pair&         pair,
+            const SmartPointer& left  = nullptr,
+            const SmartPointer& right = nullptr,
+            Color               color = Color::Red
+        );
+        ~PersistentNode() = default;
 
         [[nodiscard]] inline bool IsRed() const { return m_Color == Color::Red; }
         [[nodiscard]] inline bool IsBlack() const { return m_Color == Color::Black; }
 
+        [[nodiscard]] SmartPointer CloneWithPair(const Pair& pair) const;
+        [[nodiscard]] SmartPointer CloneWithLeft(const SmartPointer& left) const;
+        [[nodiscard]] SmartPointer CloneWithRight(const SmartPointer& right) const;
+        [[nodiscard]] SmartPointer CloneAsRed() const;
+        [[nodiscard]] SmartPointer CloneAsBlack() const;
+
+        SmartPointer Balance() const;
+
         void Print(const std::string& indent = std::string()) const;
 
+    public:
+        static std::pair<SmartPointer, bool> Push(const SmartPointer& node, const Key& key, const Value& value);
+
     private:
-        Pair m_Pair;
-        PersistentNode* m_Parent;
-        PersistentNode* m_Left;
-        PersistentNode* m_Right;
-        Color           m_Color;
-        std::size_t     m_Count;
+        Pair         m_Pair;
+        SmartPointer m_Left;
+        SmartPointer m_Right;
+        Color        m_Color;
 
     }; // class PersistentNode
 

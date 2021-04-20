@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <optional>
+#include <memory>
 
 #include "PersistentNode.hpp"
 
@@ -10,27 +11,21 @@ namespace Ng {
     template <typename Key, typename Value>
     class PersistentTree {
     public:
-        using Node = PersistentNode<Key, Value>;
+        using Node    = PersistentNode<Key, Value>;
+        using NodePtr = typename Node::SmartPointer;
 
     public:
-        PersistentTree();
-        ~PersistentTree();
+        PersistentTree() = default;
+        explicit PersistentTree(NodePtr root);
+        ~PersistentTree() = default;
 
-        void Push(const Key& key, const Value& value);
+        PersistentTree<Key, Value> Push(const Key& key, const Value& value);
         void Pop(const Key& key);
 
         void Print() const;
 
     private:
-        void RotateLeft(Node* node);
-        void RotateRight(Node* node);
-
-        void PushFix(Node* node);
-        void PopFix(Node* node);
-
-    private:
-        Node*              m_CurrentRoot;
-        std::vector<Node*> m_Roots;
+        NodePtr m_Root;
 
     }; // class PersistentTree
 
