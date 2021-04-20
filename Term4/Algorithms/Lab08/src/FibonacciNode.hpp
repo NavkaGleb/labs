@@ -33,6 +33,7 @@ namespace Ng {
         inline void SetLeftSibling(FibonacciNode* leftSibling) { m_LeftSibling = leftSibling; }
         inline void SetRightSibling(FibonacciNode* rightSibling) { m_RightSibling = rightSibling; }
         inline void SetChild(FibonacciNode* child) { m_Child = child; }
+        inline void IsMarked(bool isMarked) { m_IsMarked = isMarked; }
 
         FibonacciNode* GetHandle(const T& value);
 

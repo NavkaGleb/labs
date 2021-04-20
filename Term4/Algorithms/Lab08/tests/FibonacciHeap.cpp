@@ -52,7 +52,7 @@ TEST_CASE("FibonacciHeap Push / PopPeak / Exchange") {
         }
 
         for (int j = 0; j < 150; ++j) {
-            auto key   = Ng::Random::Get(-100, -10);
+            auto key = std::numeric_limits<int>::min();
 
             heap.Exchange(keys[j], key);
             keys[j] = key;

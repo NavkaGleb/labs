@@ -47,7 +47,7 @@ namespace Ng {
         void Pop(Node* node);
 
         void Consolidate();
-        void Cut(Node* parent, Node* child);
+        void Cut(Node* node);
         void CascadingCut(Node* node);
 
     private:

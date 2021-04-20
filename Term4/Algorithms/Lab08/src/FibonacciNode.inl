@@ -81,7 +81,7 @@ namespace Ng {
     }
 
     template <typename T>
-    void FibonacciNode<T>::PushChild(FibonacciNode* child) {        
+    void FibonacciNode<T>::PushChild(FibonacciNode* child) {
         child->StayAlone();
 
         child->m_Parent   = this;

@@ -82,7 +82,7 @@ namespace Ng {
         handle->SetValue(newValue);
 
         if (parent && m_Comparator(handle->GetValue(), parent->GetValue())) {
-            Cut(parent, handle);
+            Cut(handle);
             CascadingCut(parent);
         }
 
@@ -103,8 +103,10 @@ namespace Ng {
             return;
 
         if (handle->HasParent()) {
-            Cut(handle->GetParent(), handle);
-            CascadingCut(handle);
+            auto* parent = handle->GetParent();
+
+            Cut(handle);
+            CascadingCut(parent);
         }
 
         Pop(handle);
@@ -131,7 +133,8 @@ namespace Ng {
 
     template <typename T, typename Comparator>
     void FibonacciHeap<T, Comparator>::Push(Node* node) {
-        node->m_Parent = nullptr;
+        node->SetParent(nullptr);
+        node->IsMarked(false);
 
         if (!m_Peak)
             m_Peak = node;
@@ -208,25 +211,22 @@ namespace Ng {
     }
 
     template <typename T, typename Comparator>
-    void FibonacciHeap<T, Comparator>::Cut(Node* parent, Node* child) {
-        parent->PopChild(child);
-        Push(child);
+    void FibonacciHeap<T, Comparator>::Cut(Node* node) {
+        node->GetParent()->PopChild(node);
+        Push(node);
     }
 
     template <typename T, typename Comparator>
     void FibonacciHeap<T, Comparator>::CascadingCut(Node* node) {
-        Node* parent = node->GetParent();
+        if (node->HasParent()) {
+            if (!node->m_IsMarked)
+                return node->IsMarked(true);
 
-        if (!parent)
-            return;
+            auto* parent = node->GetParent();
 
-        if (!node->m_IsMarked) {
-            node->m_IsMarked = true;
-            return;
+            Cut(node);
+            CascadingCut(parent);
         }
-
-        Cut(parent, node);
-        CascadingCut(parent);
     }
 
 } // namespace Ng
