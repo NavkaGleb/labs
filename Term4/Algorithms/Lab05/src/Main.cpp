@@ -6,7 +6,7 @@
 #include "PersistentTree.hpp"
 
 int main() {
-    constexpr int count = 10000;
+    constexpr int count = 100;
 
     Ng::PersistentTree<int, int> tree;
     std::vector<int>             keys(count);
@@ -19,6 +19,11 @@ int main() {
     }
 
     tree.Print();
+
+    std::cout << "iterators: " << std::endl;
+    for (auto it = tree.Begin(); it != tree.End(); ++it)
+        std::cout << (*it).first << " ";
+    std::cout << std::endl;
 
     std::cout << "At1: " << *tree.At(32) << std::endl;
     std::cout << "At2: " << tree.At(10001).has_value() << std::endl;

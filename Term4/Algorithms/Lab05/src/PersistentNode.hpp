@@ -39,6 +39,8 @@ namespace Ng {
         [[nodiscard]] inline bool IsRed() const { return m_Color == Color::Red; }
         [[nodiscard]] inline bool IsBlack() const { return m_Color == Color::Black; }
 
+        [[nodiscard]] SmartPointer GetMinNode() const;
+
         [[nodiscard]] SmartPointer CloneWithPair(const Pair& pair) const;
         [[nodiscard]] SmartPointer CloneWithLeft(const SmartPointer& left) const;
         [[nodiscard]] SmartPointer CloneWithRight(const SmartPointer& right) const;
@@ -47,7 +49,7 @@ namespace Ng {
 
         SmartPointer Balance() const;
 
-        void Print(const std::string& indent = std::string()) const;
+        void Print(const std::string& indent = std::string(), bool root = true) const;
 
     public:
         static std::pair<SmartPointer, bool> Push(const SmartPointer& node, const Key& key, const Value& value);

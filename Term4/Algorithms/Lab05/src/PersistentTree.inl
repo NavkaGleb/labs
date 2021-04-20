@@ -3,6 +3,29 @@
 namespace Ng {
 
     template <typename Key, typename Value>
+    PersistentTree<Key, Value>::Iterator::Iterator(NodePtr node, std::stack<NodePtr>&& stack)
+        : m_Node(node)
+        , m_Stack(std::move(stack)) {}
+
+    template <typename Key, typename Value>
+    typename PersistentTree<Key, Value>::Iterator& PersistentTree<Key, Value>::Iterator::operator ++() {
+        m_Node = m_Node->m_Right;
+
+        while (!m_Stack.empty() || m_Node) {
+            if (m_Node) {
+                m_Stack.push(m_Node);
+                m_Node = m_Node->m_Left;
+            } else {
+                m_Node = m_Stack.top();
+                m_Stack.pop();
+                break;
+            }
+        }
+
+        return *this;
+    }
+
+    template <typename Key, typename Value>
     PersistentTree<Key, Value>::PersistentTree()
         : m_Count(0) {}
 
@@ -69,5 +92,27 @@ namespace Ng {
         if (m_Root)
             m_Root->Print();
     }
+
+    template <typename Key, typename Value>
+    typename PersistentTree<Key, Value>::Iterator PersistentTree<Key, Value>::Begin() {
+        NodePtr             node = m_Root;
+        std::stack<NodePtr> stack;
+
+        while (!stack.empty() || node) {
+            if (!node->m_Left)
+                break;
+
+            stack.push(node);
+            node = node->m_Left;
+        }
+
+        return Iterator(node, std::move(stack));
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentTree<Key, Value>::Iterator PersistentTree<Key, Value>::End() {
+        return Iterator(nullptr);
+    }
+
 
 } // namespace Ng

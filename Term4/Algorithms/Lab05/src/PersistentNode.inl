@@ -20,6 +20,16 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
+    PersistentNodePtr<Key, Value> PersistentNode<Key, Value>::GetMinNode() const {
+        SmartPointer node = this;
+
+        while (node && node->m_Left)
+            node = node->m_Left;
+
+        return node;
+    }
+
+    template <typename Key, typename Value>
     PersistentNodePtr<Key, Value> PersistentNode<Key, Value>::CloneWithLeft(const SmartPointer& left) const {
         return std::make_shared<const PersistentNode>(m_Pair, left, m_Right, m_Color);
     }
@@ -128,14 +138,14 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    void PersistentNode<Key, Value>::Print(const std::string& indent) const {
+    void PersistentNode<Key, Value>::Print(const std::string& indent, bool root) const {
         std::cout << indent << "+- " << m_Pair.first << ":" << (m_Color == Color::Red ? "Red" : "Black") << std::endl;
 
         if (m_Left)
-            m_Left->Print(indent + "   ");
+            m_Left->Print(indent + (root ? "   " : "|  "), !m_Right);
 
         if (m_Right)
-            m_Right->Print(indent + "   ");
+            m_Right->Print(indent + (root ? "   " : "|  "), (bool)m_Left);
     }
 
     template <typename Key, typename Value>
