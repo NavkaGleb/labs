@@ -3,12 +3,12 @@
 namespace Ng {
 
     template <typename Key, typename Value>
-    PersistentTree<Key, Value>::Iterator::Iterator(NodePtr node, std::stack<NodePtr>&& stack)
+    PersistentTree<Key, Value>::IIterator::IIterator(NodePtr node, std::stack<NodePtr>&& stack)
         : m_Node(node)
         , m_Stack(std::move(stack)) {}
 
     template <typename Key, typename Value>
-    typename PersistentTree<Key, Value>::Iterator& PersistentTree<Key, Value>::Iterator::operator ++() {
+    typename PersistentTree<Key, Value>::IIterator& PersistentTree<Key, Value>::IIterator::operator ++() {
         m_Node = m_Node->m_Right;
 
         while (!m_Stack.empty() || m_Node) {
@@ -24,6 +24,14 @@ namespace Ng {
 
         return *this;
     }
+
+    template <typename Key, typename Value>
+    PersistentTree<Key, Value>::Iterator::Iterator(NodePtr node, std::stack<NodePtr>&& stack)
+        : PersistentTree<Key, Value>::IIterator(node, std::move(stack)) {}
+
+    template <typename Key, typename Value>
+    PersistentTree<Key, Value>::ConstIterator::ConstIterator(NodePtr node, std::stack<NodePtr>&& stack)
+        : PersistentTree<Key, Value>::IIterator(node, std::move(stack)) {}
 
     template <typename Key, typename Value>
     PersistentTree<Key, Value>::PersistentTree()
@@ -114,5 +122,25 @@ namespace Ng {
         return Iterator(nullptr);
     }
 
+    template <typename Key, typename Value>
+    typename PersistentTree<Key, Value>::ConstIterator PersistentTree<Key, Value>::Begin() const {
+        NodePtr             node = m_Root;
+        std::stack<NodePtr> stack;
+
+        while (!stack.empty() || node) {
+            if (!node->m_Left)
+                break;
+
+            stack.push(node);
+            node = node->m_Left;
+        }
+
+        return ConstIterator(node, std::move(stack));
+    }
+
+    template <typename Key, typename Value>
+    typename PersistentTree<Key, Value>::ConstIterator PersistentTree<Key, Value>::End() const {
+        return ConstIterator(nullptr);
+    }
 
 } // namespace Ng

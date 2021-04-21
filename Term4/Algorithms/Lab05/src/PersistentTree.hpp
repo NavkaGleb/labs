@@ -16,23 +16,39 @@ namespace Ng {
         using NodePtr = typename Node::SmartPointer;
 
     public:
-        class Iterator {
+        class IIterator {
+        protected:
+            explicit IIterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
+
         public:
-            explicit Iterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
+            IIterator& operator ++();
 
-            inline const typename Node::Pair& operator *() const { return m_Node->m_Pair; }
-//            inline typename Node::Pair* operator ->() { return &m_Node->m_Pair; }
+            inline bool operator !=(const IIterator& other) const { return m_Node != other.m_Node; }
+            inline bool operator ==(const IIterator& other) const { return m_Node == other.m_Node; }
 
-            Iterator& operator ++();
-
-            inline bool operator !=(const Iterator& other) const { return m_Node != other.m_Node; }
-            inline bool operator ==(const Iterator& other) const { return m_Node == other.m_Node; }
-
-        private:
+        protected:
             NodePtr             m_Node;
             std::stack<NodePtr> m_Stack;
 
+        }; // class IIterator
+
+        class Iterator : public IIterator {
+        public:
+            explicit Iterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
+
+            inline typename Node::Pair& operator *() { return this->m_Node->m_Pair; }
+            inline typename Node::Pair* operator ->() { return &this->m_Node->m_Pair; }
+
         }; // class Iterator
+
+        class ConstIterator {
+        public:
+            explicit ConstIterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
+
+            inline const typename Node::Pair& operator *() const { return this->m_Node->m_Pair; }
+            inline const typename Node::Pair* operator ->() const { return &this->m_Node->m_Pair; }
+
+        }; // class ConstIterator
 
     public:
         PersistentTree();
@@ -53,11 +69,27 @@ namespace Ng {
         [[nodiscard]] Iterator Begin();
         [[nodiscard]] Iterator End();
 
+        [[nodiscard]] ConstIterator Begin() const;
+        [[nodiscard]] ConstIterator End() const;
+
     private:
         NodePtr     m_Root;
         std::size_t m_Count;
 
     }; // class PersistentTree
+
+    // For range based for!
+    template <typename Key, typename Value>
+    inline auto begin(PersistentTree<Key, Value>& tree) { return tree.Begin(); }
+
+    template <typename Key, typename Value>
+    inline auto end(PersistentTree<Key, Value>& tree) { return tree.End(); }
+
+    template <typename Key, typename Value>
+    inline auto begin(const PersistentTree<Key, Value>& tree) { return tree.Begin(); }
+
+    template <typename Key, typename Value>
+    inline auto end(const PersistentTree<Key, Value>& tree) { return tree.End(); }
 
 } // namespace Ng
 
