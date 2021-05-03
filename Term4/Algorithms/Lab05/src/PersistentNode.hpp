@@ -11,10 +11,10 @@ namespace Ng {
     class PersistentNode;
 
     template <typename Key, typename Value>
-    using PersistentNodePtr = std::shared_ptr<PersistentNode<Key, Value>>;
+    using PersistentNodePtr = std::shared_ptr<const PersistentNode<Key, Value>>;
 
     template <typename Key, typename Value>
-    class PersistentNode : public std::enable_shared_from_this<PersistentNode<Key, Value>> {
+    class PersistentNode : public std::enable_shared_from_this<const PersistentNode<Key, Value>> {
     public:
         friend class PersistentTree<Key, Value>;
 
@@ -39,15 +39,13 @@ namespace Ng {
         [[nodiscard]] inline bool IsRed() const { return m_Color == Color::Red; }
         [[nodiscard]] inline bool IsBlack() const { return m_Color == Color::Black; }
 
-        [[nodiscard]] SmartPointer GetMinNode() const;
-
         [[nodiscard]] SmartPointer CloneWithPair(const Pair& pair) const;
         [[nodiscard]] SmartPointer CloneWithLeft(const SmartPointer& left) const;
         [[nodiscard]] SmartPointer CloneWithRight(const SmartPointer& right) const;
         [[nodiscard]] SmartPointer CloneAsRed() const;
         [[nodiscard]] SmartPointer CloneAsBlack() const;
 
-        SmartPointer Balance();
+        SmartPointer Balance() const;
 
         void Print(const std::string& indent = std::string(), bool root = true) const;
 

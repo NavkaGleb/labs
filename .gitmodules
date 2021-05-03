@@ -43,3 +43,12 @@
 [submodule "Term4/Algorithms/Lab05/extern/doctest"]
 	path = Term4/Algorithms/Lab05/extern/doctest
 	url = https://github.com/onqtam/doctest
+[submodule "Term4/Algorithms/Lab05/extern/benchmark"]
+	path = Term4/Algorithms/Lab05/extern/benchmark
+	url = https://github.com/google/benchmark
+[submodule "Term4/Algorithms/Lab09/External/Random"]
+	path = Term4/Algorithms/Lab09/External/Random
+	url = https://github.com/NavkaGleb/Random
+[submodule "Term4/Algorithms/Lab09/External/doctest"]
+	path = Term4/Algorithms/Lab09/External/doctest
+	url = https://github.com/onqtam/doctest

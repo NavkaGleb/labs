@@ -1,8 +1,6 @@
-set(TARGET Lab05_Tests)
+set(TARGET Lab09_Tests)
 
 file(GLOB SOURCE_FILES ./*.cpp)
-
-include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(${TARGET} ${SOURCE_FILES})
 

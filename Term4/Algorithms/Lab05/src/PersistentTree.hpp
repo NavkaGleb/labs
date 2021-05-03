@@ -32,16 +32,7 @@ namespace Ng {
 
         }; // class IIterator
 
-        class Iterator : public IIterator {
-        public:
-            explicit Iterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
-
-            inline typename Node::Pair& operator *() { return this->m_Node->m_Pair; }
-            inline typename Node::Pair* operator ->() { return &this->m_Node->m_Pair; }
-
-        }; // class Iterator
-
-        class ConstIterator {
+        class ConstIterator : public IIterator {
         public:
             explicit ConstIterator(NodePtr node, std::stack<NodePtr>&& stack = std::stack<NodePtr>());
 
@@ -60,14 +51,15 @@ namespace Ng {
         [[nodiscard]] bool IsContains(const Key& key);
 
         std::optional<std::reference_wrapper<const Value>> At(const Key& key) const;
+        std::optional<std::reference_wrapper<const Value>> GetMinKey() const;
+        std::optional<std::reference_wrapper<const Value>> GetMaxKey() const;
+
+        void Clear();
 
         PersistentTree<Key, Value> Push(const Key& key, const Value& value);
         PersistentTree<Key, Value> Pop(const Key& key);
 
         void Print() const;
-
-        [[nodiscard]] Iterator Begin();
-        [[nodiscard]] Iterator End();
 
         [[nodiscard]] ConstIterator Begin() const;
         [[nodiscard]] ConstIterator End() const;
@@ -79,12 +71,6 @@ namespace Ng {
     }; // class PersistentTree
 
     // For range based for!
-    template <typename Key, typename Value>
-    inline auto begin(PersistentTree<Key, Value>& tree) { return tree.Begin(); }
-
-    template <typename Key, typename Value>
-    inline auto end(PersistentTree<Key, Value>& tree) { return tree.End(); }
-
     template <typename Key, typename Value>
     inline auto begin(const PersistentTree<Key, Value>& tree) { return tree.Begin(); }
 

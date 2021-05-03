@@ -26,10 +26,6 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
-    PersistentTree<Key, Value>::Iterator::Iterator(NodePtr node, std::stack<NodePtr>&& stack)
-        : PersistentTree<Key, Value>::IIterator(node, std::move(stack)) {}
-
-    template <typename Key, typename Value>
     PersistentTree<Key, Value>::ConstIterator::ConstIterator(NodePtr node, std::stack<NodePtr>&& stack)
         : PersistentTree<Key, Value>::IIterator(node, std::move(stack)) {}
 
@@ -75,6 +71,37 @@ namespace Ng {
     }
 
     template <typename Key, typename Value>
+    std::optional<std::reference_wrapper<const Value>> PersistentTree<Key, Value>::GetMinKey() const {
+        if (!m_Root)
+            return std::nullopt;
+
+        auto node = m_Root;
+
+        while (node && node->m_Left)
+            node = node->m_Left;
+
+        return node->m_Pair.second;
+    }
+
+    template <typename Key, typename Value>
+    std::optional<std::reference_wrapper<const Value>> PersistentTree<Key, Value>::GetMaxKey() const {
+        if (!m_Root)
+            return std::nullopt;
+
+        auto node = m_Root;
+
+        while (node && node->m_Right)
+            node = node->m_Right;
+
+        return node->m_Pair.second;
+    }
+
+    template <typename Key, typename Value>
+    void PersistentTree<Key, Value>::Clear() {
+        m_Root.reset();
+    }
+
+    template <typename Key, typename Value>
     PersistentTree<Key, Value> PersistentTree<Key, Value>::Push(const Key& key, const Value& value) {
         const auto [maybeBlackNewRoot, isPushed] = Node::Push(m_Root, key, value);
         const auto newRoot                       = maybeBlackNewRoot->CloneAsBlack();
@@ -99,27 +126,6 @@ namespace Ng {
     void PersistentTree<Key, Value>::Print() const {
         if (m_Root)
             m_Root->Print();
-    }
-
-    template <typename Key, typename Value>
-    typename PersistentTree<Key, Value>::Iterator PersistentTree<Key, Value>::Begin() {
-        NodePtr             node = m_Root;
-        std::stack<NodePtr> stack;
-
-        while (!stack.empty() || node) {
-            if (!node->m_Left)
-                break;
-
-            stack.push(node);
-            node = node->m_Left;
-        }
-
-        return Iterator(node, std::move(stack));
-    }
-
-    template <typename Key, typename Value>
-    typename PersistentTree<Key, Value>::Iterator PersistentTree<Key, Value>::End() {
-        return Iterator(nullptr);
     }
 
     template <typename Key, typename Value>
