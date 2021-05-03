@@ -7,6 +7,9 @@ namespace Ng {
     template <typename Node, typename Edge>
     class ListGraph : public IGraph<Node, Edge> {
     public:
+        friend class GraphAlgorithm;
+
+    public:
         using NodeType = Node;
         using EdgeType = Edge;
 
