@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "IGraph.hpp"
 
 namespace Ng {
@@ -15,6 +17,8 @@ namespace Ng {
 
     public:
         explicit ListGraph(bool isDirected = false, bool isWeighted = false);
+        explicit ListGraph(const std::map<Node, std::map<Node, Edge>>& other);
+        explicit ListGraph(const std::map<Node, std::map<Node, std::optional<Edge>>>& other);
         ~ListGraph() override = default;
 
     public:
@@ -43,20 +47,10 @@ namespace Ng {
         void Print() const override;
 
     private:
-        struct InnerEdge {
-            Node ToNode = Node();
-            Edge Value  = Edge();
-
-            InnerEdge(const Node& toNode, const Edge& value)
-                : ToNode(toNode)
-                , Value(value) {}
-        };
-
-    private:
-        bool                                   m_IsDirected;
-        bool                                   m_IsWeighted;
-        std::size_t                            m_EdgeCount;
-        std::map<Node, std::vector<InnerEdge>> m_AdjacencyList;
+        bool                                 m_IsDirected;
+        bool                                 m_IsWeighted;
+        std::size_t                          m_EdgeCount;
+        std::map<Node, std::map<Node, Edge>> m_AdjacencyList;
 
     }; // class ListGraph
 

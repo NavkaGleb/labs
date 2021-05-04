@@ -1,6 +1,3 @@
-#include <utility>
-#include <iostream>
-
 namespace Ng {
 
     template <typename T>

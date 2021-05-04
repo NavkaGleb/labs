@@ -4,6 +4,7 @@ project(Lab09)
 set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(External/doctest)
+add_subdirectory(External/libfort)
 add_subdirectory(External/Random)
 
 add_subdirectory(Source)

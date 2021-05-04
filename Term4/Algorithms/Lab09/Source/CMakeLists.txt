@@ -5,6 +5,4 @@ file(GLOB SOURCE_FILES ./*.cpp)
 
 add_executable(${TARGET} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(${TARGET} PRIVATE NgRandom)
-
-target_precompile_headers(${TARGET} PRIVATE pch.hpp)
+target_link_libraries(${TARGET} PRIVATE NgRandom fort)
