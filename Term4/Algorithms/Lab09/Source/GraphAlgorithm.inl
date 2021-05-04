@@ -3,7 +3,7 @@
 namespace Ng {
 
     template <typename Node, typename Edge>
-    std::map<Node, std::optional<Edge>> GraphAlgorithm::DijkstraAlgorithm(
+    std::map<Node, std::optional<Edge>> GraphAlgorithm::Dijkstra(
         const ListGraph<Node, Edge>& graph,
         const Node&                  source
     ) {
@@ -37,7 +37,7 @@ namespace Ng {
     }
 
     template <typename Node, typename Edge>
-    std::map<Node, std::optional<Edge>> GraphAlgorithm::BellmanFordAlgorithm(
+    std::map<Node, std::optional<Edge>> GraphAlgorithm::BellmanFord(
         const ListGraph<Node, Edge>& graph,
         const Node&                  source
     ) {
@@ -71,26 +71,29 @@ namespace Ng {
     }
 
     template <typename Node, typename Edge>
-    std::map<Node, std::map<Node, std::optional<Edge>>> GraphAlgorithm::JohnsonAlgorithm(const ListGraph<Node, Edge>& graph) {
-        if (!graph.IsDirected() || !graph.IsDirected())
+    std::map<Node, std::map<Node, std::optional<Edge>>> GraphAlgorithm::Johnson(
+        const ListGraph<Node, Edge>& graph,
+        const Node& tempNode
+    ) {
+        if (!graph.IsDirected() || !graph.IsDirected() || graph.IsNodeExists(tempNode))
             return {};
 
         std::map<Node, std::map<Node, std::optional<Edge>>> distance;
         ListGraph<Node, Edge> temp(graph);
 
         // Push temp node
-        temp.PushNode(Node());
+        temp.PushNode(tempNode);
 
         for (const auto& [from, edges] : temp.m_AdjacencyList)
-            temp.PushEdge(Node(), from, Edge());
+            temp.PushEdge(tempNode, from, Edge());
 
-        auto bellmanFord = BellmanFordAlgorithm(temp, Node());
+        auto bellmanFord = BellmanFord(temp, tempNode);
 
         // Check if there ara negative cycles
         if (bellmanFord.empty())
             return {};
 
-        temp.PopNode(Node());
+        temp.PopNode(tempNode);
 
         // Create all edges > 0
         for (auto& [from, edges] : temp.m_AdjacencyList)
@@ -98,7 +101,7 @@ namespace Ng {
                 edge += *bellmanFord[from] - *bellmanFord[to];
 
         for (const auto& [from, edges] : temp.m_AdjacencyList)
-            distance[from] = DijkstraAlgorithm(temp, from);
+            distance[from] = Dijkstra(temp, from);
 
         // Get distance for original graph
         for (auto& [from, edges] : distance)

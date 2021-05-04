@@ -25,7 +25,7 @@ TEST_CASE("DijkstraAlgorithm") {
         { "Node4", 5.0f         }
     };
 
-    std::map<std::string, std::optional<float>> actual = Ng::GraphAlgorithm::DijkstraAlgorithm(graph, "Node1"s);
+    std::map<std::string, std::optional<float>> actual = Ng::GraphAlgorithm::Dijkstra(graph, "Node1"s);
 
     CHECK(expected == actual);
 }

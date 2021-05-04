@@ -32,7 +32,7 @@ TEST_CASE("BellmanFordAlgorithm") {
         { "E",  1 }
     };
 
-    std::map<std::string, std::optional<int>> actual = Ng::GraphAlgorithm::BellmanFordAlgorithm(graph, "A"s);
+    std::map<std::string, std::optional<int>> actual = Ng::GraphAlgorithm::BellmanFord(graph, "A"s);
 
     CHECK(expected == actual);
 }
