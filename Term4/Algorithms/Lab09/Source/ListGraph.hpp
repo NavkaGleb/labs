@@ -10,6 +10,7 @@ namespace Ng {
     class ListGraph : public IGraph<Node, Edge> {
     public:
         friend class GraphAlgorithm;
+        friend class Graphviz;
 
     public:
         using NodeType = Node;
@@ -34,6 +35,8 @@ namespace Ng {
         void SetDirected(bool isDirected) override;
         void SetWeighted(bool isWeighted) override;
 
+        std::vector<Node> GetNodes() const override;
+
         void Clear() override;
 
         void PushNode(const Node& node) override;
@@ -43,8 +46,6 @@ namespace Ng {
         void PushEdge(const Node& from, const Node& to, const Edge& edge) override;
         void PopEdge(const Node& from, const Node& to) override;
         void PopEdges() override;
-
-        void Print() const override;
 
     private:
         bool                                 m_IsDirected;

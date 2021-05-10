@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace Ng {
 
     template <typename Node, typename Edge>
@@ -21,6 +23,8 @@ namespace Ng {
         virtual void SetDirected(bool isDirected) = 0;
         virtual void SetWeighted(bool isWeighted) = 0;
 
+        virtual std::vector<Node> GetNodes() const = 0;
+
         virtual void Clear() = 0;
 
         virtual void PushNode(const Node& node) = 0;
@@ -30,8 +34,6 @@ namespace Ng {
         virtual void PushEdge(const Node& from, const Node& to, const Edge& edge) = 0;
         virtual void PopEdge(const Node& from, const Node& to) = 0;
         virtual void PopEdges() = 0;
-
-        virtual void Print() const = 0;
 
     }; // class IGraph
 

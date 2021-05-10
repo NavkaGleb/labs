@@ -84,6 +84,18 @@ namespace Ng {
     }
 
     template <typename Node, typename Edge>
+    std::vector<Node> ListGraph<Node, Edge>::GetNodes() const {
+        std::vector<Node> result;
+
+        result.reserve(GetNodeCount());
+
+        for (const auto& [node, edges] : m_AdjacencyList)
+            result.push_back(node);
+
+        return result;
+    }
+
+    template <typename Node, typename Edge>
     void ListGraph<Node, Edge>::Clear() {
 
     }
@@ -140,37 +152,6 @@ namespace Ng {
     void ListGraph<Node, Edge>::PopEdges() {
         for (auto& [node, edges] : m_AdjacencyList)
             edges.clear();
-    }
-
-    template <typename Node, typename Edge>
-    void ListGraph<Node, Edge>::Print() const {
-        fort::char_table table;
-
-        table.set_border_style(FT_BASIC2_STYLE);
-
-        table << "Node";
-
-        for (const auto& [from, edges] : m_AdjacencyList)
-            table << from;
-
-        table[table.cur_row()].set_cell_text_align(fort::text_align::center);
-        table << fort::endr;
-
-        for (const auto& [from, edges] : m_AdjacencyList) {
-            table[table.cur_row()].set_cell_text_align(fort::text_align::center);
-            table << from;
-
-            for (const auto& [to, edges] : m_AdjacencyList) {
-                if (IsEdgeExists(from, to))
-                    table << m_AdjacencyList.at(from).at(to);
-                else
-                    table << "null";
-            }
-
-            table << fort::endr;
-        }
-
-        std::cout << table.to_string() << std::endl;
     }
 
 } // namespace Ng
