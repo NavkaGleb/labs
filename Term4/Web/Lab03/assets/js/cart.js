@@ -9,8 +9,8 @@ window.addEventListener("load", () => {
 
     for (let i = 0; i < buttons.length; ++i) {
         buttons[i].addEventListener("click", () => {
-            totalPrice        += parseFloat(prices[i].innerHTML);
-            cartText.innerHTML = totalPrice.toString();
+            totalPrice         += parseFloat(prices[i].innerHTML);
+            cartText.innerHTML  = totalPrice.toFixed(2);
         });
     }
 });
