@@ -1,0 +1,35 @@
+.side-main-menu {
+	list-style-type: none;
+	padding: 0;
+	margin-left: 15px;
+}
+
+.side-main-menu-item-active > a {
+	text-decoration: underline;
+}
+
+.side-main-menu-item {
+	margin-bottom: 10px;
+}
+
+.side-main-menu-item > a {
+	font-size: 16px;
+}
+
+.side-main-menu-item > a,
+.side-sub-menu-item > a {
+	text-decoration: none;
+	color: black;
+	transition: 0.3s;
+}
+
+.side-main-menu-item > a:hover,
+.side-sub-menu-item > a:hover {
+	color: red;
+	transition: 0.3s;
+}
+
+.side-sub-menu {
+	list-style-type: disc;
+	display: none;
+}

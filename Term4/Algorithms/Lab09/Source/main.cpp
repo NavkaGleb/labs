@@ -40,15 +40,29 @@ int main() {
     for (int i = 0; i < 10; ++i)
         graph.PushNode(i);
 
-    for (int i = 0; i < 10; ++i)
-        graph.PushEdge(Ng::Random::Get(0, 9), Ng::Random::Get(0, 9), Ng::Random::Get(-5, 10));
+    for (int i = 0; i < 13; ++i) {
+        auto from = Ng::Random::Get(0, 9);
+        auto to = Ng::Random::Get(0, 9);
+
+        if (from != to)
+            graph.PushEdge(from, to, Ng::Random::Get(-5, 10));
+    }
 
     std::cout << "NodeCount: " << graph.GetNodeCount() << std::endl;
     std::cout << "EdgeCount: " << graph.GetEdgeCount() << std::endl;
 
+    std::cout << "Graph" << std::endl;
     std::cout << Ng::Graphviz::ToString(graph) << std::endl;
-    std::cout << "http://www.webgraphviz.com/" << std::endl;
 
-    if (auto distance = Ng::GraphAlgorithm::Johnson(graph, 10); !distance.empty())
-        Print(distance);
+    if (auto distance = Ng::GraphAlgorithm::Johnson(graph, 10); distance.empty()) {
+        std::cout << "There are negative cycles!" << std::endl;
+    } else {
+        Ng::ListGraph<int, int> distanceGraph(distance);
+
+        std::cout << "DistanceGraph" << std::endl;
+        std::cout << Ng::Graphviz::ToString(distanceGraph) << std::endl;
+//        Print(distance);
+    }
+
+    std::cout << "http://www.webgraphviz.com/" << std::endl;
 }

@@ -1,0 +1,17 @@
+.carousel-image-container {
+    margin: auto;
+    width: 60%;
+    padding-top: 50%;
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-image-container img {
+    width: 100%;
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}

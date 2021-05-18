@@ -19,9 +19,6 @@ namespace Ng {
 
         for (const auto& [from, edges] : m_AdjacencyList) {
             for (const auto& [to, edge] : edges) {
-                if (from == to)
-                    continue;
-
                 ++m_EdgeCount;
 
                 if (!IsEdgeExists(to, from))
@@ -41,9 +38,6 @@ namespace Ng {
 
         for (const auto& [from, edges] : other) {
             for (const auto& [to, edge] : edges) {
-                if (from == to)
-                    continue;
-
                 if (!edge)
                     continue;
 

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lab02</title>
+
+	<!-- Custom css -->
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/header.css">
+	<link rel="stylesheet" type="text/css" href="css/navbar.css">
+	<link rel="stylesheet" type="text/css" href="css/catalog.css">
+	<link rel="stylesheet" type="text/css" href="css/side-menu.css">
+	<link rel="stylesheet" type="text/css" href="css/footer.css">
+	<link rel="stylesheet" type="text/css" href="css/feedback-form.css">
+
+	<!-- Bootstrap -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+	<!-- Fontawesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+</head>
+<body>
+	<header id="header" class="m-3">
+		<div class="container">
+			<div class="header-title-container">
+				<div class="header-logo-container">
+					<img class="header-logo" src="media/logo.png" alt="The Lego Group logo">	
+				</div>
+				<div class="header-title-holder">
+					<div class="header-title">The Lego Group</div>
+					<div class="header-sub-title">Toy company</div>
+				</div>
+			</div>
+
+			<div class="header-contact-container">
+				<span class="header-contact mt-1">+38(099)-999-99-99</span>
+				<span class="header-contact">+38(067)-999-99-99</span>
+				<button id="header-feedback-button" class="btn btn-sm btn-danger mt-2">Feedback</button>
+			</div>
+		</div>
+	</header>
+	<section id="navbar">
+		<div class="container-fluid bg-dark text-white">
+			<ul class="nav justify-content-center">
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="#">Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Catalog</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Payment & Shipping</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Price list</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Contacts</a>
+				</li>
+			</ul>
+		</div>
+	</section>
+	<section id="slider" class="bg-light">
+		<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+			<div class="carousel-indicators">
+				<button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+				<button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+				<button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+			</div>
+			<div class="carousel-inner">
+				<div class="carousel-item active" data-bs-interval="4000">
+					<img src="media/slide1.png" class="d-block mx-auto my-auto h-100" alt="slide 1">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>First slide label</h5>
+						<p>Some representative placeholder content for the first slide.</p>
+					</div>
+				</div>
+				<div class="carousel-item" data-bs-interval="4000">
+					<img src="media/slide2.png" class="d-block mx-auto my-auto" style="height: 500px" alt="...">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>Second slide label</h5>
+						<p>Some representative placeholder content for the second slide.</p>
+					</div>
+				</div>
+				<div class="carousel-item" data-bs-interval="4000">
+					<img src="media/slide3.png" class="d-block mx-auto my-auto" style="height: 500px" alt="...">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>Third slide label</h5>
+						<p>Some representative placeholder content for the third slide.</p>
+					</div>
+				</div>
+			</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+	</section>
+	<section id="content">
+		<div class="container bg-light">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb pt-3">
+					<li class="breadcrumb-item"><a href="#">Home</a></li>
+					<li class="breadcrumb-item"><a href="#">Catalog</a></li>
+					<li class="breadcrumb-item"><a href="#">Themes</a></li>
+					<li class="breadcrumb-item active" aria-current="page">All</li>
+				</ol>
+			</nav>
+			<div class="row">
+				<div class="col-4 col-sm-4 col-md-2 col-lg-2 col-xl-2">
+					<ul class="side-main-menu">
+						<li class="side-main-menu-item side-main-menu-item-active">
+							<button class="btn btn-sm btn-danger" onclick="themesCollapse()">Themes</button>
+							<ul id="themes" class="side-sub-menu">
+								<li class="side-sub-menu-item"><a href="">All</a></li>
+								<li class="side-sub-menu-item"><a href="">Architecture</a></li>
+								<li class="side-sub-menu-item"><a href="">Batman™</a></li>
+								<li class="side-sub-menu-item"><a href="">City</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator 3-in-1</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator Expert</a></li>
+								<li class="side-sub-menu-item"><a href="">Friends</a></li>
+								<li class="side-sub-menu-item"><a href="">Minecraft™</a></li>
+								<li class="side-sub-menu-item"><a href="">Technic™</a></li>
+								<li class="side-sub-menu-item"><a href="">Harry Potter™</a></li>
+							</ul>
+						</li>
+						<li class="side-main-menu-item">
+							<button class="btn btn-sm btn-danger" onclick="interestsCollapse()">Interests</button>
+							<ul id="interests" class="side-sub-menu">
+								<li class="side-sub-menu-item"><a href="">All</a></li>
+								<li class="side-sub-menu-item"><a href="">Architecture</a></li>
+								<li class="side-sub-menu-item"><a href="">Batman™</a></li>
+								<li class="side-sub-menu-item"><a href="">City</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator 3-in-1</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator Expert</a></li>
+								<li class="side-sub-menu-item"><a href="">Friends</a></li>
+								<li class="side-sub-menu-item"><a href="">Minecraft™</a></li>
+								<li class="side-sub-menu-item"><a href="">Technic™</a></li>
+								<li class="side-sub-menu-item"><a href="">Harry Potter™</a></li>
+							</ul>
+						</li>
+						<li class="side-main-menu-item">
+							<button class="btn btn-sm btn-danger" onclick="shopByCollapse()">Shop by</button>
+							<ul id="shop-by" class="side-sub-menu">
+								<li class="side-sub-menu-item"><a href="">All</a></li>
+								<li class="side-sub-menu-item"><a href="">Architecture</a></li>
+								<li class="side-sub-menu-item"><a href="">Batman™</a></li>
+								<li class="side-sub-menu-item"><a href="">City</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator 3-in-1</a></li>
+								<li class="side-sub-menu-item"><a href="">Creator Expert</a></li>
+								<li class="side-sub-menu-item"><a href="">Friends</a></li>
+								<li class="side-sub-menu-item"><a href="">Minecraft™</a></li>
+								<li class="side-sub-menu-item"><a href="">Technic™</a></li>
+								<li class="side-sub-menu-item"><a href="">Harry Potter™</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="col-8 col-sm-8 col-md-10 col-lg-10 col-xl-10">
+					<div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-1.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Bike Chase</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 6+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 136</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 130</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">19.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div> 
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-2.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">1989 Batmobile™</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 16+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 3306</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 1625</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">249.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-3.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Yoda™</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 10+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece-count">
+										<span class="catalog-item-pieces">Pieces: 1771</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 650</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">99.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-4.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Porsche 911</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 18+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 1458</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 975</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">$149.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-5.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">NASA Space Shuttle</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 18+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 2354</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 1300</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">199.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div> 
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-6.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Colosseum</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 18+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 123</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 123</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">549.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-7.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Sorcerer's Dragon</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="icon">
+										<span class="catalog-item-age">Age: 9+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 1016</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 520</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">79.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-8.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">Ninte Entertainment™</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 18+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 2646</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 1495</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">229.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+						<div class="col p-3">
+							<div class="card w-100">
+								<div class="card-image-container mx-auto mt-3">
+									<img class="card-image" src="media/catalog-item-9.jpeg" alt="">
+								</div>
+								<div class="card-body">
+									<h5 class="card-title">X-1 Ninja Charger</h5>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/age-icon.svg" alt="age">
+										<span class="catalog-item-age">Age: 8+</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/piece-icon.svg" alt="piece count">
+										<span class="catalog-item-pieces">Pieces: 599</span>
+									</div>
+									<div class="catalog-item-info-row">
+										<img class="catalog-item-icon" src="media/vip-points-icon.svg" alt="vip-points">
+										<span class="catalog-item-vip-points">VIP points: 325</span>
+									</div>
+									<div class="catalog-item-info-price-row">
+										<span class="catalog-item-price">49.99</span>
+										<img class="catalog-item-icon" src="media/price-icon.svg" alt="price">
+									</div>
+								</div>
+								<div class="card-footer">
+									<button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<nav aria-label="Page navigation example">
+								<ul class="pagination pb-3 d-flex justify-content-center">
+									<li class="page-item"><a class="page-link" href="#">Previous</a></li>
+									<li class="page-item"><a class="page-link" href="#">1</a></li>
+									<li class="page-item"><a class="page-link" href="#">2</a></li>
+									<li class="page-item"><a class="page-link" href="#">3</a></li>
+									<li class="page-item"><a class="page-link" href="#">Next</a></li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<h5>Only the best is good enough</h5>
+							<p>
+								As children shape their own worlds with LEGO bricks, we play our part in having a positive impact on the world they live in today and will inherit in the
+							</p>
+						</div>
+						<div class="col-6">
+							<h5>Inspire and Develop the Builders of Tomorrow</h5>
+							<p>LEGO play starts to release a child’s potential from the moment they pick up their first brick.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<footer id="footer">
+		<div class="container d-flex justify-content-between align-items-center">
+			<div class="footer-title">
+				@ 2021. The Lego Group
+				<br>
+				lego.group@gmail.com
+			</div>
+			<div class="footer-menu-container">
+				<div>Menu</div>
+				<ul class="footer-list">
+					<li class="footer-list-item"><a href="index.html">Home</a></li>
+					<li class="footer-list-item"><a href="index.html">Catalog</a></li>
+					<li class="footer-list-item"><a href="index.html">Payment & Shipping</a></li>
+					<li class="footer-list-item"><a href="index.html">Price list</a></li>
+					<li class="footer-list-item"><a href="index.html">Contacts</a></li>
+				</ul>
+			</div>
+			<div class="footer-media-container">
+				<div>Media</div>
+				<ul class="footer-list">
+					<li class="footer-list-item"><a href="https://www.lego.com/">The Lego Group</a></li>
+					<li class="footer-list-item"><a href="https://www.flaticon.com/">Flaticon</a></li>
+				</ul>
+			</div>
+		</div>
+	</footer>
+	<div id="feedback-background-container">
+		<div class="feedback-form-container">
+			<button id="feedback-form-close-button"></button>
+			<form class="feedback-form" method="get">
+				<h2 class="feedback-form-title">Feedback</h2>
+				<div class="feedback-form-row">
+					<label for="name">Full Name *</label>
+					<input class="feedback-form-input" type="text" name="name" id="name" required>
+				</div>
+				<div class="feedback-form-row">
+					<label for="phone-number">Phone number *</label>
+					<input class="feedback-form-input" type="tel" name="phone-number" id="phone-number" required>
+				</div>
+				<div class="feedback-form-row">
+					<label for="email">Email *</label>
+					<input class="feedback-form-input" type="email" name="email" id="email" required>
+				</div>
+				<div class="feedback-form-row">
+					<label for="message">Message</label>
+					<textarea class="feedback-form-textarea" rows="10" name="message" id="message"></textarea>
+				</div>
+				<button id="feedback-form-submit-button" type="submit">Submit</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Bootstrap -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+
+	<!-- Custom js -->
+	<script src="js/collapse.js"></script>
+	<script src="js/feedback-form.js"></script>
+</body>
+</html>

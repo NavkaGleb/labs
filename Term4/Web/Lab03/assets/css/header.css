@@ -1,0 +1,46 @@
+#header {
+	/*height: 100px;*/
+}
+
+.header-title-container {
+	display: flex;
+	float: left;
+}
+
+.header-logo-container {
+	width: 100px;
+	height: 100px;
+	display: flex;
+	align-items: center;
+}
+
+.header-logo {
+	width: 100%;
+}
+
+.header-title-holder {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-left: 10px;
+}
+
+.header-title {
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.header-sub-title {
+	color: #70757A;
+}
+
+.header-contact-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	float: right;
+}
+
+.header-contact {
+	font-size: 18px;
+}
