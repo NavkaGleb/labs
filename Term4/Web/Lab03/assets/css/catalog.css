@@ -1,9 +1,16 @@
+.catalog-item {
+	display: none !important;
+}
+
+.catalog-item-active {
+	display: block !important;
+}
+
 .card-image-container {
 	width: 90%;
 	padding-top: 90%;
 	display: flex;
 	justify-content: center;
-	/*overflow: hidden;*/
 	position: relative;
 }
 
@@ -19,23 +26,6 @@
 
 .catalog-page-active {
 	display: flex;
-}
-
-.catalog-item {
-	min-width: 250px;
-	flex-grow: 1;
-	height: 320px;
-	padding: 10px;
-	transition: 0.3s;
-	font-size: 16px;
-}
-
-.catalog-item:hover {
-	box-shadow: 0 0px 15px #ccc;
-}
-
-.catalog-item:hover > .catalog-item-title:hover {
-	color: red;
 }
 
 .catalog-item-image-container {

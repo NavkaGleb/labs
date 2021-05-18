@@ -6,13 +6,11 @@
     <title>Lab02</title>
 
     <!-- Custom css -->
-    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
     <link rel="stylesheet" type="text/css" href="assets/css/header.css">
     <link rel="stylesheet" type="text/css" href="assets/css/navbar.css">
     <link rel="stylesheet" type="text/css" href="assets/css/carousel.css">
     <link rel="stylesheet" type="text/css" href="assets/css/catalog.css">
     <link rel="stylesheet" type="text/css" href="assets/css/footer.css">
-<!--    <link rel="stylesheet" type="text/css" href="assets/css/feedback-form.css">-->
 
     <!-- Fontawesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
@@ -20,16 +18,8 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
 
-    <style>
-        a {
-            color: #dc3545;
-            transition: 0.3s;
-        }
-
-        a:hover {
-            color: #BB2D3B;
-        }
-    </style>
+    <!-- Custom css -->
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
 </head>
 <body>
 <header id="header" class="m-3">
@@ -272,9 +262,9 @@
                 </ul>
             </div>
 
-            <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
-                <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
-                    <div class="col p-3">
+            <div id="catalog-items" class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-1.jpeg" alt="">
@@ -304,7 +294,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-2.jpeg" alt="">
@@ -334,7 +324,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-3.jpeg" alt="">
@@ -364,7 +354,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-4.jpeg" alt="">
@@ -394,7 +384,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-5.jpeg" alt="">
@@ -424,7 +414,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-6.jpeg" alt="">
@@ -454,7 +444,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-7.jpeg" alt="">
@@ -484,7 +474,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-8.jpeg" alt="">
@@ -514,7 +504,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col p-3">
+                    <div class="col p-3 catalog-item">
                         <div class="card w-100">
                             <div class="card-image-container mx-auto mt-3">
                                 <img class="card-image" src="assets/images/catalog-item-9.jpeg" alt="">
@@ -548,12 +538,8 @@
                 <div class="row">
                     <div class="col">
                         <nav aria-label="Page navigation example">
-                            <ul class="pagination pb-3 d-flex justify-content-center">
-                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                            <ul id="pagination" class="pagination pb-3 d-flex justify-content-center">
+                                <!-- auto generation -->
                             </ul>
                         </nav>
                     </div>
@@ -605,7 +591,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 
 <!-- Custom js -->
-<script src="assets/js/collapse.js"></script>
-<script src="assets/js/feedback-form.js"></script>
+<script src="assets/js/pagination.js"></script>
 </body>
 </html>
