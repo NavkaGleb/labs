@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab02</title>
+    <title>Lab03</title>
 
     <!-- Custom css -->
     <link rel="stylesheet" type="text/css" href="assets/css/header.css">
@@ -11,6 +11,8 @@
     <link rel="stylesheet" type="text/css" href="assets/css/carousel.css">
     <link rel="stylesheet" type="text/css" href="assets/css/catalog.css">
     <link rel="stylesheet" type="text/css" href="assets/css/footer.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/scroll-button.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/cart.css">
 
     <!-- Fontawesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
@@ -63,9 +65,9 @@
                                             <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
                                             <label for="floatingInput">Email address</label>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-                                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" required></textarea>
+                                        <div class="form-floating">
+                                            <textarea class="form-control" placeholder="Leave a comment here" id="comments" style="height: 100px"></textarea>
+                                            <label for="comments">Comments</label>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -290,7 +292,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -320,7 +322,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -350,7 +352,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -374,13 +376,13 @@
                                     <span class="catalog-item-vip-points">VIP points: 975</span>
                                 </div>
                                 <div class="catalog-item-info-price-row">
-                                    <span class="catalog-item-price">$149.99</span>
+                                    <span class="catalog-item-price">149.99</span>
                                     <img class="catalog-item-icon" src="assets/images/price-icon.svg" alt="price">
                                 </div>
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -410,7 +412,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -440,7 +442,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -470,7 +472,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -500,7 +502,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -530,7 +532,7 @@
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-sm btn-danger w-100">Detail</button>
-                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Card</button>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -577,7 +579,7 @@
                 <li class="footer-list-item"><a href="index.html">Contacts</a></li>
             </ul>
         </div>
-        <div class="footer-assets/images-container">
+        <div class="footer-media-container">
             <div>Media</div>
             <ul class="footer-list">
                 <li class="footer-list-item"><a href="https://www.lego.com/">The Lego Group</a></li>
@@ -587,10 +589,15 @@
     </div>
 </footer>
 
+<button id="cart" class="btn-danger" disabled><i class="fas fa-shopping-cart me-1"></i> Total Price: <span>0</span></button>
+<button class="btn btn-danger" id="scroll-button"><i class="fas fa-chevron-up"></i></button>
+
 <!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 
 <!-- Custom js -->
 <script src="assets/js/pagination.js"></script>
+<script src="assets/js/scroll-button.js"></script>
+<script src="assets/js/cart.js"></script>
 </body>
 </html>

@@ -87,4 +87,6 @@ window.addEventListener("load", () => {
 
     // imitate click to first page
     pagination.children[1].click();
+
+    window.scrollTo(0, 0);
 });
