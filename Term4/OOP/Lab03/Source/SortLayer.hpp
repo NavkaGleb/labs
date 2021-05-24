@@ -58,6 +58,9 @@ namespace Lab03 {
         void BottomUpMergeSortQuads(QuadIterator begin, QuadIterator end);
         void ParallelMergeSortQuads(QuadIterator begin, QuadIterator end);
 
+        auto PartitionQuads(QuadIterator begin, QuadIterator end) -> QuadIterator;
+        void MergeQuads(QuadIterator begin, QuadIterator middle, QuadIterator end);
+
     private:
         Ziben::OrthographicCamera      m_Camera;
         Ziben::Ref<Ziben::FrameBuffer> m_FrameBuffer;

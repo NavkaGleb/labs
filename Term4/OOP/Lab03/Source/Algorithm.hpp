@@ -39,7 +39,16 @@ namespace Lab03 {
         static void QuickSort(T begin, T end, Comparator comparator);
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        static void ParallelQuickSort(T begin, T end, Comparator comparator);
+
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
         static void MergeSort(T begin, T end, Comparator comparator);
+
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        static void BottomUpMergeSort(T begin, T end, Comparator comparator);
+
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        static void ParallelMergeSort(T begin, T end, Comparator comparator);
 
     private:
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>

@@ -91,6 +91,26 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::ParallelQuickSort(T begin, T end, Comparator comparator) {
+        if (begin >= end)
+            return;
+
+        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+            return InsertionSortQuads(begin, end);
+
+        auto partition = Partition(begin, end - 1);
+
+        if (end - begin >= 20) {
+            auto left = std::async(std::launch::async, [&] { return ParallelQuickSort(begin, partition); });
+            ParallelQuickSort(partition + 1, end);
+            left.wait();
+        } else {
+            ParallelQuickSort(begin,         partition);
+            ParallelQuickSort(partition + 1, end);
+        }
+    }
+
+    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
     void Algorithm::MergeSort(T begin, T end, Comparator comparator) {
         if (begin >= end)
             return;
@@ -104,6 +124,35 @@ namespace Lab03 {
         MergeSort(middle, end,    comparator);
 
         Merge(begin, middle, end, comparator);
+    }
+
+    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::BottomUpMergeSort(T begin, T end, Comparator comparator) {
+        for (typename std::iterator_traits<T>::difference_type size = 1; size < end - begin; size += size)
+            for (auto left = begin; left < end - size; left += size * 2)
+                Merge(left, left + size, std::min(left + size + size, end));
+    }
+
+    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::ParallelMergeSort(T begin, T end, Comparator comparator) {
+        if (begin >= end)
+            return;
+
+        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+            return InsertionSortQuads(begin, end);
+
+        auto middle = begin + std::distance(begin, end) / 2;
+
+        if (end - begin >= 20) {
+            auto left = std::async(std::launch::async, [&] { return ParallelMergeSort(begin, middle); });
+            ParallelMergeSort(middle, end);
+            left.wait();
+        } else {
+            ParallelMergeSort(begin,  middle);
+            ParallelMergeSort(middle, end);
+        }
+
+        Merge(begin, middle, end);
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
