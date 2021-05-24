@@ -1,6 +1,7 @@
 #pragma once
 
 #include <future>
+#include <atomic>
 
 #include <Ziben/Window/WindowEvent.hpp>
 #include <Ziben/Scene/Layer.hpp>
@@ -35,15 +36,24 @@ namespace Lab03 {
         using QuadContainer = std::vector<Quad>;
         using QuadIterator  = QuadContainer::iterator;
 
-        using SortFunction  = void (SortLayer::*)(QuadIterator, QuadIterator);
+        using ShuffleFunction = void (SortLayer::*)();
+        using SortFunction    = void (SortLayer::*)(QuadIterator, QuadIterator);
 
     private:
         bool OnWindowResized(Ziben::WindowResizedEvent& event);
 
         void InitQuads();
-        void ShuffleQuads();
         void UpdateQuads();
         void SwapQuads(Quad& lhs, Quad& rhs);
+
+        void RandomShuffleQuads();
+        void ReverseQuads();
+
+        template <typename Function, typename... Args>
+        decltype(auto) AsyncRun(Function&& function, Args&&... args);
+
+        template <ShuffleFunction ShuffleFunction>
+        void Shuffle();
 
         template <SortFunction SortFunction>
         void Sort();
@@ -71,18 +81,54 @@ namespace Lab03 {
         glm::vec4                      m_BeginColor;
         glm::vec4                      m_EndColor;
 
-        bool                           m_IsSorted;
-
         std::future<void>              m_SortFuture;
-        int                            m_DelayTime;
+        std::atomic_bool               m_IsRunning;
+        std::atomic_bool               m_IsSorted;
+        std::atomic_uint32_t           m_AsyncTasks;
+        uint32_t                       m_DelayTime;
 
     }; // class SortLayer
 
+    template <typename Function, typename... Args>
+    decltype(auto) SortLayer::AsyncRun(Function&& function, Args&&... args) {
+        return std::async(std::launch::async, [
+            &,
+            function = std::forward<Function>(function),
+            ...args  = std::forward<Args>(args)
+        ] {
+            ++m_AsyncTasks;
+            function(std::forward<Args>(args)...);
+            --m_AsyncTasks;
+        });
+    }
+
+    template <SortLayer::ShuffleFunction ShuffleFunction>
+    void SortLayer::Shuffle() {
+        if (m_IsRunning)
+            return;
+
+        m_SortFuture = AsyncRun([&] {
+            m_IsRunning = true;
+            m_IsSorted  = false;
+
+            (this->*ShuffleFunction)();
+
+            m_IsRunning = false;
+        });
+    }
+
     template <SortLayer::SortFunction SortFunction>
     void SortLayer::Sort() {
-        m_SortFuture = std::async(std::launch::async, [&] {
+        if (m_IsSorted || m_IsRunning)
+            return;
+
+        m_SortFuture = AsyncRun([&] {
+            m_IsRunning = true;
+
             (this->*SortFunction)(m_Quads.begin(), m_Quads.end());
-            m_IsSorted = true;
+
+            m_IsSorted  = true;
+            m_IsRunning = false;
         });
     }
 

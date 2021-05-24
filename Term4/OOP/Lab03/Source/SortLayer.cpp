@@ -19,6 +19,7 @@ namespace Lab03 {
         static void Sleep(uintmax_t ms) {
             auto end = clock() + ms * CLOCKS_PER_SEC / 1000;
             while (clock() < end);
+//            std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         }
 
     } // namespace Internal
@@ -35,7 +36,9 @@ namespace Lab03 {
         , m_QuadCount(50)
         , m_BeginColor(254.0f / 255.0f, 212.0f / 255.0f, 123.0f / 255.0f, 1.0f)
         , m_EndColor(254.0f / 255.0f, 109.0f / 255.0f, 41.0f / 255.0f, 1.0f)
+        , m_IsRunning(false)
         , m_IsSorted(true)
+        , m_AsyncTasks(1)
         , m_DelayTime(1) {}
 
     SortLayer::~SortLayer() noexcept {
@@ -47,8 +50,8 @@ namespace Lab03 {
         Ziben::FrameBufferSpecification specification;
 
         specification.Attachments = {
-            { Ziben::FrameBufferTextureFormat::RGBA8      },
-            { Ziben::FrameBufferTextureFormat::Depth      }
+            { Ziben::FrameBufferTextureFormat::RGBA8 },
+            { Ziben::FrameBufferTextureFormat::Depth }
         };
 
         specification.Width  = 1280;
@@ -178,8 +181,13 @@ namespace Lab03 {
             {
                 ImVec2 buttonSize = { ImGui::GetContentRegionAvailWidth(), 0.0f };
 
-                if (ImGui::Button("Shuffle", buttonSize))
-                    ShuffleQuads();
+                if (ImGui::Button("RandomShuffle", buttonSize))
+                    Shuffle<&SortLayer::RandomShuffleQuads>();
+
+                if (ImGui::Button("Reverse", buttonSize))
+                    Shuffle<&SortLayer::ReverseQuads>();
+
+                ImGui::Separator();
 
                 if (ImGui::Button("BubbleSort", buttonSize))
                     Sort<&SortLayer::BubbleSortQuads>();
@@ -212,10 +220,12 @@ namespace Lab03 {
 
             ImGui::Begin("Settings");
             {
-                ImGui::Text("Sorted: %s", m_IsSorted ? "True" : "False");
+                ImGui::Text("AsyncTasks: %d", (uint32_t)m_AsyncTasks);
+                ImGui::Text("IsRunning: %d", (bool)m_IsRunning);
+                ImGui::Text("IsSorted: %s", m_IsSorted ? "True" : "False");
                 ImGui::Text("QuadCount: %llu", m_QuadCount);
 
-                ImGui::DragInt("Delay Time (us)", &m_DelayTime, 0.3f, 1, 1000);
+                ImGui::DragInt("Delay Time (us)", reinterpret_cast<int*>(&m_DelayTime), 0.3f, 1, 1000);
 
                 if (ImGui::ColorEdit4("BeginColor", glm::value_ptr(m_BeginColor)))
                     UpdateQuads();
@@ -223,7 +233,7 @@ namespace Lab03 {
                 if (ImGui::ColorEdit4("EndColor", glm::value_ptr(m_EndColor)))
                     UpdateQuads();
 
-                if (m_IsSorted && ImGui::DragInt("QuadCount", reinterpret_cast<int*>(&m_QuadCount), 0.3f, 2, 400))
+                if (m_IsSorted && ImGui::DragInt("QuadCount", reinterpret_cast<int*>(&m_QuadCount), 0.3f, 2, 2000))
                     UpdateQuads();
             }
             ImGui::End();
@@ -253,17 +263,6 @@ namespace Lab03 {
             m_Quads[i].Index = i;
     }
 
-    void SortLayer::ShuffleQuads() {
-        m_SortFuture = std::async(std::launch::async, [&] {
-            m_IsSorted = false;
-
-            for (auto i = m_Quads.size() - 1; i > 0; --i) {
-                SwapQuads(m_Quads[i], m_Quads[Ziben::Random::GetFromRange<decltype(i)>(0, i)]);
-                Internal::Sleep(m_DelayTime);
-            }
-        });
-    }
-
     void SortLayer::UpdateQuads() {
         if (m_QuadCount != m_Quads.size())
            InitQuads();
@@ -277,13 +276,27 @@ namespace Lab03 {
         for (std::size_t i = 0; i < m_Quads.size(); ++i) {
             m_Quads[i].Size     = { scaleX, scaleY * static_cast<float>(m_Quads[i].Index + 1) };
             m_Quads[i].Position = { scaleX * static_cast<float>(i + 1) - m_Quads[i].Size.x / 2.0f, height - m_Quads[i].Size.y / 2.0f };
-            m_Quads[i].Color    = glm::lerp(m_EndColor, m_BeginColor, m_Quads[i].Size.y / height);
+            m_Quads[i].Color    = glm::lerp(m_BeginColor, m_EndColor, m_Quads[i].Size.y / height);
         }
     }
 
     void SortLayer::SwapQuads(Quad& lhs, Quad& rhs) {
         std::swap(lhs.Index, rhs.Index);
         UpdateQuads();
+    }
+
+    void SortLayer::RandomShuffleQuads() {
+        for (std::size_t i = m_Quads.size() - 1; i > 0; --i) {
+            SwapQuads(m_Quads[i], m_Quads[Ziben::Random::GetFromRange<decltype(i)>(0, i)]);
+            Internal::Sleep(m_DelayTime);
+        }
+    }
+
+    void SortLayer::ReverseQuads() {
+        for (std::size_t i = 0; i < m_QuadCount / 2; ++i) {
+            SwapQuads(m_Quads[i], m_Quads[m_QuadCount - i - 1]);
+            Internal::Sleep(m_DelayTime);
+        }
     }
 
     void SortLayer::BubbleSortQuads(QuadIterator begin, QuadIterator end) {
@@ -367,8 +380,10 @@ namespace Lab03 {
         auto partition = PartitionQuads(begin, end - 1);
 
         if (end - begin >= 20) {
-            auto left = std::async(std::launch::async, [&] { return ParallelQuickSortQuads(begin, partition); });
+            auto left = AsyncRun([&] { return ParallelQuickSortQuads(begin, partition); });
             ParallelQuickSortQuads(partition + 1, end);
+
+            left.wait();
         } else {
             ParallelQuickSortQuads(begin,         partition);
             ParallelQuickSortQuads(partition + 1, end);
@@ -406,8 +421,10 @@ namespace Lab03 {
         auto middle = begin + std::distance(begin, end) / 2;
 
         if (end - begin >= 20) {
-            auto left = std::async(std::launch::async, [&] { return ParallelMergeSortQuads(begin, middle); });
+            auto left = AsyncRun([&] { return ParallelMergeSortQuads(begin, middle); });
             ParallelMergeSortQuads(middle, end);
+
+            left.wait();
         } else {
             ParallelMergeSortQuads(begin,  middle);
             ParallelMergeSortQuads(middle, end);
@@ -437,6 +454,7 @@ namespace Lab03 {
         }
 
         SwapQuads(*end, *i);
+        Internal::Sleep(m_DelayTime);
 
         return i;
     }
