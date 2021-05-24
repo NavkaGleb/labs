@@ -45,7 +45,7 @@ namespace Lab03 {
         void UpdateQuads();
         void SwapQuads(Quad& lhs, Quad& rhs);
 
-        template <SortFunction sortFunction>
+        template <SortFunction SortFunction>
         void Sort();
 
         void BubbleSortQuads(QuadIterator begin, QuadIterator end);
@@ -55,6 +55,8 @@ namespace Lab03 {
         void QuickSortQuads(QuadIterator begin, QuadIterator end);
         void ParallelQuickSortQuads(QuadIterator begin, QuadIterator end);
         void MergeSortQuads(QuadIterator begin, QuadIterator end);
+        void BottomUpMergeSortQuads(QuadIterator begin, QuadIterator end);
+        void ParallelMergeSortQuads(QuadIterator begin, QuadIterator end);
 
     private:
         Ziben::OrthographicCamera      m_Camera;
@@ -73,10 +75,10 @@ namespace Lab03 {
 
     }; // class SortLayer
 
-    template <SortLayer::SortFunction sortFunction>
+    template <SortLayer::SortFunction SortFunction>
     void SortLayer::Sort() {
         m_SortFuture = std::async(std::launch::async, [&] {
-            (this->*sortFunction)(m_Quads.begin(), m_Quads.end());
+            (this->*SortFunction)(m_Quads.begin(), m_Quads.end());
             m_IsSorted = true;
         });
     }
