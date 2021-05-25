@@ -8,6 +8,8 @@
 #include <Ziben/Renderer/OrthographicCamera.hpp>
 #include <Ziben/Renderer/FrameBuffer.hpp>
 
+#include "ParticleSystem.hpp"
+
 namespace Lab03 {
 
     class SortLayer : public Ziben::Layer {
@@ -86,6 +88,9 @@ namespace Lab03 {
         std::atomic_bool               m_IsSorted;
         std::atomic_uint32_t           m_AsyncTasks;
         uint32_t                       m_DelayTime;
+
+        ParticleSystem                 m_ParticleSystem;
+        ParticleProps                  m_Particle;
 
     }; // class SortLayer
 
