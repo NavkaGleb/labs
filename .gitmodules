@@ -55,6 +55,9 @@
 [submodule "Term4/Algorithms/Lab09/External/libfort"]
 	path = Term4/Algorithms/Lab09/External/libfort
 	url = https://github.com/seleznevae/libfort
+[submodule "Term4/OOP/Lab03/External/doctest"]
+	path = Term4/OOP/Lab03/External/doctest
+	url = https://github.com/onqtam/doctest
 [submodule "Term4/OOP/Lab03/External/Ziben"]
 	path = Term4/OOP/Lab03/External/Ziben
 	url = https://github.com/NavkaGleb/Ziben

@@ -75,6 +75,12 @@ namespace Lab03 {
         m_Particle.VelocityVariation = { 50.0f, 50.0f };
         m_Particle.Position          = { 0.0f,   0.0f };
 
+        // Init Sort
+//        m_BubbleSortQuads = BubbleSortQuadsFunctor;
+
+        // Subscribe
+        RegisterObserver(&m_BubbleSortQuads);
+
         // Init Quads();
         UpdateQuads();
     }
@@ -87,6 +93,7 @@ namespace Lab03 {
         Ziben::EventDispatcher dispatcher(event);
 
         dispatcher.Dispatch<Ziben::WindowResizedEvent>(ZIBEN_BIND_EVENT_FUNC(OnWindowResized));
+        dispatcher.Dispatch<Ziben::WindowClosedEvent>(ZIBEN_BIND_EVENT_FUNC(OnWindowClosed));
     }
 
     void SortLayer::OnUpdate(const Ziben::TimeStep& ts) {
@@ -236,8 +243,15 @@ namespace Lab03 {
 
                 ImGui::Separator();
 
-                if (ImGui::Button("BubbleSort", buttonSize))
-                    Sort<&SortLayer::BubbleSortQuads>();
+                if (ImGui::Button("BubbleSort", buttonSize)) {
+                    m_SortFuture = AsyncRun([&] {
+                        m_BubbleSortQuads(m_Quads.begin(), m_Quads.end(), [&](Quad& lhs, Quad& rhs) {
+                            SwapQuads(lhs, rhs);
+                        });
+                    });
+                }
+
+//                    Sort<&SortLayer::BubbleSortQuads>();
 
                 if (ImGui::Button("SelectionSort", buttonSize))
                     Sort<&SortLayer::SelectionSortQuads>();
@@ -330,6 +344,12 @@ namespace Lab03 {
         return true;
     }
 
+    bool SortLayer::OnWindowClosed(Ziben::WindowClosedEvent& event) {
+        NotifyObservers(reinterpret_cast<const void*>(m_QuadCount));
+
+        return true;
+    }
+
     void SortLayer::InitQuads() {
         std::size_t prevCount = m_Quads.size();
 
@@ -359,6 +379,7 @@ namespace Lab03 {
     void SortLayer::SwapQuads(Quad& lhs, Quad& rhs) {
         std::swap(lhs.Index, rhs.Index);
         UpdateQuads();
+        Internal::Sleep(m_DelayTime);
     }
 
     void SortLayer::RandomShuffleQuads() {
@@ -375,184 +396,44 @@ namespace Lab03 {
         }
     }
 
-    void SortLayer::BubbleSortQuads(QuadIterator begin, QuadIterator end) {
-        for (auto [i, isSwapped] = std::make_pair(begin, false); i != end - 1; ++i) {
-            isSwapped = false;
-
-            for (auto j = begin; j != end - std::distance(begin, i) - 1; ++j) {
-                if (*(j + 1) < *j) {
-                    isSwapped = true;
-
-                    SwapQuads(*(j + 1), *j);
-                    Internal::Sleep(m_DelayTime);
-                }
-            }
-
-            if (!isSwapped)
-                break;
-        }
-    }
-
     void SortLayer::SelectionSortQuads(QuadIterator begin, QuadIterator end) {
-        for (auto i = begin, min = QuadIterator(); i != end - 1; ++i) {
-            min = i;
 
-            for (auto j = i; j < end; ++j)
-                if (*j < *min)
-                    min = j;
-
-            SwapQuads(*i, *min);
-            Internal::Sleep(m_DelayTime);
-        }
     }
 
     void SortLayer::InsertionSortQuads(QuadIterator begin, QuadIterator end) {
-        for (auto i = begin + 1; i != end; ++i) {
-            for (auto j = i; j != begin && *j < *(j - 1); --j) {
-                SwapQuads(*j, *(j - 1));
-                Internal::Sleep(m_DelayTime);
-            }
-        }
+
     }
 
     void SortLayer::ShellSortQuads(QuadIterator begin, QuadIterator end) {
-        std::iterator_traits<QuadIterator>::difference_type h = 1;
 
-        while (h < (end - begin) / 3)
-            h = 3 * h + 1;
-
-        while (h >= 1) {
-            for (auto i = begin + h; i != end; ++i) {
-                for (auto j = i; j >= begin + h && *j < *(j - h); j -= h) {
-                    SwapQuads(*j, *(j - h));
-                    Internal::Sleep(m_DelayTime);
-                }
-            }
-
-            h = h / 3;
-        }
     }
 
     void SortLayer::QuickSortQuads(QuadIterator begin, QuadIterator end) {
-        if (begin >= end)
-            return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
-            return InsertionSortQuads(begin, end);
-
-        auto partition = PartitionQuads(begin, end - 1);
-
-        QuickSortQuads(begin,         partition);
-        QuickSortQuads(partition + 1, end);
     }
 
     void SortLayer::ParallelQuickSortQuads(QuadIterator begin, QuadIterator end) {
-        if (begin >= end)
-            return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
-            return InsertionSortQuads(begin, end);
-
-        auto partition = PartitionQuads(begin, end - 1);
-
-        if (end - begin >= 20) {
-            auto left = AsyncRun([&] { return ParallelQuickSortQuads(begin, partition); });
-            ParallelQuickSortQuads(partition + 1, end);
-
-            left.wait();
-        } else {
-            ParallelQuickSortQuads(begin,         partition);
-            ParallelQuickSortQuads(partition + 1, end);
-        }
     }
 
     void SortLayer::MergeSortQuads(QuadIterator begin, QuadIterator end) {
-        if (begin >= end)
-            return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
-            return InsertionSortQuads(begin, end);
-
-        auto middle = begin + std::distance(begin, end) / 2;
-
-        MergeSortQuads(begin,  middle);
-        MergeSortQuads(middle, end);
-
-        MergeQuads(begin, middle, end);
     }
 
     void SortLayer::BottomUpMergeSortQuads(QuadIterator begin, QuadIterator end) {
-        for (std::iterator_traits<QuadIterator>::difference_type size = 1; size < m_Quads.size(); size += size)
-            for (auto left = begin; left < end - size; left += size * 2)
-                MergeQuads(left, left + size, std::min(left + size + size, end));
+
     }
 
     void SortLayer::ParallelMergeSortQuads(QuadIterator begin, QuadIterator end) {
-        if (begin >= end)
-            return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
-            return InsertionSortQuads(begin, end);
-
-        auto middle = begin + std::distance(begin, end) / 2;
-
-        if (end - begin >= 20) {
-            auto left = AsyncRun([&] { return ParallelMergeSortQuads(begin, middle); });
-            ParallelMergeSortQuads(middle, end);
-
-            left.wait();
-        } else {
-            ParallelMergeSortQuads(begin,  middle);
-            ParallelMergeSortQuads(middle, end);
-        }
-
-        MergeQuads(begin, middle, end);
     }
 
-    auto SortLayer::PartitionQuads(QuadIterator begin, QuadIterator end) -> SortLayer::QuadIterator {
-        auto i = begin - 1;
-        auto j = end;
+    auto SortLayer::PartitionQuads(QuadIterator begin, QuadIterator end) -> QuadIterator {
 
-        while (true) {
-            while (*(++i) < *end)
-                if (i == end)
-                    break;
-
-            while (*end < *(--j))
-                if (j == begin)
-                    break;
-
-            if (j <= i)
-                break;
-
-            SwapQuads(*i, *j);
-            Internal::Sleep(m_DelayTime);
-        }
-
-        SwapQuads(*end, *i);
-        Internal::Sleep(m_DelayTime);
-
-        return i;
     }
 
     void SortLayer::MergeQuads(QuadIterator begin, QuadIterator middle, QuadIterator end) {
-        std::vector<Quad> temp(std::distance(begin, end));
 
-        auto i = begin;
-        auto j = middle;
-
-        for (auto& k : temp) {
-            if ((*i < *j && i < middle) || j >= end)
-                k = *(i++);
-            else if ((*j < *i && j < end) || i >= middle)
-                k = *(j++);
-        }
-
-        for (auto k = temp.begin(); k != temp.end(); ++k) {
-            *(begin + std::distance(temp.begin(), k)) = *k;
-            UpdateQuads();
-            Internal::Sleep(m_DelayTime);
-        }
     }
 
 } // namespace Lab03

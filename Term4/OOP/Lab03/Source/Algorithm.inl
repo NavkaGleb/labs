@@ -1,5 +1,7 @@
 #include <Ziben/Utility/Random.hpp>
 
+#include <future>
+
 namespace Lab03 {
 
     template <RandomAccessIteratorConcept T>

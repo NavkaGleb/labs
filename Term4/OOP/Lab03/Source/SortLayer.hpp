@@ -9,10 +9,11 @@
 #include <Ziben/Renderer/FrameBuffer.hpp>
 
 #include "ParticleSystem.hpp"
+#include "SortLayerAlgorithm.hpp"
 
 namespace Lab03 {
 
-    class SortLayer : public Ziben::Layer {
+    class SortLayer : public Ziben::Layer, public Subject {
     public:
         SortLayer();
         ~SortLayer() noexcept override;
@@ -25,24 +26,12 @@ namespace Lab03 {
         void OnImGuiRender() override;
 
     private:
-        struct Quad {
-            std::size_t Index    = 0;
-            glm::vec2   Position = glm::vec2(0.0f);
-            glm::vec2   Size     = glm::vec2(1.0f);
-            glm::vec4   Color    = glm::vec4(1.0f);
-
-            inline bool operator <(const Quad& other) const { return Index < other.Index; }
-        };
-
-    private:
-        using QuadContainer = std::vector<Quad>;
-        using QuadIterator  = QuadContainer::iterator;
-
         using ShuffleFunction = void (SortLayer::*)();
         using SortFunction    = void (SortLayer::*)(QuadIterator, QuadIterator);
 
     private:
         bool OnWindowResized(Ziben::WindowResizedEvent& event);
+        bool OnWindowClosed(Ziben::WindowClosedEvent& event);
 
         void InitQuads();
         void UpdateQuads();
@@ -60,7 +49,6 @@ namespace Lab03 {
         template <SortFunction SortFunction>
         void Sort();
 
-        void BubbleSortQuads(QuadIterator begin, QuadIterator end);
         void SelectionSortQuads(QuadIterator begin, QuadIterator end);
         void InsertionSortQuads(QuadIterator begin, QuadIterator end);
         void ShellSortQuads(QuadIterator begin, QuadIterator end);
@@ -91,6 +79,16 @@ namespace Lab03 {
 
         ParticleSystem                 m_ParticleSystem;
         ParticleProps                  m_Particle;
+
+        BubbleSortQuadsFunctor         m_BubbleSortQuads;
+        SelectionSortQuadsFunctor      m_SelectionSortQuads;
+        InsertionSortQuadsFunctor      m_InsertionSortQuads;
+        ShellSortQuadsFunctor          m_ShellSortQuads;
+        QuickSortQuadsFunctor          m_QuickSortQuads;
+        ParallelQuickSortQuadsFunctor  m_ParallelQuickSortQuads;
+        MergeSortQuadsFunctor          m_MergeSortQuads;
+        BottomUpMergeSortQuadsFunctor  m_BottomUpMergeSortQuads;
+        ParallelMergeSortQuadsFunctor  m_ParallelMergeSortQuads;
 
     }; // class SortLayer
 

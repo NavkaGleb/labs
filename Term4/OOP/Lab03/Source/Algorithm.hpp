@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <functional>
 
 namespace Lab03 {
 
@@ -23,38 +24,38 @@ namespace Lab03 {
         template <RandomAccessIteratorConcept T, typename Func>
         static void Shuffle(T begin, T end, Func func);
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void BubbleSort(T begin, T end, Comparator comparator);
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void BubbleSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void SelectionSort(T begin, T end, Comparator comparator);
+        static void SelectionSort(T begin, T end, Comparator comparator = Comparator());
+
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void InsertionSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void InsertionSort(T begin, T end, Comparator comparator);
+        static void ShellSort(T begin, T end, Comparator comparator = Comparator());
+
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void QuickSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void ShellSort(T begin, T end, Comparator comparator);
+        static void ParallelQuickSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void QuickSort(T begin, T end, Comparator comparator);
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void MergeSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void ParallelQuickSort(T begin, T end, Comparator comparator);
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void BottomUpMergeSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void MergeSort(T begin, T end, Comparator comparator);
-
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void BottomUpMergeSort(T begin, T end, Comparator comparator);
-
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
-        static void ParallelMergeSort(T begin, T end, Comparator comparator);
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
+        static void ParallelMergeSort(T begin, T end, Comparator comparator = Comparator());
 
     private:
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
         static T Partition(T begin, T end, Comparator comparator);
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
         static void Merge(T begin, T middle, T end, Comparator comparator);
 
     }; // class Algorithm
