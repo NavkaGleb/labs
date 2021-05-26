@@ -27,19 +27,19 @@ namespace Lab03 {
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void BubbleSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void SelectionSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void InsertionSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void ShellSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void QuickSort(T begin, T end, Comparator comparator = Comparator());
 
-        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>()>
+        template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>
         static void ParallelQuickSort(T begin, T end, Comparator comparator = Comparator());
 
         template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator = std::less<>>

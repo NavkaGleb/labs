@@ -156,14 +156,14 @@ namespace Lab03 {
         const SwapFunction<Iterator>& swap
     ) const {
         auto i = begin - 1;
-        auto j = end - 1;
+        auto j = end;
 
         while (true) {
             if (this->m_IsShutdownRef)
-                return end;
+                return end + 1;
 
-            while (*(++i) < *(end - 1)) {}
-                if (i == end - 1)
+            while (*(++i) < *end)
+                if (i == end)
                     break;
 
             while (*end < *(--j))
@@ -176,7 +176,7 @@ namespace Lab03 {
             swap(*i, *j);
         }
 
-        swap(*(end - 1), *i);
+        swap(*end, *i);
 
         return i;
     }
@@ -197,7 +197,7 @@ namespace Lab03 {
         if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
             return (*this->m_InnerSort)(begin, end);
 
-        auto partition = this->Partition(begin, end, this->m_Swap);
+        auto partition = this->Partition(begin, end - 1, this->m_Swap);
 
         if (partition == end)
             return;
@@ -261,7 +261,7 @@ namespace Lab03 {
 
             if ((*i < *j && i < middle) || j >= end)
                 k = *(i++);
-            else if ((*j < *i && j < end) || i >= middle)
+            else if ((!(*i < *j) && j < end) || i >= middle)
                 k = *(j++);
         }
 

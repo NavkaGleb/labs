@@ -17,7 +17,7 @@ namespace Lab03 {
     class SortLayer : public Ziben::Layer, public Subject {
     public:
         SortLayer();
-        ~SortLayer() noexcept override;
+        ~SortLayer() noexcept override = default;
 
         void OnAttach() override;
         void OnDetach() override;
@@ -92,6 +92,7 @@ namespace Lab03 {
 
         ParticleSystem                 m_ParticleSystem;
         ParticleProps                  m_Particle;
+        uint32_t                       m_GenParticleCount;
 
         ApplicationState               m_ApplicationState;
 

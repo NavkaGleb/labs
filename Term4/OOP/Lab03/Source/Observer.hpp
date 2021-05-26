@@ -21,9 +21,6 @@ namespace Lab03 {
         virtual ~Subject() = default;
 
     public:
-        template <ObserverConcept T>
-        IObserver* RegisterObserver();
-
         void RegisterObserver(IObserver* observer);
         void UnregisterObserver(IObserver* observer);
         void NotifyObservers(const void* eventData);
@@ -32,10 +29,5 @@ namespace Lab03 {
         std::vector<IObserver*> m_Observers;
 
     }; // class Subject
-
-    template <ObserverConcept T>
-    IObserver* Subject::RegisterObserver() {
-        return m_Observers.emplace_back(new T);
-    }
 
 } // namespace Lab03

@@ -19,7 +19,6 @@ namespace Lab03 {
         static void Sleep(uintmax_t ms) {
             auto end = clock() + ms * CLOCKS_PER_SEC / 1000;
             while (clock() < end);
-//            std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         }
 
     } // namespace Internal
@@ -39,13 +38,31 @@ namespace Lab03 {
         , m_IsSorted(true)
         , m_AsyncTasks(1)
         , m_DelayTime(1)
+        , m_GenParticleCount(5)
         , m_ApplicationState(ApplicationState::Init) {}
 
-    SortLayer::~SortLayer() noexcept {
-
-    }
-
     void SortLayer::OnAttach() {
+        std::vector<uint8_t> a(1000);
+
+        for (auto& e : a) {
+            e = Ziben::Random::Get<uint8_t>();
+            std::cout << +e << " ";
+        }
+
+        std::cout << std::endl;
+
+        std::cout << "-------------------" << std::endl;
+        for (const auto& j : a)
+            std::cout << +j << " ";
+        std::cout << std::endl;
+
+        Algorithm::ParallelMergeSort(a.begin(), a.end());
+
+        std::cout << "-------------------" << std::endl;
+        for (const auto& j : a)
+            std::cout << +j << " ";
+        std::cout << std::endl;
+
         // Init FrameBuffer
         Ziben::FrameBufferSpecification specification;
 
@@ -54,7 +71,7 @@ namespace Lab03 {
             { Ziben::FrameBufferTextureFormat::Depth }
         };
 
-        specification.Width  = 1280;
+        specification.Width  = 1080;
         specification.Height = 720;
 
         m_FrameBuffer = Ziben::FrameBuffer::Create(std::move(specification));
@@ -249,7 +266,7 @@ namespace Lab03 {
 
                     m_Particle.Position = { positionX, positionY };
 
-                    for (int i = 0; i < 13; ++i)
+                    for (int i = 0; i < m_GenParticleCount; ++i)
                         m_ParticleSystem.Push(m_Particle);
                 }
             }
@@ -328,6 +345,8 @@ namespace Lab03 {
                 ImGui::DragFloat("SizeBegin", &m_Particle.SizeBegin, 0.2f, 1.0f, 100.0f);
                 ImGui::DragFloat("LifeTime", &m_Particle.LifeTime, 0.2f, 0.1f, 6.0f);
                 ImGui::DragFloat2("VelocityVariation", glm::value_ptr(m_Particle.VelocityVariation), 0.1f, 0.0f, 100.0f);
+
+                ImGui::DragInt("GenParticleCount", reinterpret_cast<int*>(&m_GenParticleCount), 0.1f, 1, 20);
             }
             ImGui::End();
 
