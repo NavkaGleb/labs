@@ -11,7 +11,6 @@
 #include <Ziben/Renderer/Renderer2D.hpp>
 
 #include "Application.hpp"
-#include "Algorithm.hpp"
 
 namespace Lab03 {
 
@@ -34,17 +33,16 @@ namespace Lab03 {
             static_cast<float>(Application::Get().GetWindow().GetHeight()),
             0
         )
-        , m_QuadCount(50)
         , m_BeginColor(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f)
         , m_EndColor(90.0f / 255.0f, 67.0f / 255.0f, 177.0f / 255.0f, 1.0f)
         , m_IsRunning(false)
         , m_IsSorted(true)
         , m_AsyncTasks(1)
-        , m_DelayTime(1) {}
+        , m_DelayTime(1)
+        , m_ApplicationState(ApplicationState::Init) {}
 
     SortLayer::~SortLayer() noexcept {
-        if (m_SortFuture.valid())
-            m_SortFuture.wait();
+
     }
 
     void SortLayer::OnAttach() {
@@ -62,7 +60,7 @@ namespace Lab03 {
         m_FrameBuffer = Ziben::FrameBuffer::Create(std::move(specification));
 
         // Init ParticleSystem
-        m_ParticleSystem.SetMaxParticleCount(10'000);
+        m_ParticleSystem.SetMaxParticleCount(3'000);
 
         // Init Particle
         m_Particle.ColorBegin        = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
@@ -75,18 +73,45 @@ namespace Lab03 {
         m_Particle.VelocityVariation = { 50.0f, 50.0f };
         m_Particle.Position          = { 0.0f,   0.0f };
 
-        // Init Sort
-//        m_BubbleSortQuads = BubbleSortQuadsFunctor;
+        // Init ShuffleAlgorithm
+        m_ShuffleAlgorithms[ShuffleType::RandomShuffle] = CreateShuffleAlgorithm(ShuffleType::RandomShuffle);
+        m_ShuffleAlgorithms[ShuffleType::Reverse]       = CreateShuffleAlgorithm(ShuffleType::Reverse);
 
-        // Subscribe
-        RegisterObserver(&m_BubbleSortQuads);
+        // Init SortAlgorithm
+        m_SortAlgorithms[SortType::BubbleSort]        = CreateSortAlgorithm(SortType::BubbleSort);
+        m_SortAlgorithms[SortType::SelectionSort]     = CreateSortAlgorithm(SortType::SelectionSort);
+        m_SortAlgorithms[SortType::InsertionSort]     = CreateSortAlgorithm(SortType::InsertionSort);
+        m_SortAlgorithms[SortType::ShellSort]         = CreateSortAlgorithm(SortType::ShellSort);
+        m_SortAlgorithms[SortType::QuickSort]         = CreateSortAlgorithm(SortType::QuickSort);
+        m_SortAlgorithms[SortType::ParallelQuickSort] = CreateSortAlgorithm(SortType::ParallelQuickSort);
+        m_SortAlgorithms[SortType::MergeSort]         = CreateSortAlgorithm(SortType::MergeSort);
+        m_SortAlgorithms[SortType::BottomUpMergeSort] = CreateSortAlgorithm(SortType::BottomUpMergeSort);
+        m_SortAlgorithms[SortType::ParallelMergeSort] = CreateSortAlgorithm(SortType::ParallelMergeSort);
 
-        // Init Quads();
+        // Register Observers
+        for (const auto& [type, algorithm] : m_ShuffleAlgorithms)
+            RegisterObserver(algorithm);
+
+        for (const auto& [type, algorithm] : m_SortAlgorithms)
+            RegisterObserver(algorithm);
+
+        // Init Quads
+        InitQuads(50);
         UpdateQuads();
+
+        // Init ApplicationState
+        m_ApplicationState = ApplicationState::Running;
+
+        // Notify All Observers
+        NotifyObservers(reinterpret_cast<const void*>(&m_ApplicationState));
     }
 
     void SortLayer::OnDetach() {
+        if (m_SortFuture.valid())
+            m_SortFuture.wait();
 
+        for (auto& [type, algorithm] : m_SortAlgorithms)
+            delete algorithm;
     }
 
     void SortLayer::OnEvent(Ziben::Event& event) {
@@ -236,46 +261,39 @@ namespace Lab03 {
                 ImVec2 buttonSize = { ImGui::GetContentRegionAvailWidth(), 0.0f };
 
                 if (ImGui::Button("RandomShuffle", buttonSize))
-                    Shuffle<&SortLayer::RandomShuffleQuads>();
+                    Shuffle<ShuffleType::RandomShuffle>();
 
                 if (ImGui::Button("Reverse", buttonSize))
-                    Shuffle<&SortLayer::ReverseQuads>();
+                    Shuffle<ShuffleType::Reverse>();
 
                 ImGui::Separator();
 
-                if (ImGui::Button("BubbleSort", buttonSize)) {
-                    m_SortFuture = AsyncRun([&] {
-                        m_BubbleSortQuads(m_Quads.begin(), m_Quads.end(), [&](Quad& lhs, Quad& rhs) {
-                            SwapQuads(lhs, rhs);
-                        });
-                    });
-                }
-
-//                    Sort<&SortLayer::BubbleSortQuads>();
+                if (ImGui::Button("BubbleSort", buttonSize))
+                    Sort<SortType::BubbleSort>();
 
                 if (ImGui::Button("SelectionSort", buttonSize))
-                    Sort<&SortLayer::SelectionSortQuads>();
+                    Sort<SortType::SelectionSort>();
 
                 if (ImGui::Button("InsertionSort", buttonSize))
-                    Sort<&SortLayer::InsertionSortQuads>();
+                    Sort<SortType::InsertionSort>();
 
                 if (ImGui::Button("ShellSort", buttonSize))
-                    Sort<&SortLayer::ShellSortQuads>();
+                    Sort<SortType::ShellSort>();
 
                 if (ImGui::Button("QuickSort", buttonSize))
-                    Sort<&SortLayer::QuickSortQuads>();
+                    Sort<SortType::QuickSort>();
 
                 if (ImGui::Button("ParallelQuickSort", buttonSize))
-                    Sort<&SortLayer::ParallelQuickSortQuads>();
+                    Sort<SortType::ParallelQuickSort>();
 
                 if (ImGui::Button("MergeSort", buttonSize))
-                    Sort<&SortLayer::MergeSortQuads>();
+                    Sort<SortType::MergeSort>();
 
                 if (ImGui::Button("BottomUpMergeSort", buttonSize))
-                    Sort<&SortLayer::BottomUpMergeSortQuads>();
+                    Sort<SortType::BottomUpMergeSort>();
 
                 if (ImGui::Button("ParallelMergeSort", buttonSize))
-                    Sort<&SortLayer::ParallelMergeSortQuads>();
+                    Sort<SortType::ParallelMergeSort>();
             }
             ImGui::End();
 
@@ -284,7 +302,7 @@ namespace Lab03 {
                 ImGui::Text("AsyncTasks: %d", (uint32_t)m_AsyncTasks);
                 ImGui::Text("IsRunning: %d", (bool)m_IsRunning);
                 ImGui::Text("IsSorted: %s", m_IsSorted ? "True" : "False");
-                ImGui::Text("QuadCount: %llu", m_QuadCount);
+                ImGui::Text("QuadCount: %llu", m_Quads.size());
 
                 ImGui::DragInt("Delay Time", reinterpret_cast<int*>(&m_DelayTime), 0.3f, 1, 1000);
 
@@ -294,8 +312,11 @@ namespace Lab03 {
                 if (ImGui::ColorEdit4("EndColor", glm::value_ptr(m_EndColor)))
                     UpdateQuads();
 
-                if (m_IsSorted && ImGui::DragInt("QuadCount", reinterpret_cast<int*>(&m_QuadCount), 0.3f, 2, 2000))
-                    UpdateQuads();
+                if (std::size_t quadCount = m_Quads.size();
+                    m_IsSorted && ImGui::DragInt("QuadCount", reinterpret_cast<int*>(&quadCount), 0.3f, 2, 2000)
+                ) {
+                    UpdateQuads(quadCount);
+                }
             }
             ImGui::End();
 
@@ -345,29 +366,63 @@ namespace Lab03 {
     }
 
     bool SortLayer::OnWindowClosed(Ziben::WindowClosedEvent& event) {
-        NotifyObservers(reinterpret_cast<const void*>(m_QuadCount));
+        NotifyObservers(reinterpret_cast<const void*>(&(m_ApplicationState = ApplicationState::Shutdown)));
 
         return true;
     }
 
-    void SortLayer::InitQuads() {
+    ControllableAlgorithm<QuadIterator>* SortLayer::CreateShuffleAlgorithm(ShuffleType type) {
+        auto Swap  = [&](Quad& lhs, Quad& rhs) { SwapQuads(lhs, rhs); };
+
+        switch (type) {
+            case ShuffleType::RandomShuffle: return new RandomShuffleAlgorithm<QuadIterator>(Swap);
+            case ShuffleType::Reverse:       return new ReverseAlgorithm<QuadIterator>(Swap);
+
+            default: break;
+        }
+
+        throw std::invalid_argument("Lab03::SortLayer::CreateShuffleAlgorithm: Unknown shuffle type");
+    }
+
+    ControllableAlgorithm<QuadIterator>* SortLayer::CreateSortAlgorithm(SortType type) {
+        auto Swap  = [&](Quad& lhs, Quad& rhs) { SwapQuads(lhs, rhs); };
+        auto Async = [&](const std::function<void()>& function) { return AsyncRun(function); };
+
+        switch (type) {
+            case SortType::BubbleSort:        return new BubbleSortAlgorithm<QuadIterator>(Swap);
+            case SortType::SelectionSort:     return new SelectionSortAlgorithm<QuadIterator>(Swap);
+            case SortType::InsertionSort:     return new InsertionSortAlgorithm<QuadIterator>(Swap);
+            case SortType::ShellSort:         return new ShellSortAlgorithm<QuadIterator>(Swap);
+            case SortType::QuickSort:         return new QuickSortAlgorithm<QuadIterator>(Swap, m_SortAlgorithms[SortType::InsertionSort]);
+            case SortType::ParallelQuickSort: return new ParallelQuickSortAlgorithm<QuadIterator, decltype(Async)>(Swap, Async, m_SortAlgorithms[SortType::InsertionSort]);
+            case SortType::MergeSort:         return new MergeSortAlgorithm<QuadIterator>(Swap, m_SortAlgorithms[SortType::InsertionSort]);
+            case SortType::BottomUpMergeSort: return new BottomUpMergeSortAlgorithm<QuadIterator>(Swap, m_SortAlgorithms[SortType::InsertionSort]);
+            case SortType::ParallelMergeSort: return new ParallelMergeSortAlgorithm<QuadIterator, decltype(Async)>(Swap, Async, m_SortAlgorithms[SortType::InsertionSort]);
+
+            default: break;
+        }
+
+        throw std::invalid_argument("Lab03::SortLayer::CreateSortAlgorithm: Unknown sort type");
+    }
+
+    void SortLayer::InitQuads(std::size_t count) {
         std::size_t prevCount = m_Quads.size();
 
-        m_Quads.resize(m_QuadCount);
+        m_Quads.resize(count);
 
         for (std::size_t i = prevCount; i < m_Quads.size(); ++i)
             m_Quads[i].Index = i;
     }
 
-    void SortLayer::UpdateQuads() {
-        if (m_QuadCount != m_Quads.size())
-           InitQuads();
+    void SortLayer::UpdateQuads(std::size_t count) {
+        if (count != m_Quads.size() && count != 0)
+           InitQuads(count);
 
         auto width   = static_cast<float>(m_ViewportSize.x);
         auto height  = static_cast<float>(m_ViewportSize.y);
 
-        float scaleX = width  / static_cast<float>(m_QuadCount);
-        float scaleY = height / static_cast<float>(m_QuadCount);
+        float scaleX = width  / static_cast<float>(m_Quads.size());
+        float scaleY = height / static_cast<float>(m_Quads.size());
 
         for (std::size_t i = 0; i < m_Quads.size(); ++i) {
             m_Quads[i].Size     = { scaleX, scaleY * static_cast<float>(m_Quads[i].Index + 1) };
@@ -380,60 +435,6 @@ namespace Lab03 {
         std::swap(lhs.Index, rhs.Index);
         UpdateQuads();
         Internal::Sleep(m_DelayTime);
-    }
-
-    void SortLayer::RandomShuffleQuads() {
-        for (std::size_t i = m_Quads.size() - 1; i > 0; --i) {
-            SwapQuads(m_Quads[i], m_Quads[Ziben::Random::GetFromRange<decltype(i)>(0, i)]);
-            Internal::Sleep(m_DelayTime);
-        }
-    }
-
-    void SortLayer::ReverseQuads() {
-        for (std::size_t i = 0; i < m_QuadCount / 2; ++i) {
-            SwapQuads(m_Quads[i], m_Quads[m_QuadCount - i - 1]);
-            Internal::Sleep(m_DelayTime);
-        }
-    }
-
-    void SortLayer::SelectionSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::InsertionSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::ShellSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::QuickSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::ParallelQuickSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::MergeSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::BottomUpMergeSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    void SortLayer::ParallelMergeSortQuads(QuadIterator begin, QuadIterator end) {
-
-    }
-
-    auto SortLayer::PartitionQuads(QuadIterator begin, QuadIterator end) -> QuadIterator {
-
-    }
-
-    void SortLayer::MergeQuads(QuadIterator begin, QuadIterator middle, QuadIterator end) {
-
     }
 
 } // namespace Lab03

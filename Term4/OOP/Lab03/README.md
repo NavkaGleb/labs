@@ -2,5 +2,6 @@
 
 ## Implemented Design Patterns
 1. Singleton
-2. ObjectPool
-3. Observer
+2. Factory Method
+3. ObjectPool
+4. Observer

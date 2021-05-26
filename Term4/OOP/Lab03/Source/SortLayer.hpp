@@ -9,7 +9,8 @@
 #include <Ziben/Renderer/FrameBuffer.hpp>
 
 #include "ParticleSystem.hpp"
-#include "SortLayerAlgorithm.hpp"
+#include "ControllableAlgorithm.hpp"
+#include "SortableQuad.hpp"
 
 namespace Lab03 {
 
@@ -26,47 +27,59 @@ namespace Lab03 {
         void OnImGuiRender() override;
 
     private:
-        using ShuffleFunction = void (SortLayer::*)();
-        using SortFunction    = void (SortLayer::*)(QuadIterator, QuadIterator);
+        enum class ShuffleType : uint8_t {
+            None = 0,
+            RandomShuffle,
+            Reverse
+        };
+
+        enum class SortType : uint8_t {
+            None = 0,
+            BubbleSort,
+            SelectionSort,
+            InsertionSort,
+            ShellSort,
+            QuickSort,
+            ParallelQuickSort,
+            MergeSort,
+            BottomUpMergeSort,
+            ParallelMergeSort
+        };
+
+    private:
+        using ControllableAlgorithm      = ControllableAlgorithm<QuadIterator>;
+
+        using ShuffleAlgorithmContainer = std::unordered_map<ShuffleType, ControllableAlgorithm*>;
+        using SortAlgorithmContainer     = std::unordered_map<SortType, ControllableAlgorithm*>;
 
     private:
         bool OnWindowResized(Ziben::WindowResizedEvent& event);
         bool OnWindowClosed(Ziben::WindowClosedEvent& event);
 
-        void InitQuads();
-        void UpdateQuads();
+        ControllableAlgorithm* CreateShuffleAlgorithm(ShuffleType type);
+        ControllableAlgorithm* CreateSortAlgorithm(SortType type);
+
+        void InitQuads(std::size_t count);
+        void UpdateQuads(std::size_t count = 0);
         void SwapQuads(Quad& lhs, Quad& rhs);
 
-        void RandomShuffleQuads();
-        void ReverseQuads();
-
         template <typename Function, typename... Args>
-        decltype(auto) AsyncRun(Function&& function, Args&&... args);
+        std::future<void> AsyncRun(Function&& function, Args&&... args);
 
-        template <ShuffleFunction ShuffleFunction>
+        template <ShuffleType ShuffleType>
         void Shuffle();
 
-        template <SortFunction SortFunction>
+        template <SortType SortType>
         void Sort();
-
-        void SelectionSortQuads(QuadIterator begin, QuadIterator end);
-        void InsertionSortQuads(QuadIterator begin, QuadIterator end);
-        void ShellSortQuads(QuadIterator begin, QuadIterator end);
-        void QuickSortQuads(QuadIterator begin, QuadIterator end);
-        void ParallelQuickSortQuads(QuadIterator begin, QuadIterator end);
-        void MergeSortQuads(QuadIterator begin, QuadIterator end);
-        void BottomUpMergeSortQuads(QuadIterator begin, QuadIterator end);
-        void ParallelMergeSortQuads(QuadIterator begin, QuadIterator end);
-
-        auto PartitionQuads(QuadIterator begin, QuadIterator end) -> QuadIterator;
-        void MergeQuads(QuadIterator begin, QuadIterator middle, QuadIterator end);
 
     private:
         Ziben::OrthographicCamera      m_Camera;
         Ziben::Ref<Ziben::FrameBuffer> m_FrameBuffer;
         glm::vec<2, uint32_t>          m_ViewportSize;
 
-        std::size_t                    m_QuadCount;
+        ShuffleAlgorithmContainer      m_ShuffleAlgorithms;
+        SortAlgorithmContainer         m_SortAlgorithms;
+
         QuadContainer                  m_Quads;
         glm::vec4                      m_BeginColor;
         glm::vec4                      m_EndColor;
@@ -80,20 +93,12 @@ namespace Lab03 {
         ParticleSystem                 m_ParticleSystem;
         ParticleProps                  m_Particle;
 
-        BubbleSortQuadsFunctor         m_BubbleSortQuads;
-        SelectionSortQuadsFunctor      m_SelectionSortQuads;
-        InsertionSortQuadsFunctor      m_InsertionSortQuads;
-        ShellSortQuadsFunctor          m_ShellSortQuads;
-        QuickSortQuadsFunctor          m_QuickSortQuads;
-        ParallelQuickSortQuadsFunctor  m_ParallelQuickSortQuads;
-        MergeSortQuadsFunctor          m_MergeSortQuads;
-        BottomUpMergeSortQuadsFunctor  m_BottomUpMergeSortQuads;
-        ParallelMergeSortQuadsFunctor  m_ParallelMergeSortQuads;
+        ApplicationState               m_ApplicationState;
 
     }; // class SortLayer
 
     template <typename Function, typename... Args>
-    decltype(auto) SortLayer::AsyncRun(Function&& function, Args&&... args) {
+    std::future<void> SortLayer::AsyncRun(Function&& function, Args&&... args) {
         return std::async(std::launch::async, [
             &,
             function = std::forward<Function>(function),
@@ -105,7 +110,7 @@ namespace Lab03 {
         });
     }
 
-    template <SortLayer::ShuffleFunction ShuffleFunction>
+    template <SortLayer::ShuffleType ShuffleType>
     void SortLayer::Shuffle() {
         if (m_IsRunning)
             return;
@@ -114,13 +119,13 @@ namespace Lab03 {
             m_IsRunning = true;
             m_IsSorted  = false;
 
-            (this->*ShuffleFunction)();
+            (*m_ShuffleAlgorithms[ShuffleType])(m_Quads.begin(), m_Quads.end());
 
             m_IsRunning = false;
         });
     }
 
-    template <SortLayer::SortFunction SortFunction>
+    template <SortLayer::SortType SortType>
     void SortLayer::Sort() {
         if (m_IsSorted || m_IsRunning)
             return;
@@ -128,7 +133,7 @@ namespace Lab03 {
         m_SortFuture = AsyncRun([&] {
             m_IsRunning = true;
 
-            (this->*SortFunction)(m_Quads.begin(), m_Quads.end());
+            (*m_SortAlgorithms[SortType])(m_Quads.begin(), m_Quads.end());
 
             m_IsSorted  = true;
             m_IsRunning = false;
