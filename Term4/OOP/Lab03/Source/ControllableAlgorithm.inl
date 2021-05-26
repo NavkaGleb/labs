@@ -5,14 +5,16 @@ namespace Lab03 {
     template <RandomAccessIteratorConcept Iterator>
     ControllableAlgorithm<Iterator>::ControllableAlgorithm(const SwapFunction<Iterator>& swap)
         : m_Swap(swap)
-        , m_IsShutdown(false) {}
+        , m_Command(ControllableAlgorithmCommand::None) {}
 
     template <RandomAccessIteratorConcept Iterator>
     void ControllableAlgorithm<Iterator>::OnNotify(const void* data) {
-        auto state = *reinterpret_cast<const ApplicationState*>(data);
+        m_Command = *reinterpret_cast<const ControllableAlgorithmCommand*>(data);
+    }
 
-        if (state == ApplicationState::Shutdown)
-            m_IsShutdown = true;
+    template <RandomAccessIteratorConcept Iterator>
+    bool ControllableAlgorithm<Iterator>::UpdateState() const {
+        return true;
     }
 
     template <RandomAccessIteratorConcept Iterator, typename AsyncFunction>
@@ -32,7 +34,10 @@ namespace Lab03 {
         using DifferenceType = typename std::iterator_traits<Iterator>::difference_type;
 
         for (auto i = begin; i != end; ++i) {
-            if (this->m_IsShutdown)
+            while (this->IsPaused())
+                std::this_thread::yield();
+
+            if (this->IsCanceled())
                 return;
 
             this->m_Swap(*i, *(begin + Ziben::Random::GetFromRange<DifferenceType>(i - begin, end - begin - 1)));
@@ -45,8 +50,11 @@ namespace Lab03 {
 
     template <typename Iterator>
     void ReverseAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
-        for (auto i = begin; !this->m_IsShutdown && i < begin + (end - begin) / 2; ++i) {
-            if (this->m_IsShutdown)
+        for (auto i = begin; i < begin + (end - begin) / 2; ++i) {
+            while (this->IsPaused())
+                std::this_thread::yield();
+
+            if (this->IsCanceled())
                 return;
 
             this->m_Swap(*i, *(end - (i - begin) - 1));
@@ -65,7 +73,10 @@ namespace Lab03 {
             isSwapped = false;
 
             for (auto j = begin; j != end - std::distance(begin, i) - 1; ++j) {
-                if (this->m_IsShutdown)
+                while (this->IsPaused())
+                    std::this_thread::yield();
+
+                if (this->IsCanceled())
                     return;
 
                 if (*(j + 1) < *j) {
@@ -90,7 +101,10 @@ namespace Lab03 {
             min = i;
 
             for (auto j = i; j < end; ++j) {
-                if (this->m_IsShutdown)
+                while (this->IsPaused())
+                    std::this_thread::yield();
+
+                if (this->IsCanceled())
                     return;
 
                 if (*j < *min)
@@ -109,7 +123,10 @@ namespace Lab03 {
     void InsertionSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
         for (auto i = begin + 1; i != end; ++i) {
             for (auto j = i; j != begin && *j < *(j - 1); --j) {
-                if (this->m_IsShutdown)
+                while (this->IsPaused())
+                    std::this_thread::yield();
+
+                if (this->IsCanceled())
                     return;
 
                 this->m_Swap(*j, *(j - 1));
@@ -133,7 +150,10 @@ namespace Lab03 {
         while (h >= 1) {
             for (auto i = begin + h; i != end; ++i) {
                 for (auto j = i; j >= begin + h && *j < *(j - h); j -= h) {
-                    if (this->m_IsShutdown)
+                    while (this->IsPaused())
+                        std::this_thread::yield();
+
+                    if (this->IsCanceled())
                         return;
 
                     this->m_Swap(*j, *(j - h));
@@ -145,8 +165,11 @@ namespace Lab03 {
     }
 
     template <typename Iterator>
-    IQuickSortAlgorithm<Iterator>::IQuickSortAlgorithm(bool& isShutdown, ControllableAlgorithm<Iterator>* innerSort)
-        : m_IsShutdownRef(isShutdown)
+    IQuickSortAlgorithm<Iterator>::IQuickSortAlgorithm(
+        ControllableAlgorithmCommand&    command,
+        ControllableAlgorithm<Iterator>* innerSort
+    )
+        : m_CommandRef(command)
         , m_InnerSort(innerSort) {}
 
     template <typename Iterator>
@@ -159,7 +182,10 @@ namespace Lab03 {
         auto j = end;
 
         while (true) {
-            if (this->m_IsShutdownRef)
+            while (this->m_CommandRef == ControllableAlgorithmCommand::Pause)
+                std::this_thread::yield();
+
+            if (this->m_CommandRef == ControllableAlgorithmCommand::Cancel)
                 return end + 1;
 
             while (*(++i) < *end)
@@ -187,7 +213,7 @@ namespace Lab03 {
         ControllableAlgorithm<Iterator>* innerSort
     )
         : ControllableAlgorithm<Iterator>(swap)
-        , IQuickSortAlgorithm<Iterator>(this->m_IsShutdown, innerSort) {}
+        , IQuickSortAlgorithm<Iterator>(this->m_Command, innerSort) {}
 
     template <typename Iterator>
     void QuickSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
@@ -213,7 +239,7 @@ namespace Lab03 {
         ControllableAlgorithm<Iterator>* innerSort
     )
         : ControllableParallelAlgorithm<Iterator, AsyncFunction>(swap, async)
-        , IQuickSortAlgorithm<Iterator>(this->m_IsShutdown, innerSort) {}
+        , IQuickSortAlgorithm<Iterator>(this->m_Command, innerSort) {}
 
     template <typename Iterator, typename AsyncFunction>
     void ParallelQuickSortAlgorithm<Iterator, AsyncFunction>::operator ()(Iterator begin, Iterator end) const {
@@ -237,8 +263,11 @@ namespace Lab03 {
     }
 
     template <typename Iterator>
-    IMergeSortAlgorithm<Iterator>::IMergeSortAlgorithm(bool& isShutdown, ControllableAlgorithm<Iterator>* innerSort)
-        : m_IsShutdownRef(isShutdown)
+    IMergeSortAlgorithm<Iterator>::IMergeSortAlgorithm(
+        ControllableAlgorithmCommand&    command,
+        ControllableAlgorithm<Iterator>* innerSort
+    )
+        : m_CommandRef(command)
         , m_InnerSort(innerSort) {}
         
     template <typename Iterator>
@@ -256,7 +285,10 @@ namespace Lab03 {
         auto j = middle;
 
         for (auto& k : temp) {
-            if (this->m_IsShutdownRef)
+            while (this->m_CommandRef == ControllableAlgorithmCommand::Pause)
+                std::this_thread::yield();
+
+            if (this->m_CommandRef == ControllableAlgorithmCommand::Cancel)
                 return;
 
             if ((*i < *j && i < middle) || j >= end)
@@ -275,7 +307,7 @@ namespace Lab03 {
         ControllableAlgorithm<Iterator>* innerSort
     )
         : ControllableAlgorithm<Iterator>(swap)
-        , IMergeSortAlgorithm<Iterator>(this->m_IsShutdown, innerSort) {}
+        , IMergeSortAlgorithm<Iterator>(this->m_Command, innerSort) {}
 
     template <typename Iterator>
     void MergeSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
@@ -299,7 +331,7 @@ namespace Lab03 {
         ControllableAlgorithm<Iterator>* innerSort
     )
         : ControllableAlgorithm<Iterator>(swap)
-        , IMergeSortAlgorithm<Iterator>(this->m_IsShutdown, innerSort) {}
+        , IMergeSortAlgorithm<Iterator>(this->m_Command, innerSort) {}
         
     template <typename Iterator>
     void BottomUpMergeSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
@@ -317,7 +349,7 @@ namespace Lab03 {
         ControllableAlgorithm<Iterator>* innerSort
     )
         : ControllableParallelAlgorithm<Iterator, AsyncFunction>(swap, async)
-        , IMergeSortAlgorithm<Iterator>(this->m_IsShutdown, innerSort) {}
+        , IMergeSortAlgorithm<Iterator>(this->m_Command, innerSort) {}
 
     template <typename Iterator, typename AsyncFunction>
     void ParallelMergeSortAlgorithm<Iterator, AsyncFunction>::operator ()(Iterator begin, Iterator end) const {

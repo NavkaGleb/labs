@@ -7,10 +7,11 @@
 
 namespace Lab03 {
 
-    enum class ApplicationState : uint8_t {
-        Init = 0,
-        Running,
-        Shutdown
+    enum class ControllableAlgorithmCommand : uint8_t {
+        None = 0,
+        Run,
+        Pause,
+        Cancel
     };
 
     template <RandomAccessIteratorConcept Iterator>
@@ -31,8 +32,15 @@ namespace Lab03 {
         virtual void operator ()(Iterator begin, Iterator end) const = 0;
 
     protected:
-        SwapFunction<Iterator> m_Swap;
-        bool                   m_IsShutdown;
+        [[nodiscard]] inline bool IsRun() const { return m_Command == ControllableAlgorithmCommand::Run; }
+        [[nodiscard]] inline bool IsPaused() const { return m_Command == ControllableAlgorithmCommand::Pause; }
+        [[nodiscard]] inline bool IsCanceled() const { return m_Command == ControllableAlgorithmCommand::Cancel; }
+
+        [[nodiscard]] bool UpdateState() const;
+
+    protected:
+        SwapFunction<Iterator>       m_Swap;
+        ControllableAlgorithmCommand m_Command;
 
     }; // class ControllableAlgorithm
 
@@ -119,14 +127,14 @@ namespace Lab03 {
     template <typename Iterator>
     class IQuickSortAlgorithm {
     public:
-        explicit IQuickSortAlgorithm(bool& isShutdown, ControllableAlgorithm<Iterator>* innerSort);
+        explicit IQuickSortAlgorithm(ControllableAlgorithmCommand& command, ControllableAlgorithm<Iterator>* innerSort);
         IQuickSortAlgorithm() = default;
 
     protected:
         [[nodiscard]] Iterator Partition(Iterator begin, Iterator end, const SwapFunction<Iterator>& swap) const;
 
     protected:
-        bool&                            m_IsShutdownRef;
+        ControllableAlgorithmCommand&    m_CommandRef;
         ControllableAlgorithm<Iterator>* m_InnerSort;
 
     }; //class IQuickSortAlgorithm
@@ -164,14 +172,14 @@ namespace Lab03 {
     template <typename Iterator>
     class IMergeSortAlgorithm {
     public:
-        explicit IMergeSortAlgorithm(bool& isShutdown, ControllableAlgorithm<Iterator>* innerSort);
+        explicit IMergeSortAlgorithm(ControllableAlgorithmCommand& command, ControllableAlgorithm<Iterator>* innerSort);
         virtual ~IMergeSortAlgorithm() = default;
 
     protected:
         void Merge(Iterator begin, Iterator middle, Iterator end, const SwapFunction<Iterator>& swap) const;
         
     protected:
-        bool&                            m_IsShutdownRef;
+        ControllableAlgorithmCommand&    m_CommandRef;
         ControllableAlgorithm<Iterator>* m_InnerSort;
 
     }; // IMergeSortAlgorithm

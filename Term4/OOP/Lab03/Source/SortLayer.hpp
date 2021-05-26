@@ -61,6 +61,7 @@ namespace Lab03 {
 
         void InitQuads(std::size_t count);
         void UpdateQuads(std::size_t count = 0);
+        void ResetQuads();
         void SwapQuads(Quad& lhs, Quad& rhs);
 
         template <typename Function, typename... Args>
@@ -94,7 +95,7 @@ namespace Lab03 {
         ParticleProps                  m_Particle;
         uint32_t                       m_GenParticleCount;
 
-        ApplicationState               m_ApplicationState;
+        ControllableAlgorithmCommand   m_AlgorithmCommand;
 
     }; // class SortLayer
 

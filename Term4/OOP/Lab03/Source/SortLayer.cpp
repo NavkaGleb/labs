@@ -39,30 +39,9 @@ namespace Lab03 {
         , m_AsyncTasks(1)
         , m_DelayTime(1)
         , m_GenParticleCount(5)
-        , m_ApplicationState(ApplicationState::Init) {}
+        , m_AlgorithmCommand(ControllableAlgorithmCommand::None) {}
 
     void SortLayer::OnAttach() {
-        std::vector<uint8_t> a(1000);
-
-        for (auto& e : a) {
-            e = Ziben::Random::Get<uint8_t>();
-            std::cout << +e << " ";
-        }
-
-        std::cout << std::endl;
-
-        std::cout << "-------------------" << std::endl;
-        for (const auto& j : a)
-            std::cout << +j << " ";
-        std::cout << std::endl;
-
-        Algorithm::ParallelMergeSort(a.begin(), a.end());
-
-        std::cout << "-------------------" << std::endl;
-        for (const auto& j : a)
-            std::cout << +j << " ";
-        std::cout << std::endl;
-
         // Init FrameBuffer
         Ziben::FrameBufferSpecification specification;
 
@@ -77,7 +56,7 @@ namespace Lab03 {
         m_FrameBuffer = Ziben::FrameBuffer::Create(std::move(specification));
 
         // Init ParticleSystem
-        m_ParticleSystem.SetMaxParticleCount(3'000);
+        m_ParticleSystem.SetMaxParticleCount(4'000);
 
         // Init Particle
         m_Particle.ColorBegin        = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
@@ -115,17 +94,14 @@ namespace Lab03 {
         // Init Quads
         InitQuads(50);
         UpdateQuads();
-
-        // Init ApplicationState
-        m_ApplicationState = ApplicationState::Running;
-
-        // Notify All Observers
-        NotifyObservers(reinterpret_cast<const void*>(&m_ApplicationState));
     }
 
     void SortLayer::OnDetach() {
         if (m_SortFuture.valid())
             m_SortFuture.wait();
+
+        for (auto& [type, algorithm] : m_ShuffleAlgorithms)
+            delete algorithm;
 
         for (auto& [type, algorithm] : m_SortAlgorithms)
             delete algorithm;
@@ -311,6 +287,35 @@ namespace Lab03 {
 
                 if (ImGui::Button("ParallelMergeSort", buttonSize))
                     Sort<SortType::ParallelMergeSort>();
+
+                ImGui::Separator();
+
+                if (m_IsRunning) {
+                    if (ImGui::Button("Reset", buttonSize)) {
+                        NotifyObservers(reinterpret_cast<const void*>(
+                            &(m_AlgorithmCommand = ControllableAlgorithmCommand::Cancel)
+                        ));
+
+                        m_SortFuture.wait();
+
+                        ResetQuads();
+
+                        NotifyObservers(reinterpret_cast<const void*>(
+                            &(m_AlgorithmCommand = ControllableAlgorithmCommand::Run)
+                        ));
+                    }
+
+                    const char* text    = "Pause";
+                    auto        command = ControllableAlgorithmCommand::Pause;
+
+                    if (m_AlgorithmCommand == ControllableAlgorithmCommand::Pause) {
+                        text    = "Resume";
+                        command = ControllableAlgorithmCommand::Run;
+                    }
+
+                    if (ImGui::Button(text, buttonSize))
+                        NotifyObservers(reinterpret_cast<const void*>(&(m_AlgorithmCommand = command)));
+                }
             }
             ImGui::End();
 
@@ -385,7 +390,7 @@ namespace Lab03 {
     }
 
     bool SortLayer::OnWindowClosed(Ziben::WindowClosedEvent& event) {
-        NotifyObservers(reinterpret_cast<const void*>(&(m_ApplicationState = ApplicationState::Shutdown)));
+        NotifyObservers(reinterpret_cast<const void*>(&(m_AlgorithmCommand = ControllableAlgorithmCommand::Cancel)));
 
         return true;
     }
@@ -448,6 +453,15 @@ namespace Lab03 {
             m_Quads[i].Position = { scaleX * static_cast<float>(i + 1) - m_Quads[i].Size.x / 2.0f, height - m_Quads[i].Size.y / 2.0f };
             m_Quads[i].Color    = glm::lerp(m_BeginColor, m_EndColor, m_Quads[i].Size.y / height);
         }
+    }
+
+    void SortLayer::ResetQuads() {
+        for (std::size_t i = 0; i < m_Quads.size(); ++i)
+            m_Quads[i].Index = i;
+
+        UpdateQuads();
+
+        m_IsRunning = false;
     }
 
     void SortLayer::SwapQuads(Quad& lhs, Quad& rhs) {
