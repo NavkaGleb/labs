@@ -26,6 +26,7 @@ namespace Lab03 {
     SortLayer::SortLayer()
         : Ziben::Layer("SortLayer")
         , m_ViewportSize(0)
+        , m_ViewportBounds({ glm::vec2(0.0f), glm::vec2(0.0f) })
         , m_Camera(
             0,
             static_cast<float>(Application::Get().GetWindow().GetWidth()),
@@ -132,6 +133,21 @@ namespace Lab03 {
             UpdateQuads();
         }
 
+        // ParticleSystem Random Update
+        if (m_IsSorted) {
+            auto positionX = Ziben::Random::GetFromRange(m_ViewportBounds[0].x, m_ViewportBounds[1].x);
+            auto positionY = Ziben::Random::GetFromRange(m_ViewportBounds[0].y, m_ViewportBounds[1].y);
+
+            auto randomProps = m_Particle;
+
+            randomProps.Position  = { positionX, positionY };
+            randomProps.LifeTime  = Ziben::Random::GetFromRange(0.5f, 1.5f);
+            randomProps.SizeBegin = Ziben::Random::GetFromRange(15.0f, 20.f);
+
+            if (Ziben::Random::Get<bool>(0.2f))
+                m_ParticleSystem.Push(randomProps);
+        }
+
         m_ParticleSystem.OnUpdate(ts);
     }
 
@@ -230,13 +246,20 @@ namespace Lab03 {
                     ImVec2(1, 0)
                 );
 
-                // ParticleSystem Update
+                auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+                auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+                auto viewportOffset    = ImGui::GetWindowPos();
+
+                if (m_ViewportBounds[0] != *reinterpret_cast<glm::vec2*>(&viewportMinRegion))
+                    m_ViewportBounds[0] = *reinterpret_cast<glm::vec2*>(&viewportMinRegion);
+
+                if (m_ViewportBounds[1] != *reinterpret_cast<glm::vec2*>(&viewportMaxRegion))
+                    m_ViewportBounds[1] = *reinterpret_cast<glm::vec2*>(&viewportMaxRegion);
+
+                ImVec2 windowPosition  = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+
+                // ParticleSystem User Update
                 if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-                    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-                    auto viewportOffset    = ImGui::GetWindowPos();
-
-                    ImVec2 windowPosition  = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-
                     auto positionX = ImGui::GetMousePos().x - windowPosition.x;
                     auto positionY = ImGui::GetMousePos().y - windowPosition.y;
 
@@ -352,6 +375,9 @@ namespace Lab03 {
                 ImGui::DragFloat2("VelocityVariation", glm::value_ptr(m_Particle.VelocityVariation), 0.1f, 0.0f, 100.0f);
 
                 ImGui::DragInt("GenParticleCount", reinterpret_cast<int*>(&m_GenParticleCount), 0.1f, 1, 20);
+
+                if (ImGui::Button("Bloom!", { ImGui::GetContentRegionAvailWidth(), 0.0f }))
+                    BloomParticle();
             }
             ImGui::End();
 
@@ -468,6 +494,30 @@ namespace Lab03 {
         std::swap(lhs.Index, rhs.Index);
         UpdateQuads();
         Internal::Sleep(m_DelayTime);
+    }
+
+    void SortLayer::BloomParticle() {
+        auto positionX   = Ziben::Random::GetFromRange(m_ViewportBounds[0].x, m_ViewportBounds[1].x);
+        auto positionY   = Ziben::Random::GetFromRange(m_ViewportBounds[0].y, m_ViewportBounds[1].y);
+
+        auto randomProps = m_Particle;
+
+        for (int i = 0, count = Ziben::Random::GetFromRange(40, 120); i < count; ++i) {
+            randomProps.Position = {
+                Ziben::Random::GetFromRange(positionX - 10.0f, positionX + 10.0f),
+                Ziben::Random::GetFromRange(positionY - 10.0f, positionY + 10.0f)
+            };
+
+            randomProps.VelocityVariation = {
+                Ziben::Random::GetFromRange(20.0f, 50.0f),
+                Ziben::Random::GetFromRange(20.0f, 50.0f)
+            };
+
+            randomProps.SizeBegin = Ziben::Random::GetFromRange(20.0f, 40.f);
+            randomProps.LifeTime  = Ziben::Random::GetFromRange(0.5f, 1.5f);
+
+            m_ParticleSystem.Push(randomProps);
+        }
     }
 
 } // namespace Lab03

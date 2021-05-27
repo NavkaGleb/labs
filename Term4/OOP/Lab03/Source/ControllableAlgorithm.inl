@@ -251,6 +251,9 @@ namespace Lab03 {
 
         auto partition = this->Partition(begin, end - 1, this->m_Swap);
 
+        if (partition == end)
+            return;
+
         if (end - begin >= 20) {
             auto left = this->m_Async([&] { return (*this)(begin, partition); });
             (*this)(partition + 1, end);

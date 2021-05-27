@@ -73,10 +73,13 @@ namespace Lab03 {
         template <SortType SortType>
         void Sort();
 
+        void BloomParticle();
+
     private:
         Ziben::OrthographicCamera      m_Camera;
         Ziben::Ref<Ziben::FrameBuffer> m_FrameBuffer;
         glm::vec<2, uint32_t>          m_ViewportSize;
+        std::array<glm::vec2, 2>       m_ViewportBounds;
 
         ShuffleAlgorithmContainer      m_ShuffleAlgorithms;
         SortAlgorithmContainer         m_SortAlgorithms;
