@@ -43,6 +43,8 @@ namespace Lab03 {
         , m_AlgorithmCommand(ControllableAlgorithmCommand::None) {}
 
     void SortLayer::OnAttach() {
+        ZIBEN_PROFILE_FUNCTION();
+
         // Init FrameBuffer
         Ziben::FrameBufferSpecification specification;
 
@@ -57,7 +59,7 @@ namespace Lab03 {
         m_FrameBuffer = Ziben::FrameBuffer::Create(std::move(specification));
 
         // Init ParticleSystem
-        m_ParticleSystem.SetMaxParticleCount(4'000);
+        m_ParticleSystem.SetMaxParticleCount(40'000);
 
         // Init Particle
         m_Particle.ColorBegin        = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
@@ -93,7 +95,7 @@ namespace Lab03 {
             RegisterObserver(algorithm);
 
         // Init Quads
-        InitQuads(50);
+        InitQuads(2000);
         UpdateQuads();
     }
 
@@ -116,6 +118,8 @@ namespace Lab03 {
     }
 
     void SortLayer::OnUpdate(const Ziben::TimeStep& ts) {
+        ZIBEN_PROFILE_FUNCTION();
+
         // Resize
         if (auto specification = m_FrameBuffer->GetSpecification();
             m_ViewportSize.x > 0 &&
@@ -134,7 +138,7 @@ namespace Lab03 {
         }
 
         // ParticleSystem Random Update
-        if (m_IsSorted) {
+        if (m_IsSorted && Ziben::Random::Get<bool>(0.2f)) {
             auto positionX = Ziben::Random::GetFromRange(m_ViewportBounds[0].x, m_ViewportBounds[1].x);
             auto positionY = Ziben::Random::GetFromRange(m_ViewportBounds[0].y, m_ViewportBounds[1].y);
 
@@ -144,14 +148,15 @@ namespace Lab03 {
             randomProps.LifeTime  = Ziben::Random::GetFromRange(0.5f, 1.5f);
             randomProps.SizeBegin = Ziben::Random::GetFromRange(15.0f, 20.f);
 
-            if (Ziben::Random::Get<bool>(0.2f))
-                m_ParticleSystem.Push(randomProps);
+            m_ParticleSystem.Push(randomProps);
         }
 
         m_ParticleSystem.OnUpdate(ts);
     }
 
     void SortLayer::OnRender() {
+        ZIBEN_PROFILE_FUNCTION();
+
         Ziben::Renderer2D::ResetStatistics();
 
         Ziben::FrameBuffer::Bind(m_FrameBuffer);
@@ -161,8 +166,11 @@ namespace Lab03 {
 
             Ziben::Renderer2D::BeginScene(m_Camera);
             {
-                for (const auto& quad : m_Quads)
+                for (const auto& quad : m_Quads) {
+                    ZIBEN_PROFILE_SCOPE("RectRender!");
+
                     Ziben::Renderer2D::DrawQuad(quad.Position, quad.Size, quad.Color);
+                }
             }
             Ziben::Renderer2D::EndScene();
 
@@ -173,6 +181,8 @@ namespace Lab03 {
     }
 
     void SortLayer::OnImGuiRender() {
+        ZIBEN_PROFILE_FUNCTION();
+
         static bool               dockspaceOpen   = true;
         static bool               fullscreen      = true;
         static bool               padding         = false;
@@ -274,6 +284,8 @@ namespace Lab03 {
 
             ImGui::Begin("Sorting");
             {
+                ZIBEN_PROFILE_SCOPE("SortLayer::OnImGuiRender::Sorting");
+
                 ImVec2 buttonSize = { ImGui::GetContentRegionAvailWidth(), 0.0f };
 
                 if (ImGui::Button("RandomShuffle", buttonSize))
@@ -344,6 +356,8 @@ namespace Lab03 {
 
             ImGui::Begin("SortProps");
             {
+                ZIBEN_PROFILE_SCOPE("SortLayer::OnImGuiRender::SortProps");
+
                 ImGui::Text("AsyncTasks: %d", (uint32_t)m_AsyncTasks);
                 ImGui::Text("IsRunning: %d", (bool)m_IsRunning);
                 ImGui::Text("IsSorted: %s", m_IsSorted ? "True" : "False");
@@ -367,14 +381,16 @@ namespace Lab03 {
 
             ImGui::Begin("ParticleProps");
             {
+                ZIBEN_PROFILE_SCOPE("SortLayer::OnImGuiRender::ParticleProps");
+
                 ImGui::ColorEdit4("ColorBegin", glm::value_ptr(m_Particle.ColorBegin));
                 ImGui::ColorEdit4("ColorEnd", glm::value_ptr(m_Particle.ColorEnd));
 
                 ImGui::DragFloat("SizeBegin", &m_Particle.SizeBegin, 0.2f, 1.0f, 100.0f);
-                ImGui::DragFloat("LifeTime", &m_Particle.LifeTime, 0.2f, 0.1f, 6.0f);
+                ImGui::DragFloat("LifeTime", &m_Particle.LifeTime, 0.2f, 0.1f, 20.0f);
                 ImGui::DragFloat2("VelocityVariation", glm::value_ptr(m_Particle.VelocityVariation), 0.1f, 0.0f, 100.0f);
 
-                ImGui::DragInt("GenParticleCount", reinterpret_cast<int*>(&m_GenParticleCount), 0.1f, 1, 20);
+                ImGui::DragInt("GenParticleCount", reinterpret_cast<int*>(&m_GenParticleCount), 0.1f, 1, 50);
 
                 if (ImGui::Button("Bloom!", { ImGui::GetContentRegionAvailWidth(), 0.0f }))
                     BloomParticle();
@@ -383,6 +399,8 @@ namespace Lab03 {
 
             ImGui::Begin("Stats");
             {
+                ZIBEN_PROFILE_SCOPE("SortLayer::OnImGuiRender::Stats");
+
                 const auto& statistics = Ziben::Renderer2D::GetStatistics();
 
                 ImGui::Text("Renderer2D Statistics");
@@ -465,6 +483,8 @@ namespace Lab03 {
     }
 
     void SortLayer::UpdateQuads(std::size_t count) {
+        ZIBEN_PROFILE_FUNCTION();
+
         if (count != m_Quads.size() && count != 0)
            InitQuads(count);
 
@@ -488,9 +508,12 @@ namespace Lab03 {
         UpdateQuads();
 
         m_IsRunning = false;
+        m_IsSorted  = true;
     }
 
     void SortLayer::SwapQuads(Quad& lhs, Quad& rhs) {
+        ZIBEN_PROFILE_FUNCTION();
+
         std::swap(lhs.Index, rhs.Index);
         UpdateQuads();
         Internal::Sleep(m_DelayTime);
@@ -502,7 +525,7 @@ namespace Lab03 {
 
         auto randomProps = m_Particle;
 
-        for (int i = 0, count = Ziben::Random::GetFromRange(40, 120); i < count; ++i) {
+        for (int i = 0, count = Ziben::Random::GetFromRange(60, 120); i < count; ++i) {
             randomProps.Position = {
                 Ziben::Random::GetFromRange(positionX - 10.0f, positionX + 10.0f),
                 Ziben::Random::GetFromRange(positionY - 10.0f, positionY + 10.0f)

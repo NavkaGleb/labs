@@ -19,6 +19,8 @@ namespace Lab03 {
     }
 
     void ParticleSystem::OnUpdate(const Ziben::TimeStep& ts) {
+        ZIBEN_PROFILE_FUNCTION();
+
         for (auto& particle : m_ParticlePool) {
             if (!particle.Active)
                 continue;
@@ -35,6 +37,8 @@ namespace Lab03 {
     }
 
     void ParticleSystem::OnRender(const Ziben::OrthographicCamera& camera) {
+        ZIBEN_PROFILE_FUNCTION();
+
         Ziben::Renderer2D::BeginScene(camera);
         {
             for (const auto& particle : m_ParticlePool) {
@@ -78,7 +82,8 @@ namespace Lab03 {
         particle.SizeBegin     = props.SizeBegin + props.SizeVariation * Ziben::Random::GetFromRange(-1.0f, 1.0f);
         particle.SizeEnd       = props.SizeEnd;
 
-        m_PoolIndex            = --m_PoolIndex % m_ParticlePool.size();
+        if (--m_PoolIndex >= m_ParticlePool.size())
+            m_PoolIndex = m_ParticlePool.size() - 1;
     }
 
 } // namespace Lab03
