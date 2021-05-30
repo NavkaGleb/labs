@@ -59,7 +59,7 @@ namespace Lab03 {
         m_FrameBuffer = Ziben::FrameBuffer::Create(std::move(specification));
 
         // Init ParticleSystem
-        m_ParticleSystem.SetMaxParticleCount(40'000);
+        m_ParticleSystem.SetMaxParticleCount(100'000);
 
         // Init Particle
         m_Particle.ColorBegin        = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };

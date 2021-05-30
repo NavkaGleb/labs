@@ -3,6 +3,7 @@ project(Lab03)
 
 set(CMAKE_CXX_STANDARD 20)
 
+#set(ZIBEN_ENABLE_PROFILING TRUE)
 add_subdirectory(External/Ziben)
 add_subdirectory(External/doctest)
 
