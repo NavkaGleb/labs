@@ -7,6 +7,9 @@
 
 namespace Lab03 {
 
+    ///
+    /// @brief Enum to control ControllableAlgorithm
+    ///
     enum class ControllableAlgorithmCommand : uint8_t {
         None = 0,
         Run,
@@ -19,6 +22,7 @@ namespace Lab03 {
         typename std::iterator_traits<Iterator>::value_type&, typename std::iterator_traits<Iterator>::value_type&
     )>;
 
+    ///
     template <RandomAccessIteratorConcept Iterator>
     class ControllableAlgorithm : public IObserver {
     public:

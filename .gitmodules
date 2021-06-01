@@ -61,3 +61,6 @@
 [submodule "Term4/OOP/Lab03/External/Ziben"]
 	path = Term4/OOP/Lab03/External/Ziben
 	url = https://github.com/NavkaGleb/Ziben
+[submodule "Term4/OOP/Lab03/External/benchmark"]
+	path = Term4/OOP/Lab03/External/benchmark
+	url = https://github.com/google/benchmark

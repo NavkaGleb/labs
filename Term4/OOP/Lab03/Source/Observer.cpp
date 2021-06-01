@@ -18,9 +18,9 @@ namespace Lab03 {
         delete observer;
     }
 
-    void Subject::NotifyObservers(const void* eventData) {
+    void Subject::NotifyObservers(const void* data) {
         for (auto& observer : m_Observers)
-            observer->OnNotify(eventData);
+            observer->OnNotify(data);
     }
 
 } // namespace Lab03

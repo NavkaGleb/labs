@@ -24,7 +24,28 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::BubbleSort(T begin, T end, Comparator comparator) {
+    T Algorithm::MedianOf3(T begin, T middle, T end, const Comparator& comparator) {
+        if (comparator(*begin, *middle)) {
+            if (comparator(*middle, *end))
+                return middle;
+
+            if (comparator(*begin, *end))
+                return end;
+
+            return begin;
+        }
+
+        if (comparator(*begin, *end))
+            return begin;
+
+        if (comparator(*middle, *end))
+            return end;
+
+        return middle;
+    }
+
+    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::BubbleSort(T begin, T end, const Comparator& comparator) {
         bool isSwapped;
 
         for (auto i = begin; i != end - 1; ++i) {
@@ -43,7 +64,7 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::SelectionSort(T begin, T end, Comparator comparator) {
+    void Algorithm::SelectionSort(T begin, T end, const Comparator& comparator) {
         for (auto i = begin, min = T(); i != end - 1; ++i) {
             min = i;
 
@@ -56,14 +77,14 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::InsertionSort(T begin, T end, Comparator comparator) {
+    void Algorithm::InsertionSort(T begin, T end, const Comparator& comparator) {
         for (auto i = begin + 1; i != end; ++i)
             for (auto j = i; j != begin && comparator(*j, *(j - 1)); --j)
                 std::swap(*j, *(j - 1));
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::ShellSort(T begin, T end, Comparator comparator) {
+    void Algorithm::ShellSort(T begin, T end, const Comparator& comparator) {
         typename std::iterator_traits<T>::difference_type h = 1;
 
         while (h < (end - begin) / 3)
@@ -78,12 +99,12 @@ namespace Lab03 {
         }
     }
 
-    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::QuickSort(T begin, T end, Comparator comparator) {
-        if (begin >= end)
+    template <uint32_t InsertionSortCutoff, RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::QuickSort(T begin, T end, const Comparator& comparator) {
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= InsertionSortCutoff)
             return InsertionSort(begin, end, comparator);
 
         auto partition = Partition(begin, end - 1, comparator);
@@ -92,17 +113,26 @@ namespace Lab03 {
         QuickSort(partition + 1, end,       comparator);
     }
 
-    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::ParallelQuickSort(T begin, T end, Comparator comparator) {
-        if (begin >= end)
+    template <
+        uint32_t                    InsertionSortCutoff,
+        uint32_t                    AsyncCutoff,
+        RandomAccessIteratorConcept T,
+        ComparatorConcept<T>        Comparator
+    >
+    void Algorithm::ParallelQuickSort(
+        T                 begin,
+        T                 end,
+        const Comparator& comparator
+    ) {
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= InsertionSortCutoff)
             return InsertionSort(begin, end, comparator);
 
         auto partition = Partition(begin, end - 1, comparator);
 
-        if (end - begin >= 20) {
+        if (std::distance(begin, end) >= AsyncCutoff) {
             auto left = std::async(std::launch::async, [&] { return ParallelQuickSort(begin, partition, comparator); });
             ParallelQuickSort(partition + 1, end, comparator);
             left.wait();
@@ -112,12 +142,12 @@ namespace Lab03 {
         }
     }
 
-    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::MergeSort(T begin, T end, Comparator comparator) {
-        if (begin >= end)
+    template <uint32_t InsertionSortCutoff, RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
+    void Algorithm::MergeSort(T begin, T end, const Comparator& comparator) {
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= 5)
             return InsertionSort(begin, end, comparator);
 
         auto middle = begin + std::distance(begin, end) / 2;
@@ -129,7 +159,7 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::BottomUpMergeSort(T begin, T end, Comparator comparator) {
+    void Algorithm::BottomUpMergeSort(T begin, T end, const Comparator& comparator) {
         using DifferenceType = typename std::iterator_traits<T>::difference_type;
 
         for (DifferenceType size = 1; size < end - begin; size += size)
@@ -137,17 +167,22 @@ namespace Lab03 {
                 Merge(left, left + size, std::min(left + size + size, end), comparator);
     }
 
-    template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::ParallelMergeSort(T begin, T end, Comparator comparator) {
-        if (begin >= end)
+    template <
+        uint32_t                    InsertionSortCutoff,
+        uint32_t                    AsyncCutoff,
+        RandomAccessIteratorConcept T,
+        ComparatorConcept<T>        Comparator
+    >
+    void Algorithm::ParallelMergeSort(T begin, T end, const Comparator& comparator) {
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= InsertionSortCutoff)
             return InsertionSort(begin, end, comparator);
 
         auto middle = begin + std::distance(begin, end) / 2;
 
-        if (end - begin >= 20) {
+        if (std::distance(begin, end) >= AsyncCutoff) {
             auto left = std::async(std::launch::async, [&] { return ParallelMergeSort(begin, middle, comparator); });
             ParallelMergeSort(middle, end, comparator);
             left.wait();
@@ -160,7 +195,9 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    T Algorithm::Partition(T begin, T end, Comparator comparator) {
+    T Algorithm::Partition(T begin, T end, const Comparator& comparator) {
+        std::swap(*end, *MedianOf3(begin, begin + std::distance(begin, end) / 2, end, comparator));
+
         auto i = begin - 1;
         auto j = end;
 
@@ -185,7 +222,7 @@ namespace Lab03 {
     }
 
     template <RandomAccessIteratorConcept T, ComparatorConcept<T> Comparator>
-    void Algorithm::Merge(T begin, T middle, T end, Comparator comparator) {
+    void Algorithm::Merge(T begin, T middle, T end, const Comparator& comparator) {
         std::vector<typename std::iterator_traits<T>::value_type> temp(std::distance(begin, end));
 
         auto i = begin;
