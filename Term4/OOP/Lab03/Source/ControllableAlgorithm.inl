@@ -178,6 +178,8 @@ namespace Lab03 {
         Iterator                      end,
         const SwapFunction<Iterator>& swap
     ) const {
+        swap(*end, *Algorithm::MedianOf3(begin, begin + std::distance(begin, end) / 2, end, std::less<>()));
+
         auto i = begin - 1;
         auto j = end;
 
@@ -217,10 +219,10 @@ namespace Lab03 {
 
     template <typename Iterator>
     void QuickSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
-        if (begin >= end)
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= 5)
             return (*this->m_InnerSort)(begin, end);
 
         auto partition = this->Partition(begin, end - 1, this->m_Swap);
@@ -243,10 +245,10 @@ namespace Lab03 {
 
     template <typename Iterator, typename AsyncFunction>
     void ParallelQuickSortAlgorithm<Iterator, AsyncFunction>::operator ()(Iterator begin, Iterator end) const {
-        if (begin >= end)
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= 5)
             return (*this->m_InnerSort)(begin, end);
 
         auto partition = this->Partition(begin, end - 1, this->m_Swap);
@@ -254,7 +256,7 @@ namespace Lab03 {
         if (partition == end)
             return;
 
-        if (end - begin >= 20) {
+        if (std::distance(begin, end) >= 20) {
             auto left = this->m_Async([&] { return (*this)(begin, partition); });
             (*this)(partition + 1, end);
 
@@ -314,10 +316,10 @@ namespace Lab03 {
 
     template <typename Iterator>
     void MergeSortAlgorithm<Iterator>::operator ()(Iterator begin, Iterator end) const {
-        if (begin >= end)
+        if (begin + 1 >= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= 5)
             return (*this->m_InnerSort)(begin, end);
 
         auto middle = begin + std::distance(begin, end) / 2;
@@ -356,15 +358,15 @@ namespace Lab03 {
 
     template <typename Iterator, typename AsyncFunction>
     void ParallelMergeSortAlgorithm<Iterator, AsyncFunction>::operator ()(Iterator begin, Iterator end) const {
-        if (begin >= end)
+        if (begin + 1>= end)
             return;
 
-        if (auto distance = std::distance(begin, end); distance <= 5 && distance >= 2)
+        if (auto distance = std::distance(begin, end); distance <= 5)
             return (*this->m_InnerSort)(begin, end);
 
         auto middle = begin + std::distance(begin, end) / 2;
 
-        if (end - begin >= 20) {
+        if (std::distance(begin, end) >= 20) {
             auto left = this->m_Async([&] { return (*this)(begin, middle); });
             (*this)(middle, end);
 
