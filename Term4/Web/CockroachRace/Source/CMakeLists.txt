@@ -1,0 +1,6 @@
+set(TARGET CockroachRace)
+
+file(GLOB HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
+file(GLOB SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+add_executable(${TARGET} ${HEADER_FILES} ${SOURCE_FILES})

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url("background.png");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .line {
+            /*background: rgba(144, 32, 144, 0.2);*/
+            vertical-align: center;
+            height: 14%;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            width: 120px;
+            background-image: url("cockroach.png");
+            background-repeat: no-repeat;
+            /*background-attachment: fixed;*/
+            background-size: 100% 100%;
+        }
+
+        .winner {
+            position: absolute;
+            width: 100%;
+            font-weight: bold;
+            bottom: 30px;
+            font-size: 25px;
+            color: white;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    let distances = [];
+
+    function init(json) {
+        for (let i = 0; i < json["ids"].length; ++i) {
+            let span = document.createElement("span");
+
+            let distance = window.innerWidth * 0.80;
+
+            span.innerText = json["cockroaches"][i]["name"];
+            span.style.top = (13.2 * i).toString() + "%";
+
+            span.className = "line";
+
+            distances[i] = parseFloat(json["steps"][0]["distances"][i]["distance"]);
+
+
+            // marquee.appendChild(img);
+            document.body.appendChild(span);
+        }
+    }
+
+    function update(json) {
+        for (let i = 1; i < json["stepCount"] + 1; ++i) {
+            setTimeout(() => {
+                if (i === json["stepCount"]) {
+                    let spans = document.getElementsByClassName("line");
+
+                    // for (let j = 0; j < marques.length; ++j)
+                    //     marques[j].stop();
+
+                    let max = distances[0];
+
+                    for (let i = 0; i < distances.length; ++i)
+                        max = Math.max(max, distances[i]);
+
+                    let span = document.createElement("span");
+                    span.className = "winner";
+
+                    span.innerHTML = "Winner" + "<br>";
+
+                    for (let i = 0; i < distances.length; ++i) {
+                        if (distances[i] === max) {
+                            span.innerHTML += json["cockroaches"][i]["name"] + "<br>";
+                        }
+                    }
+
+                    document.body.appendChild(span);
+
+                    return;
+                }
+
+                for (let j = 0; j < json["ids"].length; ++j) {
+                    let span = document.getElementsByClassName("line")[j];
+                    let stepDistance = (window.innerWidth * 0.81 - 120) / json["stepCount"];
+
+                    distances[j] += parseFloat(json["steps"][i]["distances"][j]["distance"]);
+
+                    let perc = distances[j] / (i + 1);
+                    let a = perc * (i + 1) * stepDistance;
+
+                    span.style.left = a.toString() + "px";
+                }
+            }, 5000 / json["stepCount"] * (i + 1));
+        }
+    }
+
+    window.addEventListener("load", () => {
+        let json;
+
+        let url      = window.location.href;
+        let filepath = url.substring(0, url.lastIndexOf("/") + 1) + "race.json";
+
+        let request = new XMLHttpRequest;
+        request.open('GET', filepath, true);
+        request.responseType = 'blob';
+
+        request.onload = () => {
+            let reader = new FileReader;
+
+            reader.readAsText(request.response);
+            reader.onload = () => {
+                json = reader.result;
+
+                json = JSON.parse(json)["race"];
+
+                init(json);
+                update(json);
+            };
+        }
+
+        request.send();
+    });
+</script>
+</body>
+</html>
