@@ -365,10 +365,10 @@ namespace Lab03 {
 
                 ImGui::DragInt("Delay Time", reinterpret_cast<int*>(&m_DelayTime), 0.3f, 1, 1000);
 
-                if (ImGui::ColorEdit4("BeginColor", glm::value_ptr(m_BeginColor)))
+                if (ImGui::ColorEdit4("ColorBegin", glm::value_ptr(m_BeginColor)))
                     UpdateQuads();
 
-                if (ImGui::ColorEdit4("EndColor", glm::value_ptr(m_EndColor)))
+                if (ImGui::ColorEdit4("ColorEnd", glm::value_ptr(m_EndColor)))
                     UpdateQuads();
 
                 if (std::size_t quadCount = m_Quads.size();

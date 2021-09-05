@@ -49,7 +49,7 @@ namespace Lab03 {
     private:
         using ControllableAlgorithm      = ControllableAlgorithm<QuadIterator>;
 
-        using ShuffleAlgorithmContainer = std::unordered_map<ShuffleType, ControllableAlgorithm*>;
+        using ShuffleAlgorithmContainer  = std::unordered_map<ShuffleType, ControllableAlgorithm*>;
         using SortAlgorithmContainer     = std::unordered_map<SortType, ControllableAlgorithm*>;
 
     private:
