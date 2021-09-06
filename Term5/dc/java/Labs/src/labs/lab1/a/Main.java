@@ -1,5 +1,10 @@
 package labs.lab1.a;
 
+import labs.lab1.Button;
+import labs.lab1.Slider;
+import labs.lab1.Label;
+import labs.lab1.Window;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,7 +28,7 @@ class ThreadComponent {
         this.priorityLabel.setFont(new Font("Arial", Font.PLAIN, 20));
 
         this.decreasePriorityButton.addActionListener(event -> {
-            if (this.threadPriority > 1) {
+            if (this.threadPriority > Thread.MIN_PRIORITY) {
                 --threadPriority;
 
                 this.thread.setPriority(this.threadPriority);
@@ -32,7 +37,7 @@ class ThreadComponent {
         });
 
         this.increasePriorityButton.addActionListener(event -> {
-            if (this.threadPriority < 10) {
+            if (this.threadPriority < Thread.MAX_PRIORITY) {
                 ++threadPriority;
 
                 this.thread.setPriority(this.threadPriority);
@@ -49,8 +54,10 @@ class ThreadComponent {
     }
 
     public void stopThread() {
-        this.thread.interrupt();
-        this.thread = null;
+        if (this.thread != null) {
+            this.thread.interrupt();
+            this.thread = null;
+        }
     }
 }
 
@@ -66,10 +73,23 @@ public class Main {
     private final ThreadComponent leftThreadComponent;
     private final ThreadComponent rightThreadComponent;
 
+    enum Direction {
+        LEFT,
+        RIGHT;
+
+        public int toInt() {
+            return switch (this) {
+                case LEFT -> -1;
+                case RIGHT -> 1;
+            };
+        }
+    }
+
     private Main() {
         this.window = new Window(800, 500, "MainWindow");
 
         this.slider = new Slider();
+        this.slider.setEnabled(false);
 
         this.startButton = new Button("Start");
         this.stopButton = new Button("Stop");
@@ -78,33 +98,70 @@ public class Main {
         this.leftThreadComponent = new ThreadComponent();
         this.rightThreadComponent = new ThreadComponent();
 
-        setComponents();
+        this.disableButtons();
+
+        this.setComponents();
 
         this.startButton.addActionListener(event -> {
-            this.leftThreadComponent.startThread(() -> this.runThread(-1));
-            this.rightThreadComponent.startThread(() -> this.runThread(1));
+            this.leftThreadComponent.startThread(() -> this.runThread(Direction.LEFT));
+            this.rightThreadComponent.startThread(() -> this.runThread(Direction.RIGHT));
+
+            this.enableButtons();
         });
 
         this.stopButton.addActionListener(event -> {
             this.leftThreadComponent.stopThread();
             this.rightThreadComponent.stopThread();
+
+            this.disableButtons();
         });
     }
 
-    private void runThread(int step) {
+    private void runThread(Direction direction) {
         while (!Thread.interrupted()) {
             synchronized (this) {
-                this.slider.increment(step);
+                int currentValue = this.slider.getValue();
+
+                switch (direction) {
+                    case LEFT: {
+                        this.slider.setValue(currentValue <= 10 ? 10 : currentValue + direction.toInt());
+                    }
+
+                    case RIGHT: {
+                        this.slider.setValue(currentValue >= 90 ? 90 : currentValue + direction.toInt());
+                    }
+                }
+
                 this.valueLabel.setText(String.valueOf(this.slider.getValue()));
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(3);
             } catch (InterruptedException e) {
 //                e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private void enableButtons() {
+        this.startButton.setEnabled(false);
+        this.stopButton.setEnabled(true);
+
+        this.leftThreadComponent.decreasePriorityButton.setEnabled(true);
+        this.leftThreadComponent.increasePriorityButton.setEnabled(true);
+        this.rightThreadComponent.decreasePriorityButton.setEnabled(true);
+        this.rightThreadComponent.increasePriorityButton.setEnabled(true);
+    }
+
+    private void disableButtons() {
+        this.startButton.setEnabled(true);
+        this.stopButton.setEnabled(false);
+
+        this.leftThreadComponent.decreasePriorityButton.setEnabled(false);
+        this.leftThreadComponent.increasePriorityButton.setEnabled(false);
+        this.rightThreadComponent.decreasePriorityButton.setEnabled(false);
+        this.rightThreadComponent.increasePriorityButton.setEnabled(false);
     }
 
     private void setComponents() {
@@ -116,8 +173,8 @@ public class Main {
         mainPanel.setLayout(new GridLayout(6, 1, 4, 4));
 
         threadTitlePanel.setLayout(new GridLayout(1, 2, 4, 4));
-        threadTitlePanel.add(new Label("LeftThread", SwingConstants.CENTER));
-        threadTitlePanel.add(new Label("RightThread", SwingConstants.CENTER));
+        threadTitlePanel.add(new labs.lab1.Label("LeftThread", SwingConstants.CENTER));
+        threadTitlePanel.add(new labs.lab1.Label("RightThread", SwingConstants.CENTER));
 
         threadControlPanel.setLayout(new GridLayout(1, 6, 4, 4));
         threadControlPanel.add(this.leftThreadComponent.decreasePriorityButton);
@@ -128,7 +185,7 @@ public class Main {
         threadControlPanel.add(this.rightThreadComponent.increasePriorityButton);
 
         sliderValuePanel.setLayout(new GridLayout(1, 3, 4, 4));
-        sliderValuePanel.add(new Label("0", SwingConstants.CENTER));
+        sliderValuePanel.add(new labs.lab1.Label("0", SwingConstants.CENTER));
         sliderValuePanel.add(this.valueLabel);
         sliderValuePanel.add(new Label("100", SwingConstants.CENTER));
 

@@ -1,14 +1,14 @@
-package labs.lab1.a;
+package labs.lab1;
 
 import javax.swing.*;
 import java.awt.*;
 
-class Button extends JButton {
+public class Button extends JButton {
 
     private Color hoverBackgroundColor = new Color(194, 194, 194);
     private Color pressedBackgroundColor = new Color(166, 166, 166);
 
-    Button(String title) {
+    public Button(String title) {
         super(title);
 
         super.setBackground(new Color(210, 210, 210));
@@ -18,7 +18,7 @@ class Button extends JButton {
         super.setFont(new Font("Arial", Font.PLAIN, 18));
     }
 
-    Button(String title, int fontSize) {
+    public Button(String title, int fontSize) {
         super(title);
 
         super.setBackground(new Color(210, 210, 210));

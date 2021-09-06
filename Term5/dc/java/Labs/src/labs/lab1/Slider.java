@@ -1,4 +1,4 @@
-package labs.lab1.a;
+package labs.lab1;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -7,12 +7,8 @@ import java.awt.geom.RoundRectangle2D;
 
 public class Slider extends JSlider {
 
-    Slider() {
+    public Slider() {
         super.setUI(new CustomSliderUI(this));
-    }
-
-    public synchronized void increment(int step) {
-        super.setValue(super.getValue() + step);
     }
 
     private static class CustomSliderUI extends BasicSliderUI {

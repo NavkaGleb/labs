@@ -1,10 +1,10 @@
-package labs.lab1.a;
+package labs.lab1;
 
 import javax.swing.*;
 
-class Window extends JFrame {
+public class Window extends JFrame {
 
-    Window(int width, int height, String title) {
+    public Window(int width, int height, String title) {
         super(title);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
