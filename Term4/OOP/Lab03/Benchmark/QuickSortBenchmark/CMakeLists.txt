@@ -1,4 +1,4 @@
-set(TARGET Lab03_QuickSortBenchmark)
+set(TARGET SortAlgorithms_QuickSortBenchmark)
 
 file(GLOB SOURCE_FILES ./*.cpp)
 

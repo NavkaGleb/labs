@@ -1,4 +1,4 @@
-set(TARGET Lab03)
+set(TARGET SortAlgorithms)
 
 file(GLOB HEADER_FILES ./*.hpp)
 file(GLOB SOURCE_FILES ./*.cpp)

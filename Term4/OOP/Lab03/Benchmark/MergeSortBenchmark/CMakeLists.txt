@@ -1,4 +1,4 @@
-set(TARGET Lab03_MergeSortBenchmark)
+set(TARGET SortAlgorithms_MergeSortBenchmark)
 
 file(GLOB SOURCE_FILES ./*.cpp)
 

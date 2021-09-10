@@ -8,6 +8,7 @@ import labs.lab1.Label;
 import labs.lab1.Slider;
 
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class ThreadComponent {
 
@@ -24,17 +25,17 @@ class ThreadComponent {
 
 public class Main {
 
-    private int             semaphore;
-    private final Window    window;
+    private final AtomicInteger     semaphore;
+    private final Window            window;
 
-    private final ThreadComponent threadComponent1;
-    private final ThreadComponent threadComponent2;
+    private final ThreadComponent   threadComponent1;
+    private final ThreadComponent   threadComponent2;
 
-    private final Slider    slider;
-    private final Label     status;
+    private final Slider            slider;
+    private final Label             status;
 
     private Main() {
-        semaphore = 0;
+        semaphore = new AtomicInteger(0);
 
         window = new Window(600, 400, "MainWindow");
 
@@ -45,12 +46,12 @@ public class Main {
         status = new Label("Label", SwingConstants.CENTER);
 
         threadComponent1.startButton.addActionListener(event -> {
-            if (semaphore == 1) {
+            if (semaphore.get() == 1) {
                 return;
             }
 
             threadComponent1.thread = new Thread(() -> {
-                semaphore = 1;
+                semaphore.compareAndSet(0, 1);
 
                 slider.setValue(10);
                 status.setText("Busy!");
@@ -64,12 +65,12 @@ public class Main {
         });
 
         threadComponent2.startButton.addActionListener(event -> {
-            if (semaphore == 1) {
+            if (semaphore.get() == 1) {
                 return;
             }
 
             threadComponent2.thread = new Thread(() -> {
-                semaphore = 1;
+                semaphore.set(1);
 
                 slider.setValue(90);
                 status.setText("Busy!");
@@ -83,7 +84,7 @@ public class Main {
         });
 
         threadComponent1.stopButton.addActionListener(e -> {
-            if (semaphore == 0) {
+            if (semaphore.get() == 0) {
                 return;
             }
 
@@ -91,11 +92,11 @@ public class Main {
             threadComponent2.stopButton.setEnabled(true);
             status.setText("Free");
 
-            semaphore = 0;
+            semaphore.set(0);
         });
 
         threadComponent2.stopButton.addActionListener(e -> {
-            if (semaphore == 0) {
+            if (semaphore.get() == 0) {
                 return;
             }
 
@@ -103,7 +104,7 @@ public class Main {
             threadComponent1.stopButton.setEnabled(true);
             status.setText("Free");
 
-            semaphore = 0;
+            semaphore.set(0);
         });
 
         setComponents();

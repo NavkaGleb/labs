@@ -1,4 +1,4 @@
-set(TARGET Lab03_ParallelQuickSortBenchmark)
+set(TARGET SortAlgorithms_ParallelQuickSortBenchmark)
 
 file(GLOB SOURCE_FILES ./*.cpp)
 

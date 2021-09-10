@@ -119,7 +119,7 @@ public class Main {
 
     private void runThread(Direction direction) {
         while (!Thread.interrupted()) {
-            synchronized (this) {
+            synchronized (slider) {
                 int currentValue = this.slider.getValue();
 
                 switch (direction) {
