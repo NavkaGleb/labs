@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
 func generateMonks(monkCount int) MonkContainer {
@@ -16,14 +17,14 @@ func generateMonks(monkCount int) MonkContainer {
 	return monks
 }
 
-func start(monks MonkContainer) *CompetitionNode {
+func startCompetition(monks MonkContainer) *CompetitionNode {
 	channel := make(chan *CompetitionNode)
-	go round(monks, channel)
+	go startRound(monks, channel)
 
 	return <-channel
 }
 
-func round(monks MonkContainer, channel chan *CompetitionNode) {
+func startRound(monks MonkContainer, channel chan *CompetitionNode) {
 	if len(monks) == 1 {
 		channel <- &CompetitionNode{nil, nil, monks[0]}
 		return
@@ -31,8 +32,8 @@ func round(monks MonkContainer, channel chan *CompetitionNode) {
 
 	leftChannel, rightChannel := make(chan *CompetitionNode), make(chan *CompetitionNode)
 
-	go round(monks[:len(monks)/2 ], leftChannel)
-	go round(monks[ len(monks)/2:], rightChannel)
+	go startRound(monks[:len(monks)/2 ], leftChannel)
+	go startRound(monks[ len(monks)/2:], rightChannel)
 
 	monkLeftNode, monkRightNode := <-leftChannel, <-rightChannel
 
@@ -48,8 +49,10 @@ func round(monks MonkContainer, channel chan *CompetitionNode) {
 func main() {
 	const MonkCount = 16
 
+	rand.Seed(time.Now().UnixNano())
+
 	monks := generateMonks(MonkCount)
-	root := start(monks)
+	root := startCompetition(monks)
 
 	root.Print(int(math.Log2(MonkCount)))
 
