@@ -20,6 +20,6 @@ public class Main {
         System.out.printf("Winnie set to position {%d, %d}\n", winniePooh.getX(), winniePooh.getY());
 
         forest.setWinniePooh(winniePooh);
-        forest.findWinniePooh(beehive);
+        forest.searchWinniePooh(beehive);
     }
 }

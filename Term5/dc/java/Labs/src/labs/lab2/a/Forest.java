@@ -43,11 +43,11 @@ public class Forest {
         return true;
     }
 
-    public void findWinniePooh(Beehive beehive) {
-        AtomicInteger freeRegion = new AtomicInteger(height);
+    public void searchWinniePooh(Beehive beehive) {
+        AtomicInteger freeColumn = new AtomicInteger(height);
 
         for (int i = 0; i < beehive.getFlockCount(); ++i) {
-            (new Thread(new Beehive.ScanForestRegion(this, freeRegion), "Flock" + i)).start();
+            (new Thread(new Beehive.ScanForestRegion(this, freeColumn), "Flock" + i)).start();
         }
     }
 }
