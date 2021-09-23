@@ -15,13 +15,13 @@ public class Smoker implements Runnable {
                 table.acquire();
 
                 var component1 = table.getComponent(0);
-                var component2 = table.getComponent(0);
+                var component2 = table.getComponent(1);
 
                 if (component1 != null && component2 != null && component1 != component && component2 != component) {
                     table.grabComponents();
 
                     Thread.sleep(500);
-                    System.out.println("Smoker with component " + component + " grab components!");
+                    System.out.printf("%s", "Smoker with component " + component + " grab components!\n\n");
                 }
 
                 table.release();
