@@ -3,15 +3,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class DataWriter implements Runnable {
-    private final File file;
-    private final Lock writeLock;
-    private final AtomicInteger recordCount = new AtomicInteger();
-    private int counter = 0;
+
+    private final File          file;
+    private final Lock          writeLock;
+    private final AtomicInteger personCount = new AtomicInteger();
+    private int                 personId = 0;
 
     public DataWriter(File file, ReadWriteLock readWriteLock) {
         this.file = file;
@@ -22,21 +24,22 @@ public class DataWriter implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(Utils.randomInt(1500, 2500));
-                writeLock.lock();
-                System.out.printf("[%s] locked\n", Thread.currentThread().getName());
+                Thread.sleep(ThreadLocalRandom.current().nextInt(1500) + 1500);
 
-                if (Math.random() < 0.6) {
-                    String firstName = "first_name_" + counter;
-                    String lastName = "last_name_" + counter;
-                    String phone = String.valueOf(counter).repeat(5);
+                writeLock.lock();
+                System.out.printf("[%s]:\tLocked\n", Thread.currentThread().getName());
+
+                if (Math.random() < 0.6 || personCount.get() == 0) {
+                    String firstName = "first_name_" + personId;
+                    String lastName = "last_name_" + personId;
+                    String phone = String.valueOf(personId).repeat(5);
 
                     addRecord(new Person(firstName, lastName, phone));
                 } else {
-                    deleteRecord(Utils.randomInt(1, recordCount.get()));
+                    deleteRecord(ThreadLocalRandom.current().nextInt(personCount.get()));
                 }
 
-                System.out.printf("[%s] unlocked\n", Thread.currentThread().getName());
+                System.out.printf("[%s]:\tUnlocked\n", Thread.currentThread().getName());
                 writeLock.unlock();
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
@@ -44,11 +47,15 @@ public class DataWriter implements Runnable {
         }
     }
 
+    public int getPersonId() {
+        return personId;
+    }
+
     private void addRecord(Person person) throws IOException {
         var writer = new FileWriter(file, true);
 
-        counter++;
-        recordCount.incrementAndGet();
+        personId++;
+        personCount.incrementAndGet();
         writer.write(person.toString() + " ");
 
         String threadName = Thread.currentThread().getName();
@@ -56,7 +63,10 @@ public class DataWriter implements Runnable {
         String lastName = person.getLastName();
         String phone = person.getPhone();
 
-        System.out.printf("[%s] added record: (%s, %s: %s)\n", threadName, firstName, lastName, phone);
+        System.out.print(ConsoleColor.GREEN);
+        System.out.printf("[%s]:\tAdded person: (%s %s: %s)\n", threadName, firstName, lastName, phone);
+        System.out.print(ConsoleColor.RESET);
+
         writer.flush();
     }
 
@@ -74,10 +84,12 @@ public class DataWriter implements Runnable {
             if (i != index) {
                 people.add(person);
             } else {
-                recordCount.decrementAndGet();
+                personCount.decrementAndGet();
                 String threadName = Thread.currentThread().getName();
 
-                System.out.printf("[%s] removed record: (%s, %s: %s)\n", threadName, firstName, lastName, phone);
+                System.out.print(ConsoleColor.RED);
+                System.out.printf("[%s]:\tRemoved person: (%s %s: %s)\n", threadName, firstName, lastName, phone);
+                System.out.print(ConsoleColor.RESET);
             }
         }
 
