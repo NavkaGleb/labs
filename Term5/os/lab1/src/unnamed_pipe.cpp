@@ -14,12 +14,9 @@ UnnamedPipe::UnnamedPipe()
   }
 }
 
-int UnnamedPipe::GetReadDescriptor() const {
-  return file_descriptors_[0];
-}
-
-int UnnamedPipe::GetWriteDescriptor() const {
-  return file_descriptors_[1];
+UnnamedPipe::~UnnamedPipe() {
+  close(file_descriptors_[DescriptorType::kRead]);
+  close(file_descriptors_[DescriptorType::kWrite]);
 }
 
 } // namespace os_lab1

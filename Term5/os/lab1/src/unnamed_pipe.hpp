@@ -9,6 +9,7 @@ namespace os_lab1 {
 class UnnamedPipe {
  public:
   UnnamedPipe();
+  ~UnnamedPipe();
 
  public:
   template <typename T>
@@ -24,11 +25,10 @@ class UnnamedPipe {
   void WriteArray(Iterator begin, Iterator end) const;
 
  private:
-//  enum class
-
- private:
-  [[nodiscard]] int GetReadDescriptor() const;
-  [[nodiscard]] int GetWriteDescriptor() const;
+  enum DescriptorType {
+    kRead = 0,
+    kWrite
+  };
 
  private:
   std::array<int, 2> file_descriptors_;

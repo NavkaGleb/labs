@@ -22,6 +22,9 @@ size_t SimpleIterationMethod::GetAprioriEstimate() const {
 }
 
 auto SimpleIterationMethod::GetResult() const -> double {
+  // |phi_derivative(x)| <= kQ < 1 -> root exists
+  // max(|phi_derivative(x)| <= kQ < 1 -> sequence runs down
+
   const auto kQ = std::max(
     std::abs(config_.phi_derivative1(config_.min)),
     std::abs(config_.phi_derivative1(config_.max))
@@ -43,6 +46,8 @@ auto SimpleIterationMethod::GetResult() const -> double {
 }
 
 auto SimpleIterationMethod::GetResults() const -> std::vector<double> {
+  // |phi_derivative(x)| <= kQ < 1 -> ok
+
   const auto kQ = std::max(
     std::abs(config_.phi_derivative1(config_.min)),
     std::abs(config_.phi_derivative1(config_.max))
