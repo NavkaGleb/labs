@@ -8,67 +8,66 @@
 
 namespace os_lab1 {
 
-std::size_t Process::child_process_count_ = 0;
+namespace process {
 
-Process Process::GetCurrent() {
-  return { getpid(), getppid() };
+void Kill(ProcessId id, int signal) {
+  kill(id, signal);
 }
 
-Process::Process()
-  : id_(-1)
-  , parent_id_(-1) {}
+} // namespace process
 
-Process::Process(ProcessId id, ProcessId parent_id)
-  : id_(id)
-  , parent_id_(parent_id) {}
+namespace this_process {
 
-ProcessId Process::GetId() const {
-  return id_;
+ProcessId GetId() {
+  return getpid();
 }
 
-ProcessId Process::GetParentId() const {
-  return parent_id_;
+ProcessId GetParentId() {
+  return getppid();
 }
 
-bool Process::IsChild(const Process& child) const {
-  return id_ == child.parent_id_;
-}
+ProcessId SpawnChild(const ProcessExecutor &process) {
+  auto process_id = fork();
 
-Process Process::SpanChild() const {
-  if (child_process_count_ == 0 || Process::GetCurrent().IsChild(*this)) {
-    Process child;
+  assert(process_id != -1);
 
-    auto process_id = fork();
-
-    assert(process_id != -1 && "Failed to create process!");
-
-    if (process_id == 0) {
-      child.id_         = getpid();
-      child.parent_id_  = getppid();
-
-      child_process_count_++;
-    }
-
-    return child;
+  if (process_id == 0) {
+    std::exit(process());
   }
 
-  return {};
+  return process_id;
 }
 
-void Process::WaitForChild() const {
-  auto status = wait(nullptr);
+ProcessId SplitExecution(const ProcessExecutor &process) {
+  auto process_id = fork();
 
-  assert(status != 1 && "Failed to wait for child!");
+  assert(process_id != -1);
+
+  if (process_id == 0) {
+    process();
+  }
+
+  return process_id;
 }
 
-void Process::WaitForChildren() const {
-  while (auto status = wait(nullptr)) {
-    assert(status != -1 && "Failed to wait for children!");
+void WaitForChild() {
+  int status;
+
+  wait(&status);
+
+  assert(status != -1);
+}
+
+void WaitForChildren() {
+  while (auto process_id = wait(nullptr)) {
+    assert(process_id != -1);
   }
 }
 
-Process::operator bool() const {
-  return id_ != -1 && parent_id_ != -1;
+void Kill(int status) {
+  std::exit(status);
 }
+
+} // namespace this_process
 
 } // namespace os_lab1

@@ -9,20 +9,32 @@ namespace os_lab1 {
 class UnnamedPipe {
  public:
   UnnamedPipe();
+
+ public:
   ~UnnamedPipe();
 
  public:
+  [[nodiscard]] int GetReadDescriptor() const;
+  [[nodiscard]] int GetWriteDescriptor() const;
+
+ public:
+  void Open();
+  void Close();
+
   template <typename T>
-  void ReadSingle(T& data) const;
+  bool ReadSingle(T& data) const;
 
   template <std::random_access_iterator Iterator>
-  void ReadArray(Iterator begin, Iterator end) const;
+  bool ReadArray(Iterator begin, Iterator end) const;
 
   template <typename T>
-  void WriteSingle(const T& data) const;
+  bool WriteSingle(const T& data) const;
 
   template <std::random_access_iterator Iterator>
-  void WriteArray(Iterator begin, Iterator end) const;
+  bool WriteArray(Iterator begin, Iterator end) const;
+
+ public:
+  bool operator ==(const UnnamedPipe& other) const;
 
  private:
   enum DescriptorType {

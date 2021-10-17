@@ -2,45 +2,37 @@
 #define OS_LAB1_SRC_PROCESS_HPP_
 
 #include <cstdint>
+#include <unordered_map>
+#include <functional>
 
 #include <unistd.h>
+#include <signal.h>
 
 namespace os_lab1 {
 
-using ProcessId = pid_t;
+using ProcessId       = pid_t;
+using ProcessExecutor = std::function<int()>;
 
-class Process {
- public:
-  static Process GetCurrent();
+namespace process {
 
- public:
-  Process();
+void Kill(ProcessId id, int signal);
 
- private:
-  Process(ProcessId id, ProcessId parent_id);
+} // namespace process
 
- public:
-  [[nodiscard]] ProcessId GetId() const;
-  [[nodiscard]] ProcessId GetParentId() const;
+namespace this_process {
 
- public:
-  [[nodiscard]] bool IsChild(const Process& child) const;
+ProcessId GetId();
+ProcessId GetParentId();
 
-  [[nodiscard]] Process SpanChild() const;
+ProcessId SpawnChild(const ProcessExecutor& process);
+ProcessId SplitExecution(const ProcessExecutor& process);
 
-  void WaitForChild() const;
-  void WaitForChildren() const;
+void WaitForChild();
+void WaitForChildren();
 
- public:
-  explicit operator bool() const;
+void Kill(int status = 0);
 
- private:
-  static std::size_t child_process_count_;
-
- private:
-  ProcessId id_;
-  ProcessId parent_id_;
-};
+} // namespace this_process
 
 } // namespace os_lab1
 

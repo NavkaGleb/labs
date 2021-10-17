@@ -1,47 +1,42 @@
-#include <unistd.h>
 #include <iostream>
 #include <cassert>
+
+#include <unistd.h>
+#include <cerrno>
+#include <cstring>
 
 namespace os_lab1 {
 
 template <typename T>
-void UnnamedPipe::ReadSingle(T& data) const {
-  close(file_descriptors_[DescriptorType::kWrite]);
+bool UnnamedPipe::ReadSingle(T& data) const {
+  auto bytes_count = read(file_descriptors_[DescriptorType::kRead], &data, sizeof(data));
+  assert(bytes_count != -1 && strerror(errno));
 
-  auto status = read(file_descriptors_[DescriptorType::kRead], &data, sizeof(data));
-
-  assert(status != -1 && "Failed to read from pipe");
-  close(file_descriptors_[DescriptorType::kRead]);
+  return bytes_count;
 }
 
 template <std::random_access_iterator Iterator>
-void UnnamedPipe::ReadArray(Iterator begin, Iterator end) const {
-  close(file_descriptors_[DescriptorType::kWrite]);
+bool UnnamedPipe::ReadArray(Iterator begin, Iterator end) const {
+  auto bytes_count = read(file_descriptors_[DescriptorType::kRead], &*begin, std::distance(begin, end) * sizeof(*begin));
+  assert(bytes_count != -1 && strerror(errno));
 
-  auto status = read(file_descriptors_[DescriptorType::kRead], &*begin, std::distance(begin, end) * sizeof(*begin));
-
-  assert(status != -1 && "Failed to read from pipe!");
-  close(file_descriptors_[DescriptorType::kRead]);
+  return bytes_count;
 }
 
 template <typename T>
-void UnnamedPipe::WriteSingle(const T& data) const {
-  close(file_descriptors_[DescriptorType::kRead]);
+bool UnnamedPipe::WriteSingle(const T& data) const {
+  auto bytes_count = write(file_descriptors_[DescriptorType::kWrite], &data, sizeof(data));
+  assert(bytes_count != -1 && strerror(errno));
 
-  auto status = write(file_descriptors_[DescriptorType::kWrite], &data, sizeof(data));
-
-  assert(status != -1 && "Failed to write to pipe!");
-  close(file_descriptors_[DescriptorType::kWrite]);
+  return bytes_count;
 }
 
 template <std::random_access_iterator Iterator>
-void UnnamedPipe::WriteArray(Iterator begin, Iterator end) const {
-  close(file_descriptors_[DescriptorType::kRead]);
+bool UnnamedPipe::WriteArray(Iterator begin, Iterator end) const {
+  auto bytes_count = write(file_descriptors_[DescriptorType::kWrite], &*begin, std::distance(begin, end) * sizeof(*begin));
+  assert(bytes_count != -1 && strerror(errno));
 
-  auto status = write(file_descriptors_[DescriptorType::kWrite], &*begin, std::distance(begin, end) * sizeof(*begin));
-
-  assert(status != -1 && "Failed to write to pipe!");
-  close(file_descriptors_[DescriptorType::kWrite]);
+  return bytes_count;
 }
 
 } // namespace os_lab1
