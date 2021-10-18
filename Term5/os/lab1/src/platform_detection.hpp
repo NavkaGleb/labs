@@ -12,6 +12,7 @@
 #error "Android is not supported!"
 #elif defined(__linux__)
 #define OS_LAB1_PLATFORM_LINUX
+#pragma message("Linux platform!")
 #else
 #error "Unknown platform!"
 #endif

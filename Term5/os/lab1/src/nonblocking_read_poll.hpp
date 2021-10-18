@@ -1,5 +1,5 @@
-#ifndef OS_LAB1_SRC_POLL_HPP_
-#define OS_LAB1_SRC_POLL_HPP_
+#ifndef OS_LAB1_SRC_NONBLOCKING_READ_POLL_HPP_
+#define OS_LAB1_SRC_NONBLOCKING_READ_POLL_HPP_
 
 #include <vector>
 #include <functional>
@@ -40,4 +40,4 @@ class NonblockingReadPoll {
 
 } // namespace os_lab1
 
-#endif // OS_LAB1_SRC_POLL_HPP_
+#endif // OS_LAB1_SRC_NONBLOCKING_READ_POLL_HPP_

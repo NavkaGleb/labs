@@ -1,3 +1,5 @@
+#include "platform_detection.hpp"
+
 #include "manager.hpp"
 
 #include <thread>

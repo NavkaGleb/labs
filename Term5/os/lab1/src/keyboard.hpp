@@ -1,5 +1,5 @@
-#ifndef LAB1_SRC_KEYBOARD_HPP_
-#define LAB1_SRC_KEYBOARD_HPP_
+#ifndef OS_LAB1_SRC_KEYBOARD_HPP_
+#define OS_LAB1_SRC_KEYBOARD_HPP_
 
 #include <termios.h>
 
@@ -24,4 +24,4 @@ class Keyboard {
 
 } // namespace oc_lab1
 
-#endif //LAB1_SRC_KEYBOARD_HPP_
+#endif // OS_LAB1_SRC_KEYBOARD_HPP_
