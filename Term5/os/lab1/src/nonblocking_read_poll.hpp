@@ -1,7 +1,6 @@
 #ifndef OS_LAB1_SRC_POLL_HPP_
 #define OS_LAB1_SRC_POLL_HPP_
 
-#include <cstdint>
 #include <vector>
 #include <functional>
 

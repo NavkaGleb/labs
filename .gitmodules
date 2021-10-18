@@ -67,3 +67,6 @@
 [submodule "Term5/os/lab1/third_party/asio"]
 	path = Term5/os/lab1/third_party/asio
 	url = https://github.com/boostorg/asio
+[submodule "Term5/os/lab1/third_party/Random"]
+	path = Term5/os/lab1/third_party/Random
+	url = https://github.com/navkagleb/Random

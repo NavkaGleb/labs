@@ -2,11 +2,7 @@
 #define OS_LAB1_SRC_PROCESS_HPP_
 
 #include <cstdint>
-#include <unordered_map>
 #include <functional>
-
-#include <unistd.h>
-#include <signal.h>
 
 namespace os_lab1 {
 

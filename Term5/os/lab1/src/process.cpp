@@ -1,7 +1,6 @@
 #include "process.hpp"
 
 #include <cassert>
-#include <iostream>
 
 #include <unistd.h>
 #include <sys/wait.h>

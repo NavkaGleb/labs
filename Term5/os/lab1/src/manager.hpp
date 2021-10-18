@@ -1,8 +1,6 @@
 #ifndef OS_LAB1_MANAGER_HPP_
 #define OS_LAB1_MANAGER_HPP_
 
-#include <termios.h>
-
 #include "process.hpp"
 #include "keyboard.hpp"
 #include "computation_function.hpp"
@@ -42,7 +40,7 @@ class Manager {
   [[nodiscard]] NonblockingReadPoll::ListenCallback GetPollListenCallback();
 
   UserResponse Confirm(const std::string& message, std::uint32_t seconds);
-  void Exit();
+  void StopRunning();
 
  private:
   const std::size_t kSoftFailAttemptCount = 4;

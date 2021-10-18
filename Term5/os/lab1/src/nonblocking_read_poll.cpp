@@ -1,9 +1,5 @@
 #include "nonblocking_read_poll.hpp"
 
-#include <utility>
-
-#include "computation_function.hpp"
-
 namespace os_lab1 {
 
 NonblockingReadPoll::NonblockingReadPoll()
