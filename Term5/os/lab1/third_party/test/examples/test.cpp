@@ -1,6 +1,7 @@
 #include <iostream>
 #include <type_traits>
-#include "probefuncs.hpp"
+
+#include "include/test/probefuncs.hpp"
 
 int main()
 {
