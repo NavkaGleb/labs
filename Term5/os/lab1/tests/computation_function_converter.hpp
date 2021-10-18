@@ -1,11 +1,7 @@
 #ifndef OS_LAB1_TESTS_COMPUTATION_FUNCTION_CONVERTER_HPP_
 #define OS_LAB1_TESTS_COMPUTATION_FUNCTION_CONVERTER_HPP_
 
-#include <utility>
-
 #include <test/probefuncs.hpp>
-
-#include "computation_function_converter.hpp"
 
 template <typename Function, typename T>
 inline os_lab1::ComputationFunctionResult<T> Convert(const Function& function, const T& x) {
