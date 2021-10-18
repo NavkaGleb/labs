@@ -7,6 +7,10 @@ Use C++, processes (fork) and unnamed pipes. Implement the whole
 system in one program. Use polling.
 ```
 
+### Usage
+
+For decline program executing press `ESC`
+
 ### Class UnnamedPipe
 
 Basic abstraction to syscall `pipe`
