@@ -1,7 +1,10 @@
+#include <iostream>
 #include <chrono>
 
 #include <sys/wait.h>
 #include <sys/poll.h>
+
+#include "ascii_table.hpp"
 
 namespace os_lab1 {
 
@@ -11,9 +14,6 @@ Manager<T>::Manager(const ComputationFunction<T>& f, const ComputationFunction<T
 
   f_.instance = f;
   g_.instance = g;
-
-  f_.pipe.Open();
-  g_.pipe.Open();
 }
 
 template <typename T>
@@ -24,21 +24,31 @@ Manager<T>::~Manager() {
 
 template <typename T>
 void Manager<T>::Run() {
-  while (true) {
+  f_.pipe.Open();
+  g_.pipe.Open();
+
+  while (is_running_) {
     T x;
 
     std::cout << "Enter x: ";
     std::cin >> x;
 
+    std::size_t soft_fail_attempt_count;
+
+    std::cout << "Enter soft fail attempt count: ";
+    std::cin >> soft_fail_attempt_count;
+
     keyboard_.SwitchToNonblockingInput();
 
-    for (std::size_t i = 0; i < kSoftFailAttemptCount; ++i) {
+    for (std::size_t i = 0; i < soft_fail_attempt_count; ++i) {
       if (!is_running_) {
         return;
       }
 
-      std::cout << "\nAttempt: " << i << std::endl;
+      std::cout << "\nAttempt: " << i + 1 << std::endl;
+      std::cout << "Processing..." << std::endl;
 
+      // Start F process
       if (f_.result.status == ComputationFunctionStatus::kUnknown) {
         f_.process_id = this_process::SpawnChild([&] {
           f_.pipe.WriteSingle(f_.instance(x));
@@ -46,6 +56,7 @@ void Manager<T>::Run() {
         });
       }
 
+      // Start G process
       if (g_.result.status == ComputationFunctionStatus::kUnknown) {
         g_.process_id = this_process::SpawnChild([&] {
           g_.pipe.WriteSingle(g_.instance(x));
@@ -53,27 +64,36 @@ void Manager<T>::Run() {
         });
       }
 
+      // Init poll
       poll_ = NonblockingReadPoll({
         .pipes                = { f_.pipe, g_.pipe },
         .pipe_listen_callback = GetPollPipeListenCallback(),
         .listen_callback      = GetPollListenCallback()
       });
 
+      // Start listening for F and G processes
       poll_.Listen();
     }
 
-    std::cout << "Maximum attempts for 'soft fail' has been reached" << std::endl;
+    if (f_.result.status == ComputationFunctionStatus::kSoftFail || g_.result.status == ComputationFunctionStatus::kSoftFail) {
+      std::cout << "Maximum attempts for 'soft fail' has been reached" << std::endl;
+    }
 
     switch (Confirm("Please confirm performing of next computation (30s) [y/n]", 30)) {
       case UserResponse::kYes: {
         continue;
       }
+
       case UserResponse::kNo: {
-        return;
+        std::cout << "Closing..." << std::endl;
+        StopRunning();
+        break;
       }
+
       case UserResponse::kTimeout: {
-        std::cout << "Next computation is not confirmed within 30s, closing..." << std::endl;
-        return;
+        std::cout << "Next computation is not confirmed within 30s. Closing..." << std::endl;
+        StopRunning();
+        break;
       }
     }
 
@@ -92,53 +112,23 @@ NonblockingReadPoll::PipeListenCallback Manager<T>::GetPollPipeListenCallback() 
       g_.pipe.ReadSingle(g_.result);
     }
 
-    if (f_.result.status != ComputationFunctionStatus::kUnknown && g_.result.status != ComputationFunctionStatus::kUnknown) {
-      if (f_.result.status == ComputationFunctionStatus::kHardFail || g_.result.status == ComputationFunctionStatus::kHardFail) {
-        std::cout << "F: " << f_.result.status << std::endl;
-        std::cout << "G: " << g_.result.status << std::endl;
-
-        poll_.StopListen();
+    if (!IsProcessing()) {
+      if (CanGetValue() || IsHardFail()) {
+        LogStatus();
         StopRunning();
+      } else {
+        LogStatus();
 
-        return;
-      }
+        if (f_.result.status == ComputationFunctionStatus::kSoftFail) {
+          f_.result.status = ComputationFunctionStatus::kUnknown;
+        }
 
-      if (f_.result.status == ComputationFunctionStatus::kValue && g_.result.status == ComputationFunctionStatus::kValue) {
-        std::cout << "F:      " << f_.result.status << " -> " << *f_.result.value << std::endl;
-        std::cout << "G:      " << g_.result.status << " -> " << *g_.result.value << std::endl;
-        std::cout << "Result: " << *f_.result.value + *g_.result.value << std::endl;
-
-        poll_.StopListen();
-        StopRunning();
-
-        return;
-      }
-
-      if (f_.result.status == ComputationFunctionStatus::kSoftFail && g_.result.status == ComputationFunctionStatus::kSoftFail) {
-        std::cout << "F: " << f_.result.status << std::endl;
-        std::cout << "G: " << g_.result.status << std::endl;
-
-        f_.result.status = ComputationFunctionStatus::kUnknown;
-        g_.result.status = ComputationFunctionStatus::kUnknown;
+        if (g_.result.status == ComputationFunctionStatus::kSoftFail) {
+          g_.result.status = ComputationFunctionStatus::kUnknown;
+        }
 
         poll_.StopListen();
-
-        return;
       }
-
-      if (f_.result.status == ComputationFunctionStatus::kSoftFail) {
-        std::cout << "F: " << f_.result.status << std::endl;
-
-        f_.result.status = ComputationFunctionStatus::kUnknown;
-      }
-
-      if (g_.result.status == ComputationFunctionStatus::kSoftFail) {
-        std::cout << "G: " << g_.result.status << std::endl;
-
-        g_.result.status = ComputationFunctionStatus::kUnknown;
-      }
-
-      poll_.StopListen();
     }
   };
 }
@@ -146,27 +136,13 @@ NonblockingReadPoll::PipeListenCallback Manager<T>::GetPollPipeListenCallback() 
 template <typename T>
 NonblockingReadPoll::ListenCallback Manager<T>::GetPollListenCallback() {
   return [&] {
-    if (keyboard_.IsPressed() && keyboard_.GetLastCharacter() == 27) {
+    if (keyboard_.IsPressed() && keyboard_.GetLastCharacter() == ascii_table::kEscape) {
       switch (Confirm("Please confirm that computation should be stopped (5s) [y/n]", 5)) {
         case UserResponse::kYes: {
-          if (f_.result.status == ComputationFunctionStatus::kHardFail || g_.result.status == ComputationFunctionStatus::kHardFail) {
+          if (CanGetValue() || IsHardFail()) {
             std::cout << "Overridden by system" << std::endl;
 
-            std::cout << "F: " << f_.result.status << std::endl;
-            std::cout << "G: " << g_.result.status << std::endl;
-
-            poll_.StopListen();
-            StopRunning();
-
-            break;
-          }
-
-          if (f_.result.status == ComputationFunctionStatus::kValue && g_.result.status == ComputationFunctionStatus::kValue) {
-            std::cout << "F: " << f_.result.status << " -> " << *f_.result.value << std::endl;
-            std::cout << "G: " << g_.result.status << " -> " << *g_.result.value << std::endl;
-            std::cout << "Result: " << *f_.result.value + *g_.result.value << std::endl;
-
-            poll_.StopListen();
+            LogStatus();
             StopRunning();
 
             break;
@@ -180,14 +156,11 @@ NonblockingReadPoll::ListenCallback Manager<T>::GetPollListenCallback() {
           }
 
           if (g_.result.status == ComputationFunctionStatus::kUnknown) {
-            std::cout << "G don't finish. " << std::endl;
+            std::cout << "G don't finish" << std::endl;
             process::Kill(g_.process_id, 1);
           }
 
-          std::cout << "F: " << f_.result.status << std::endl;
-          std::cout << "G: " << g_.result.status << std::endl;
-
-          poll_.StopListen();
+          LogStatus();
           StopRunning();
 
           break;
@@ -208,7 +181,25 @@ NonblockingReadPoll::ListenCallback Manager<T>::GetPollListenCallback() {
 }
 
 template <typename T>
-typename Manager<T>::UserResponse Manager<T>::Confirm(const std::string& message, std::uint32_t seconds) {
+bool Manager<T>::IsProcessing() const noexcept {
+  return f_.result.status == ComputationFunctionStatus::kUnknown ||
+         g_.result.status == ComputationFunctionStatus::kUnknown;
+}
+
+template <typename T>
+bool Manager<T>::IsHardFail() const noexcept {
+  return f_.result.status == ComputationFunctionStatus::kHardFail ||
+         g_.result.status == ComputationFunctionStatus::kHardFail;
+}
+
+template <typename T>
+bool Manager<T>::CanGetValue() const noexcept {
+  return f_.result.status == ComputationFunctionStatus::kValue &&
+         g_.result.status == ComputationFunctionStatus::kValue;
+}
+
+template <typename T>
+typename Manager<T>::UserResponse Manager<T>::Confirm(const std::string& message, std::uint32_t seconds) noexcept {
   std::cout << message << std::endl;
 
   auto start = std::chrono::steady_clock::now();
@@ -217,11 +208,11 @@ typename Manager<T>::UserResponse Manager<T>::Confirm(const std::string& message
     if (keyboard_.IsPressed()) {
       auto response = keyboard_.GetLastCharacter();
 
-      if (response == 'y') {
+      if (response == ascii_table::kUpperY || response == ascii_table::kLowerY) {
         return UserResponse::kYes;
       }
 
-      if (response == 'n') {
+      if (response == ascii_table::kUpperN || response == ascii_table::kLowerN) {
         return UserResponse::kNo;
       }
     }
@@ -231,7 +222,20 @@ typename Manager<T>::UserResponse Manager<T>::Confirm(const std::string& message
 }
 
 template <typename T>
-void Manager<T>::StopRunning() {
+void Manager<T>::LogStatus() const noexcept {
+  if (CanGetValue()) {
+    std::cout << "F: " << f_.result.status << " -> " << *f_.result.value << std::endl;
+    std::cout << "G: " << g_.result.status << " -> " << *g_.result.value << std::endl;
+    std::cout << "Result: " << *f_.result.value + *g_.result.value << std::endl;
+  }
+
+  std::cout << "F: " << f_.result.status << std::endl;
+  std::cout << "G: " << g_.result.status << std::endl;
+}
+
+template <typename T>
+void Manager<T>::StopRunning() noexcept {
+  poll_.StopListen();
   is_running_ = false;
 }
 

@@ -10,11 +10,11 @@ class Keyboard {
   Keyboard();
 
  public:
-  void SwitchToBlockingInput();
-  void SwitchToNonblockingInput();
+  void SwitchToBlockingInput() noexcept;
+  void SwitchToNonblockingInput() noexcept;
 
-  bool IsPressed();
-  char GetLastCharacter();
+  bool IsPressed() noexcept;
+  char GetLastCharacter() noexcept;
 
  private:
   termios blocking_settings_;

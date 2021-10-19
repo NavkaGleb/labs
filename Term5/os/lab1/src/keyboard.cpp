@@ -9,11 +9,11 @@ Keyboard::Keyboard()
   , nonblocking_settings_()
   , peek_character_(0) {}
 
-void Keyboard::SwitchToBlockingInput() {
+void Keyboard::SwitchToBlockingInput() noexcept {
   tcsetattr(0, TCSANOW, &blocking_settings_);
 }
 
-void Keyboard::SwitchToNonblockingInput() {
+void Keyboard::SwitchToNonblockingInput() noexcept {
   tcgetattr(0, &blocking_settings_);
 
   nonblocking_settings_             = blocking_settings_;
@@ -27,7 +27,7 @@ void Keyboard::SwitchToNonblockingInput() {
   peek_character_ = -1;
 }
 
-bool Keyboard::IsPressed(){
+bool Keyboard::IsPressed() noexcept {
   char ch;
 
   if (peek_character_ != -1) {
@@ -50,7 +50,7 @@ bool Keyboard::IsPressed(){
   return false;
 }
 
-char Keyboard::GetLastCharacter(){
+char Keyboard::GetLastCharacter() noexcept {
   char ch;
 
   if (peek_character_ == -1) {

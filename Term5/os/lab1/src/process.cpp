@@ -1,6 +1,8 @@
 #include "process.hpp"
 
-#include <cassert>
+#include <stdexcept>
+#include <cerrno>
+#include <cstring>
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -17,18 +19,20 @@ void Kill(ProcessId id, int signal) {
 
 namespace this_process {
 
-ProcessId GetId() {
+ProcessId GetId() noexcept {
   return getpid();
 }
 
-ProcessId GetParentId() {
+ProcessId GetParentId() noexcept {
   return getppid();
 }
 
 ProcessId SpawnChild(const ProcessExecutor &process) {
   auto process_id = fork();
 
-  assert(process_id != -1);
+  if (process_id == -1) {
+    throw std::runtime_error(strerror(errno));
+  }
 
   if (process_id == 0) {
     std::exit(process());
@@ -40,7 +44,9 @@ ProcessId SpawnChild(const ProcessExecutor &process) {
 ProcessId SplitExecution(const ProcessExecutor &process) {
   auto process_id = fork();
 
-  assert(process_id != -1);
+  if (process_id == -1) {
+    throw std::runtime_error(strerror(errno));
+  }
 
   if (process_id == 0) {
     process();
@@ -50,20 +56,22 @@ ProcessId SplitExecution(const ProcessExecutor &process) {
 }
 
 void WaitForChild() {
-  int status;
+  auto process_id = wait(nullptr);
 
-  wait(&status);
-
-  assert(status != -1);
+  if (process_id == -1) {
+    throw std::runtime_error(strerror(errno));
+  }
 }
 
 void WaitForChildren() {
   while (auto process_id = wait(nullptr)) {
-    assert(process_id != -1);
+    if (process_id == -1) {
+      throw std::runtime_error(strerror(errno));
+    }
   }
 }
 
-void Kill(int status) {
+void Kill(int status) noexcept {
   std::exit(status);
 }
 

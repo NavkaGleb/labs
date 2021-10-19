@@ -36,17 +36,6 @@ int main(int /* argc */, char** /* argv */) {
     return { os_lab1::ComputationFunctionStatus::kValue, x % 1000 };
   };
 
-//  os_lab1::ComputationFunction<int> f = [](int x) -> os_lab1::ComputationFunctionResult<int> {
-//    std::this_thread::sleep_for(std::chrono::milliseconds(Ng::Random::GetFromRange(3000, 4000)));
-//    return { os_lab1::ComputationFunctionStatus::kValue, x };
-//  };
-//
-//  os_lab1::ComputationFunction<int> g = [](int x) -> os_lab1::ComputationFunctionResult<int> {
-//    return { os_lab1::ComputationFunctionStatus::kValue, x };
-//  };
-
   os_lab1::Manager manager(f, g);
   manager.Run();
-
-  return 0;
 }

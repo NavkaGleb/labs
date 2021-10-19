@@ -39,11 +39,13 @@ class Manager {
   [[nodiscard]] NonblockingReadPoll::PipeListenCallback GetPollPipeListenCallback();
   [[nodiscard]] NonblockingReadPoll::ListenCallback GetPollListenCallback();
 
-  UserResponse Confirm(const std::string& message, std::uint32_t seconds);
-  void StopRunning();
+  [[nodiscard]] bool IsProcessing() const noexcept;
+  [[nodiscard]] bool IsHardFail() const noexcept;
+  [[nodiscard]] bool CanGetValue() const noexcept;
 
- private:
-  const std::size_t kSoftFailAttemptCount = 4;
+  UserResponse Confirm(const std::string& message, std::uint32_t seconds) noexcept;
+  void LogStatus() const noexcept;
+  void StopRunning() noexcept;
 
  private:
   Keyboard                      keyboard_;

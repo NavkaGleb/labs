@@ -11,15 +11,12 @@ class UnnamedPipe {
   UnnamedPipe();
 
  public:
-  ~UnnamedPipe();
-
- public:
-  [[nodiscard]] int GetReadDescriptor() const;
-  [[nodiscard]] int GetWriteDescriptor() const;
+  [[nodiscard]] int GetReadDescriptor() const noexcept;
+  [[nodiscard]] int GetWriteDescriptor() const noexcept;
 
  public:
   void Open();
-  void Close();
+  void Close() noexcept;
 
   template <typename T>
   bool ReadSingle(T& data) const;
@@ -34,7 +31,7 @@ class UnnamedPipe {
   bool WriteArray(Iterator begin, Iterator end) const;
 
  public:
-  bool operator ==(const UnnamedPipe& other) const;
+  bool operator ==(const UnnamedPipe& other) const noexcept;
 
  private:
   enum DescriptorType {

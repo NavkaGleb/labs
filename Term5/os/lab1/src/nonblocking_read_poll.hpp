@@ -28,7 +28,7 @@ class NonblockingReadPoll {
 
  public:
   void Listen();
-  void StopListen();
+  void StopListen() noexcept;
 
  private:
   std::vector<UnnamedPipe>  pipes_;

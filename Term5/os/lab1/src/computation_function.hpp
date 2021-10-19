@@ -28,18 +28,8 @@ inline std::ostream& operator <<(std::ostream& ostream, ComputationFunctionStatu
 
 template <typename T>
 struct ComputationFunctionResult {
-  ComputationFunctionStatus status;
+  ComputationFunctionStatus status = ComputationFunctionStatus::kUnknown;
   std::optional<T>          value;
-
-  ComputationFunctionResult()
-    : status(ComputationFunctionStatus::kUnknown) {}
-
-  ComputationFunctionResult(ComputationFunctionStatus status)
-    : status(status) {}
-
-  ComputationFunctionResult(ComputationFunctionStatus status, const T& value)
-      : status(status)
-      , value(value) {}
 };
 
 template <typename T>

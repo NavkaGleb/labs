@@ -17,8 +17,8 @@ void Kill(ProcessId id, int signal);
 
 namespace this_process {
 
-ProcessId GetId();
-ProcessId GetParentId();
+ProcessId GetId() noexcept;
+ProcessId GetParentId() noexcept;
 
 ProcessId SpawnChild(const ProcessExecutor& process);
 ProcessId SplitExecution(const ProcessExecutor& process);
@@ -26,7 +26,7 @@ ProcessId SplitExecution(const ProcessExecutor& process);
 void WaitForChild();
 void WaitForChildren();
 
-void Kill(int status = 0);
+void Kill(int status = 0) noexcept;
 
 } // namespace this_process
 
