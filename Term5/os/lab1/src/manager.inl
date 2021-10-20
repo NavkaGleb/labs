@@ -227,10 +227,10 @@ void Manager<T>::LogStatus() const noexcept {
     std::cout << "F: " << f_.result.status << " -> " << *f_.result.value << std::endl;
     std::cout << "G: " << g_.result.status << " -> " << *g_.result.value << std::endl;
     std::cout << "Result: " << *f_.result.value + *g_.result.value << std::endl;
+  } else {
+    std::cout << "F: " << f_.result.status << std::endl;
+    std::cout << "G: " << g_.result.status << std::endl;
   }
-
-  std::cout << "F: " << f_.result.status << std::endl;
-  std::cout << "G: " << g_.result.status << std::endl;
 }
 
 template <typename T>
