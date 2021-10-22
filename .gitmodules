@@ -5,68 +5,68 @@
 	path = 3term/Algorithms/lab7/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab01/lib/Random"]
-	path = Term4/Algorithms/Lab01/lib/Random
+	path = term4/Algorithms/Lab01/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab02/lib/Random"]
-	path = Term4/Algorithms/Lab02/lib/Random
+	path = term4/Algorithms/Lab02/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab03/lib/Random"]
-	path = Term4/Algorithms/Lab03/lib/Random
+	path = term4/Algorithms/Lab03/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/OOP/Lab01/RefactoredProject/lib/Random"]
-	path = Term4/OOP/Lab01/RefactoredProject/lib/Random
+	path = term4/OOP/Lab01/RefactoredProject/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab04/lib/Random"]
-	path = Term4/Algorithms/Lab04/lib/Random
+	path = term4/Algorithms/Lab04/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab04/lib/libfort"]
-	path = Term4/Algorithms/Lab04/lib/libfort
+	path = term4/Algorithms/Lab04/lib/libfort
 	url = https://github.com/seleznevae/libfort
 [submodule "Term4/Algorithms/Lab07/Dependencies/Random"]
-	path = Term4/Algorithms/Lab07/Dependencies/Random
+	path = term4/Algorithms/Lab07/Dependencies/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab06/external/Random"]
-	path = Term4/Algorithms/Lab06/external/Random
+	path = term4/Algorithms/Lab06/external/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab06/external/doctest"]
-	path = Term4/Algorithms/Lab06/external/doctest
+	path = term4/Algorithms/Lab06/external/doctest
 	url = https://github.com/onqtam/doctest
 [submodule "Term4/Algorithms/Lab08/external/Random"]
-	path = Term4/Algorithms/Lab08/external/Random
+	path = term4/Algorithms/Lab08/external/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab08/external/doctest"]
-	path = Term4/Algorithms/Lab08/external/doctest
+	path = term4/Algorithms/Lab08/external/doctest
 	url = https://github.com/onqtam/doctest
 [submodule "Term4/Algorithms/Lab05/extern/Random"]
-	path = Term4/Algorithms/Lab05/extern/Random
+	path = term4/Algorithms/Lab05/extern/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab05/extern/doctest"]
-	path = Term4/Algorithms/Lab05/extern/doctest
+	path = term4/Algorithms/Lab05/extern/doctest
 	url = https://github.com/onqtam/doctest
 [submodule "Term4/Algorithms/Lab05/extern/benchmark"]
-	path = Term4/Algorithms/Lab05/extern/benchmark
+	path = term4/Algorithms/Lab05/extern/benchmark
 	url = https://github.com/google/benchmark
 [submodule "Term4/Algorithms/Lab09/External/Random"]
-	path = Term4/Algorithms/Lab09/External/Random
+	path = term4/Algorithms/Lab09/External/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "Term4/Algorithms/Lab09/External/doctest"]
-	path = Term4/Algorithms/Lab09/External/doctest
+	path = term4/Algorithms/Lab09/External/doctest
 	url = https://github.com/onqtam/doctest
 [submodule "Term4/Algorithms/Lab09/External/libfort"]
-	path = Term4/Algorithms/Lab09/External/libfort
+	path = term4/Algorithms/Lab09/External/libfort
 	url = https://github.com/seleznevae/libfort
 [submodule "Term4/OOP/Lab03/External/doctest"]
-	path = Term4/OOP/Lab03/External/doctest
+	path = term4/OOP/Lab03/External/doctest
 	url = https://github.com/onqtam/doctest
 [submodule "Term4/OOP/Lab03/External/Ziben"]
-	path = Term4/OOP/Lab03/External/Ziben
+	path = term4/OOP/Lab03/External/Ziben
 	url = https://github.com/NavkaGleb/Ziben
 [submodule "Term4/OOP/Lab03/External/benchmark"]
-	path = Term4/OOP/Lab03/External/benchmark
+	path = term4/OOP/Lab03/External/benchmark
 	url = https://github.com/google/benchmark
 [submodule "Term5/os/lab1/third_party/asio"]
 	path = Term5/os/lab1/third_party/asio
 	url = https://github.com/boostorg/asio
 [submodule "Term5/os/lab1/third_party/Random"]
-	path = Term5/os/lab1/third_party/Random
+	path = term5/os/lab1/third_party/Random
 	url = https://github.com/navkagleb/Random
