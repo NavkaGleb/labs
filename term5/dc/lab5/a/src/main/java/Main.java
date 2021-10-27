@@ -17,7 +17,7 @@ public class Main {
             recruitLines[i] = new RecruitLine(Config.RECRUIT_COUNT, isDone, barrier);
         }
 
-        setLeftRight();
+        setLeftRightRecruits();
 
         var threads = Arrays.stream(recruitLines).map(Thread::new).toArray(Thread[]::new);
 
@@ -30,18 +30,18 @@ public class Main {
         }
     }
 
-    private static void setLeftRight() {
+    private static void setLeftRightRecruits() {
         for (int i = 0; i < recruitLines.length; ++i) {
             if (i == 0) {
-                recruitLines[i].setLeft(null);
+                recruitLines[i].setLeftRecruit(null);
             } else {
-                recruitLines[i].setLeft(recruitLines[i - 1].getRight());
+                recruitLines[i].setLeftRecruit(recruitLines[i - 1].getLastRecruit());
             }
 
             if (i == recruitLines.length - 1) {
-                recruitLines[i].setRight(null);
+                recruitLines[i].setRightRecruit(null);
             } else {
-                recruitLines[i].setRight(recruitLines[i + 1].getLeft());
+                recruitLines[i].setRightRecruit(recruitLines[i + 1].getFirstRecruit());
             }
         }
     }
@@ -54,17 +54,17 @@ public class Main {
             var string = new StringBuilder();
 
             for (int i = 0; i < Config.RECRUIT_LINE_COUNT; ++i) {
-                string.append(recruitLines[i]);
+                string.append(recruitLines[i].toColoredString());
 
                 modified = modified || recruitLines[i].isModified();
             }
 
-            System.out.printf("Line: %s\n", string);
+            System.out.println(string);
 
             if (!modified) {
                 isDone.set(true);
             } else {
-                setLeftRight();
+                setLeftRightRecruits();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

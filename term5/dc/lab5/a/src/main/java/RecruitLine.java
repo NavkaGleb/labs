@@ -1,12 +1,10 @@
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RecruitLine implements Runnable {
 
     private Recruit[]           recruits;
-    private Recruit.Direction   left = null;
-    private Recruit.Direction   right = null;
+    private Recruit             left = null;
+    private Recruit             right = null;
     private final CyclicBarrier barrier;
     private final AtomicBoolean isDone;
     private boolean             isModified = false;
@@ -26,29 +24,27 @@ public class RecruitLine implements Runnable {
         return isModified;
     }
 
-    public void setLeft(Recruit.Direction left) {
+    public void setLeftRecruit(Recruit left) {
         this.left = left;
     }
 
-    public void setRight(Recruit.Direction right) {
+    public void setRightRecruit(Recruit right) {
         this.right = right;
     }
 
-    public Recruit.Direction getLeft() {
-        return recruits[0].getDirection();
+    public Recruit getFirstRecruit() {
+        return recruits[0];
     }
 
-    public Recruit.Direction getRight() {
-        return recruits[recruits.length - 1].getDirection();
+    public Recruit getLastRecruit() {
+        return recruits[recruits.length - 1];
     }
 
-    @Override
-    public String toString() {
+    public String toColoredString() {
         var result = new StringBuilder();
 
         for (var recruit : recruits) {
-//            result.append(recruit);
-            result.append(recruit.getDirection());
+            result.append(recruit.toColoredString());
         }
 
         return result.toString();
@@ -58,136 +54,52 @@ public class RecruitLine implements Runnable {
     public synchronized void run() {
         try {
             while (!isDone.get()) {
-                System.out.println("....");
+                var next = new Recruit[recruits.length];
 
-                var next = Arrays.copyOf(recruits, recruits.length);
+                for (int i = 0; i < recruits.length; ++i) {
+                    next[i] = new Recruit(recruits[i]);
+                }
 
                 isModified = false;
 
-//                for (int i = 1; i < recruits.length - 1; ++i) {
-//                    if ((recruits[i].isGoingLeft() && recruits[i - 1].isGoingRight()) || (recruits[i].isGoingRight() && recruits[i + 1].isGoingLeft())) {
-//                        next[i] = recruits[i].turn();
-////                        next[i].setDirection(recruits[i].getDirection().turn());
-////                        next[i].direction = recruits[i].direction.turn();
-//
-//                        isModified = true;
-//                    }
-//                }
-//
-//                switch (recruits[0]) {
-//                    case LEFT:
-//                        if (left != null && left == Recruit.Direction.RIGHT) {
-//                            next[0] = recruits[0].turn();
-////                            next[0].setDirection(recruits[0].getDirection().turn());
-////                            next[0].direction = recruits[0].direction.turn();
-//
-//                            isModified = true;
-//                        }
-//                        break;
-//                    case RIGHT:
-//                        if (recruits[1].isGoingLeft()) {
-//                            next[0] = recruits[0].turn();
-////                            next[0].setDirection(recruits[0].getDirection().turn());
-////                            next[0].direction = recruits[0].direction.turn();
-//
-//                            isModified = true;
-//                        }
-//                        break;
-//                }
-//
-//                switch (recruits[recruits.length - 1]) {
-//                    case LEFT:
-//                        if (recruits[recruits.length - 2].isGoingRight()) {
-//                            next[next.length - 1] = recruits[recruits.length - 1].turn();
-////                            next[next.length - 1].setDirection(recruits[recruits.length - 1].getDirection().turn());
-////                            next[next.length - 1].direction = recruits[recruits.length - 1].direction.turn();
-//
-//                            isModified = true;
-//                        }
-//                        break;
-//                    case RIGHT:
-//                        if (right != null && right == Recruit.Direction.LEFT) {
-//                            next[next.length - 1] = recruits[recruits.length - 1].turn();
-////                            next[next.length - 1].setDirection(recruits[recruits.length - 1].getDirection().turn());
-////                            next[next.length - 1].direction = recruits[recruits.length - 1].direction.turn();
-//
-//                            isModified = true;
-//                        }
-//                        break;
-//                }
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-
-
-
-
+                // Update all recruits except first and last
                 for (int i = 1; i < recruits.length - 1; ++i) {
-                    if ((recruits[i].isGoingLeft() && recruits[i - 1].isGoingRight()) || (recruits[i].isGoingRight() && recruits[i + 1].isGoingLeft())) {
-//                        next[i] = recruits[i].turn();
-//                        next[i].setDirection(recruits[i].getDirection().turn());
-//                        next[i].direction = recruits[i].direction.turn();
+                    if ((recruits[i].isGoingLeft() && recruits[i - 1].isGoingRight()) ||
+                        (recruits[i].isGoingRight() && recruits[i + 1].isGoingLeft())) {
                         next[i].turn();
-
                         isModified = true;
                     }
                 }
 
-                switch (recruits[0].direction) {
-                    case LEFT:
-                        if (left != null && left == Recruit.Direction.RIGHT) {
-//                            next[0] = recruits[0].turn();
-//                            next[0].setDirection(recruits[0].getDirection().turn());
-//                            next[0].direction = recruits[0].direction.turn();
-                            next[0].turn();
-
-                            isModified = true;
-                        }
-                        break;
-                    case RIGHT:
-                        if (recruits[1].isGoingLeft()) {
-//                            next[0] = recruits[0].turn();
-//                            next[0].setDirection(recruits[0].getDirection().turn());
-//                            next[0].direction = recruits[0].direction.turn();
-                            next[0].turn();
-
-
-                            isModified = true;
-                        }
-                        break;
+                // Update first recruit
+                if (recruits[0].isGoingLeft()) {
+                    if (left != null && left.isGoingRight()) {
+                        next[0].turn();
+                        isModified = true;
+                    }
                 }
 
-                switch (recruits[recruits.length - 1].direction) {
-                    case LEFT:
-                        if (recruits[recruits.length - 2].isGoingRight()) {
-//                            next[next.length - 1] = recruits[recruits.length - 1].turn();
-//                            next[next.length - 1].setDirection(recruits[recruits.length - 1].getDirection().turn());
-//                            next[next.length - 1].direction = recruits[recruits.length - 1].direction.turn();
-                            next[next.length - 1].turn();
-
-                            isModified = true;
-                        }
-                        break;
-                    case RIGHT:
-                        if (right != null && right == Recruit.Direction.LEFT) {
-//                            next[next.length - 1] = recruits[recruits.length - 1].turn();
-//                            next[next.length - 1].setDirection(recruits[recruits.length - 1].getDirection().turn());
-//                            next[next.length - 1].direction = recruits[recruits.length - 1].direction.turn();
-                            next[next.length - 1].turn();
-
-
-                            isModified = true;
-                        }
-                        break;
+                if (recruits[0].isGoingRight()) {
+                    if (recruits[1].isGoingLeft()) {
+                        next[0].turn();
+                        isModified = true;
+                    }
                 }
 
+                // Update last recruit
+                if (recruits[recruits.length - 1].isGoingLeft()) {
+                    if (recruits[recruits.length - 2].isGoingRight()) {
+                        next[next.length - 1].turn();
+                        isModified = true;
+                    }
+                }
 
-
-
+                if (recruits[recruits.length - 1].isGoingRight()) {
+                    if (right != null && right.isGoingLeft()) {
+                        next[next.length - 1].turn();
+                        isModified = true;
+                    }
+                }
 
                 recruits = next;
 

@@ -1,22 +1,22 @@
 public class CyclicBarrier {
 
     private final int       parties;
-    private int             waitingFor;
+    private int             waitingParties;
     private final Runnable  action;
 
     public CyclicBarrier(int parties, Runnable action) {
         this.parties = parties;
-        this.waitingFor = parties;
+        this.waitingParties = parties;
         this.action = action;
     }
 
     public synchronized void await() throws InterruptedException {
-        waitingFor--;
+        waitingParties--;
 
-        if (waitingFor > 0) {
+        if (waitingParties > 0) {
             wait();
         } else {
-            waitingFor = parties;
+            waitingParties = parties;
             notifyAll();
             action.run();
         }

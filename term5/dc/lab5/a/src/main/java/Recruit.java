@@ -6,31 +6,23 @@ public class Recruit {
         LEFT,
         RIGHT;
 
-        @Override
-        public String toString() {
+        public String toColoredString() {
             return switch (this) {
-                case LEFT -> ConsoleColor.RED + "<" + ConsoleColor.RESET;
-                case RIGHT -> ConsoleColor.GREEN + ">" + ConsoleColor.RESET;
+                case LEFT -> ConsoleColor.BLUE_BOLD + "<" + ConsoleColor.RESET;
+                case RIGHT -> ConsoleColor.YELLOW_BOLD + ">" + ConsoleColor.RESET;
             };
-        }
-
-        public Direction turn() {
-            return switch (this) {
-                case LEFT -> RIGHT;
-                case RIGHT -> LEFT;
-            };
-        }
-
-        public boolean isGoingLeft() {
-            return this == Direction.LEFT;
-        }
-
-        public boolean isGoingRight() {
-            return this == Direction.RIGHT;
         }
     }
 
-    public Direction direction = Math.random() < 0.5 ? Direction.LEFT : Direction.RIGHT;
+    private Direction direction;
+
+    public Recruit() {
+        this.direction = ThreadLocalRandom.current().nextBoolean() ? Direction.LEFT : Direction.RIGHT;
+    }
+
+    public Recruit(Recruit another) {
+        this.direction = another.direction;
+    }
 
     public Direction getDirection() {
         return direction;
@@ -49,5 +41,9 @@ public class Recruit {
             case LEFT -> direction = Direction.RIGHT;
             case RIGHT -> direction = Direction.LEFT;
         }
+    }
+
+    public String toColoredString() {
+        return direction.toColoredString();
     }
 }
