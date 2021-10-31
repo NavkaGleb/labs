@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cassert>
 #include <vector>
+#include <iomanip>
 
 #include "math.hpp"
 
@@ -140,14 +141,6 @@ Vector<T, kSize> SeidelMethod(
   const Vector<T, kSize>&         constant_terms,
   T                               epsilon
 ) {
-  auto log_vector = [](auto vector) {
-    for (const auto& c : vector) {
-      std::cout << c << " ";
-    }
-
-    std::cout << std::endl;
-  };
-
   assert(IsSymmetrical(coefficients));
 
   // Check if Seidel's method is coinciding
@@ -180,8 +173,15 @@ Vector<T, kSize> SeidelMethod(
       deltas[i] = std::abs(previous_x[i] - x[i]);
     }
 
+#ifdef NM_LAB2_DEBUG
     std::cout << "x: ";
-    log_vector(x);
+
+    for (const auto& c : x) {
+      std::cout << std::fixed << std::setprecision(7) << c << "\t";
+    }
+
+    std::cout << std::endl;
+#endif
 
     if (*std::max_element(std::begin(deltas), std::end(deltas)) <= epsilon) {
       break;
