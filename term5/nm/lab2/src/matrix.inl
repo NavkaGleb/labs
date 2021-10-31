@@ -64,4 +64,29 @@ constexpr const Vector<T, kColumns>& Matrix<T, kRows, kColumns>::operator[](std:
   return data_[index];
 }
 
+template <
+    typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
+    typename RhsT, std::size_t kRhsRows, std::size_t kRhsColumns
+>
+constexpr Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> operator *(
+    const Matrix<LhsT, kLhsRows, kLhsColumns>& lhs,
+    const Matrix<RhsT, kRhsRows, kRhsColumns>& rhs
+) {
+  static_assert(kLhsColumns == kRhsRows);
+
+  const auto common_dimension = kLhsColumns;
+
+  Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> result;
+
+  for (std::size_t i = 0; i < result.GetRows(); ++i) {
+    for (std::size_t j = 0; j < result.GetColumns(); ++j) {
+      for (std::size_t k = 0; k < common_dimension; ++k) {
+        result[i][j] += lhs[i][k] * rhs[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
 } // namespace nm_lab2

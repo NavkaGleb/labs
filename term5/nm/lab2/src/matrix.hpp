@@ -42,6 +42,15 @@ class Matrix {
   DataContainer data_;
 };
 
+template <
+  typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
+  typename RhsT, std::size_t kRhsRows, std::size_t kRhsColumns
+>
+constexpr Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> operator *(
+  const Matrix<LhsT, kLhsRows, kLhsColumns>& lhs,
+  const Matrix<RhsT, kRhsRows, kRhsColumns>& rhs
+);
+
 template <typename T, std::size_t kRows, std::size_t kColumns>
 auto begin(Matrix<T, kRows, kColumns>& matrix) {
   return matrix.Begin();
