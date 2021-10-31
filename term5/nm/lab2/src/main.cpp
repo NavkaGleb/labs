@@ -17,8 +17,10 @@ int main() {
 //  auto x = nm_lab2::matrix_algorithm::SquareRootMethod(coefficients, constant_terms);
 
   std::cout << "x: [ ";
+
   for (auto coefficient : x) {
     std::cout << coefficient << " ";
   }
+
   std::cout << "]" << std::endl;
 }
