@@ -4,48 +4,38 @@ import numpy as np
 from scipy.signal import argrelextrema
 
 
-def main1(time, dt):
-    t = np.arange(0, time + dt, dt)
+measurements = np.array(open("f5.txt").read().split(), float)
 
-    print(t.reshape)
+t = 5
+dt = 0.01
+time = np.arange(0, t + dt, dt)
 
 
 def main():
-    # Reading data from file
-    data_str = open("f5.txt").read().split()
-    data = np.array(data_str, float)
-
-    # Preparing array with timestamps
-    t = 5
-    dt = 0.01
-    time = np.arange(0, t + dt, dt)
-
-    # Finding Fourier transforms
+    # Discrete Fourier transform
     n = time.shape[0]
     n_range = np.arange(n)
     k = n_range.reshape((n, 1))
     m = np.exp(-2j * np.pi * k * n_range / n)
 
-    transformed_data = np.dot(m, data) / n
+    transformed_data = (m @ measurements) / n
     transformed_half_data = transformed_data[:transformed_data.shape[0] // 2 - 1]
 
-    # Find maximums
-    maximums = np.array(argrelextrema(transformed_half_data, np.greater))
-    main_frequency = maximums[0][0] / t
+    # Main frequency
+    main_frequency = np.array(argrelextrema(transformed_half_data, np.greater))[0][0] / t
 
     print(f'main_frequency: {main_frequency}')
 
-    # Apply least squares method to find resulted approximation
-    b = np.array([
-        np.sum(data * time ** 3),
-        np.sum(data * time ** 2),
-        np.sum(data * time),
-        np.sum(data * np.sin(2. * np.pi * main_frequency * time)),
-        np.sum(data)
+    # Least square method
+    c = np.array([
+        np.sum(measurements * time ** 3),
+        np.sum(measurements * time ** 2),
+        np.sum(measurements * time),
+        np.sum(measurements * np.sin(2. * np.pi * main_frequency * time)),
+        np.sum(measurements)
     ])
 
-    # Init
-    a = np.zeros((b.shape[0], b.shape[0]))
+    a = np.zeros((c.shape[0], c.shape[0]))
 
     functions = [
         time ** 3,
@@ -54,23 +44,23 @@ def main():
         np.ones(n)
     ]
 
-    for i in range(b.shape[0]):
-        for j in range(b.shape[0]):
+    for i in range(a.shape[0]):
+        for j in range(a.shape[1]):
             a[i, j] = np.sum(functions[i] * functions[j])
 
-    solution = np.matmul(np.linalg.inv(a), b.T)
+    # Find the solution
+    solution = np.linalg.inv(a) @ c
 
     print(f'solution: {solution}')
-    approximated_functions = np.dot(solution, functions)
+    approximated_functions = solution @ functions
 
-    # Displaying data from all steps
-    fig, axs = plt.subplots(3)
-    plt.grid(True)
-    fig.suptitle('Data, Approximation, Fourier transforms')
+    # Draw a chart
+    figure, axis = plt.subplots(3)
+    figure.suptitle('Data, Approximation, Fourier transforms')
 
-    axs[0].plot(time, data)
-    axs[1].plot(time, approximated_functions)
-    axs[2].plot(time, np.real(transformed_data))
+    axis[0].plot(time, measurements)
+    axis[1].plot(time, approximated_functions)
+    axis[2].plot(time, np.real(transformed_data))
 
     plt.show()
 
