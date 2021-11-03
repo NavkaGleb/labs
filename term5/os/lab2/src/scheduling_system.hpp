@@ -5,17 +5,10 @@
 #include <functional>
 
 #include "command_line_args.hpp"
-#include "process.hpp"
+#include "process_config.hpp"
+#include "scheduling_algorithm.hpp"
 
 namespace os_lab2 {
-
-struct SchedulingAlgorithmResult {
-  std::string algorithm_type;
-  std::string algorithm_name;
-  std::size_t taken_time     = 0;
-};
-
-using SchedulingAlgorithm = std::function<SchedulingAlgorithmResult(std::size_t, std::vector<Process>&)>;
 
 class SchedulingSystem {
  public:
@@ -34,7 +27,7 @@ class SchedulingSystem {
   std::size_t standard_process_deviation_;
   std::size_t simulation_time_;
 
-  std::vector<Process> processes_;
+  std::vector<ProcessConfig> processes_;
 };
 
 } // namespace os_lab2
