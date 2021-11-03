@@ -1,5 +1,7 @@
 #include "first_come_first_served_algorithm.hpp"
 
+#include <fstream>
+
 #include <tabulate/table.hpp>
 
 namespace os_lab2 {
@@ -9,31 +11,34 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
   std::vector<ProcessConfig>& processes
 ) {
   tabulate::Table table;
+  std::size_t     record_count = 0;
 
   table.add_row({ "id", "comment", "cpu_time", "io_blocking", "cpu_done" });
 
-  Result result;
-
-  result.algorithm_type = "Batch (NonPreemptive)";
-  result.algorithm_name = "First-Come First-Served";
+  Result result = { "Batch (NonPreemptive)", "First-Come First-Served" };
 
   std::size_t current_process_index = 0;
   std::size_t previous_process_index = 0;
 
   std::size_t completed = 0;
 
-  std::size_t current_row = 0;
-
-  auto add_row = [&](const std::string& comment) {
+  auto add_row = [&](const std::string& comment, tabulate::Color font_color = tabulate::Color::white) {
     table.add_row({
       std::to_string(current_process_index),
       comment,
       std::to_string(processes[current_process_index].cpu_time),
       std::to_string(processes[current_process_index].io_blocking),
       std::to_string(processes[current_process_index].cpu_done)
-    }).row(current_row + 1).format().hide_border_bottom().hide_border_top();
+    });
 
-    current_row++;
+    if (record_count != 0) {
+      table.row(record_count + 1).format()
+        .hide_border_top()
+        .hide_border_bottom()
+        .font_color(font_color);
+    }
+
+    record_count++;
   };
 
   add_row("registered...");
@@ -42,8 +47,7 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
     if (processes[current_process_index].cpu_done == processes[current_process_index].cpu_time) {
       completed++;
 
-      add_row("completed...");
-      table[current_row].format().font_color(tabulate::Color::green);
+      add_row("completed...", tabulate::Color::green);
 
       if (completed == processes.size()) {
         break;
@@ -59,10 +63,9 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
     }
 
     if (processes[current_process_index].io_blocking == processes[current_process_index].io_next) {
-      add_row("io blocked...");
-      table.row(current_row).format().font_color(tabulate::Color::red);
+      add_row("io blocked...", tabulate::Color::red);
 
-      processes[current_process_index].blocked_count++;
+      processes[current_process_index].block_count++;
       processes[current_process_index].io_next = 0;
 
       previous_process_index = current_process_index;
@@ -85,9 +88,15 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
     result.taken_time++;
   }
 
-  table.row(current_row).format().show_border_bottom();
+  table.row(record_count).format().show_border_bottom();
+
+
+  std::ofstream out_file("assets/process_result.txt");
 
   std::cout << table << std::endl;
+  out_file << table << std::endl;
+
+  out_file.close();
 
   return result;
 }

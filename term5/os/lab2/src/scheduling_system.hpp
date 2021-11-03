@@ -18,16 +18,12 @@ class SchedulingSystem {
   SchedulingSystem();
 
  public:
-  void Init(CommandLineArgs args);
+  void Init(const CommandLineArgs& args);
   void Run(SchedulingAlgorithm&& algorithm);
 
  private:
-  std::size_t process_count_;
-  std::size_t average_process_time_;
-  std::size_t standard_process_deviation_;
-  std::size_t simulation_time_;
-
-  std::vector<ProcessConfig> processes_;
+  std::size_t                 simulation_time_;
+  std::vector<ProcessConfig>  processes_;
 };
 
 } // namespace os_lab2

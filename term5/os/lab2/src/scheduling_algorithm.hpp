@@ -11,7 +11,7 @@ struct SchedulingAlgorithm {
   struct Result {
     std::string algorithm_type;
     std::string algorithm_name;
-    std::size_t taken_time      = 0;
+    std::size_t taken_time = 0;
   };
 
   virtual Result operator ()(std::size_t simulation_time, std::vector<ProcessConfig>& processes) = 0;

@@ -1,0 +1,5 @@
+process_count 3
+average_process_time 1200
+standard_process_deviation 510
+io_blocking 100 500 30
+simulation_time 5000

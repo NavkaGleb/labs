@@ -1,6 +1,7 @@
 #include "scheduling_system.hpp"
 
 #include <iostream>
+#include <fstream>
 
 #include <tabulate/table.hpp>
 
@@ -14,69 +15,93 @@ SchedulingSystem& SchedulingSystem::GetInstance() {
 }
 
 SchedulingSystem::SchedulingSystem()
-  : process_count_(3)
-  , average_process_time_(1100)
-  , standard_process_deviation_(510)
-  , simulation_time_(10'000) {}
+  : simulation_time_(0) {}
 
-void SchedulingSystem::Init(CommandLineArgs args) {
-  std::vector processes = { 100, 500, 40 };
+void SchedulingSystem::Init(const CommandLineArgs& args) {
+  struct Config {
+    std::size_t process_count               = 0;
+    std::size_t average_process_time        = 0;
+    std::size_t standard_process_deviation  = 0;
+  };
 
-  for (std::size_t i = 0; i < process_count_; ++i) {
-    double x = common::R1();
+  if (args.GetCount() != 2) {
+    throw std::invalid_argument("Didn't provided file with config!");
+  }
 
-    while (x == -1.0) {
-      x = common::R1();
+  Config        config;
+  std::ifstream in_file(args[1]);
+  std::string   fragment;
+
+  while (in_file >> fragment) {
+    if (fragment == "process_count") {
+      in_file >> config.process_count;
+
+      processes_.resize(config.process_count);
     }
 
-    ProcessConfig process;
+    if (fragment == "average_process_time") {
+      in_file >> config.average_process_time;
+    }
 
-    process.cpu_time = (std::size_t)(x * (double)standard_process_deviation_) + average_process_time_;
-    process.io_blocking = processes[i];
+    if (fragment == "standard_process_deviation") {
+      in_file >> config.standard_process_deviation;
+    }
 
-    processes_.emplace_back(process);
+    if (fragment == "io_blocking") {
+      for (auto& process : processes_) {
+        double x = common::R1();
+
+        while (x == -1.0) {
+          x = common::R1();
+        }
+
+        process.cpu_time = (std::size_t)(x * (double)config.standard_process_deviation) + config.average_process_time;
+
+        in_file >> process.io_blocking;
+      }
+    }
+
+    if (fragment == "simulation_time") {
+      in_file >> simulation_time_;
+    }
   }
 
-  tabulate::Table table;
+  in_file.close();
 
-  table.add_row({ "cpu_time", "io_blocking", "cpu_done", "io_next", "blocked_count" });
-
-  for (const auto& process : processes_) {
-    table.add_row({
-      std::to_string(process.cpu_time),
-      std::to_string(process.io_blocking),
-      std::to_string(process.cpu_done),
-      std::to_string(process.io_next),
-      std::to_string(process.blocked_count)
-    });
-  }
-
-  std::cout << table << std::endl;
+  std::cout << "Initialization was successful!" << std::endl;
 }
 
 void SchedulingSystem::Run(SchedulingAlgorithm&& algorithm) {
+  std::cout << "Working..." << std::endl;
+
   auto result = algorithm(simulation_time_, processes_);
 
-  std::cout << "-------------------------" << std::endl;
-  std::cout << "algorithm type: " << result.algorithm_type << std::endl;
-  std::cout << "algorithm name: " << result.algorithm_name << std::endl;
-  std::cout << "taken time:     " << result.taken_time << std::endl;
+  std::ofstream out_file("assets/results.txt");
+
+  out_file << "algorithm type: " << result.algorithm_type << std::endl;
+  out_file << "algorithm name: " << result.algorithm_name << std::endl;
+  out_file << "taken time:     " << result.taken_time << std::endl;
 
   tabulate::Table table;
 
-  table.add_row({ "cpu_time", "io_blocking", "cpu_done", "io_next", "blocked_count" });
+  table.add_row({ "cpu_time", "io_blocking", "cpu_done", "block_count" });
+  table.row(0).format().font_color(tabulate::Color::yellow);
 
   for (const auto& process : processes_) {
     table.add_row({
       std::to_string(process.cpu_time),
       std::to_string(process.io_blocking),
       std::to_string(process.cpu_done),
-      std::to_string(process.io_next),
-      std::to_string(process.blocked_count)
+      std::to_string(process.block_count)
     });
   }
 
   std::cout << table << std::endl;
+  out_file << table << std::endl;
+
+  out_file.close();
+
+  std::cout << "Finish!" << std::endl;
 }
 
 } // namespace os_lab2
