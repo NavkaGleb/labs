@@ -1,2 +1,1 @@
-add_subdirectory(ng-random)
-add_subdirectory(tabulate)
+add_subdirectory(scheduler-simulator)

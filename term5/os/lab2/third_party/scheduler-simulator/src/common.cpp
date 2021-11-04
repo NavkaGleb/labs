@@ -5,7 +5,7 @@
 
 #include <ng_random/random.hpp>
 
-namespace os_lab2::common {
+namespace scheduler_simulator::common {
 
 namespace _detail {
 
@@ -44,4 +44,4 @@ double R1() {
   return x;
 }
 
-} // namespace os_lab2
+} // namespace scheduler_simulator

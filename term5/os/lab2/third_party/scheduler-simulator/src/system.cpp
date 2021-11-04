@@ -1,4 +1,4 @@
-#include "scheduling_system.hpp"
+#include "system.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -7,26 +7,28 @@
 
 #include "common.hpp"
 
-namespace os_lab2 {
+namespace scheduler_simulator {
 
-SchedulingSystem& SchedulingSystem::GetInstance() {
-  static SchedulingSystem instance;
+System& System::GetInstance() {
+  static System instance;
   return instance;
 }
 
-SchedulingSystem::SchedulingSystem()
+System::System()
   : simulation_time_(0) {}
 
-void SchedulingSystem::Init(const CommandLineArgs& args) {
+void System::Init(const CommandLineArgs& args) {
   struct Config {
     std::size_t process_count               = 0;
     std::size_t average_process_time        = 0;
     std::size_t standard_process_deviation  = 0;
   };
 
-  if (args.GetCount() != 2) {
+  if (args.GetCount() != 3) {
     throw std::invalid_argument("Didn't provided file with config!");
   }
+
+  results_filepath_ = args[2];
 
   Config        config;
   std::ifstream in_file(args[1]);
@@ -71,12 +73,12 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
   std::cout << "Initialization was successful!" << std::endl;
 }
 
-void SchedulingSystem::Run(SchedulingAlgorithm&& algorithm) {
+void System::Run(SchedulingAlgorithm&& algorithm) {
   std::cout << "Working..." << std::endl;
 
   auto result = algorithm(simulation_time_, processes_);
 
-  std::ofstream out_file("assets/results.txt");
+  std::ofstream out_file(results_filepath_);
 
   out_file << "algorithm type: " << result.algorithm_type << std::endl;
   out_file << "algorithm name: " << result.algorithm_name << std::endl;
@@ -104,4 +106,4 @@ void SchedulingSystem::Run(SchedulingAlgorithm&& algorithm) {
   std::cout << "Finish!" << std::endl;
 }
 
-} // namespace os_lab2
+} // namespace scheduler_simulator

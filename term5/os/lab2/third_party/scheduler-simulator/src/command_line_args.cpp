@@ -1,6 +1,6 @@
 #include "command_line_args.hpp"
 
-namespace os_lab2 {
+namespace scheduler_simulator {
 
 CommandLineArgs::CommandLineArgs(int argc, char** argv)
   : argc_(argc)
@@ -22,4 +22,4 @@ const char* CommandLineArgs::operator [](std::size_t index) const {
   return argv_[index];
 }
 
-} // namespace os_lab2
+} // namespace scheduler_simulator

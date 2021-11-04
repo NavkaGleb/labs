@@ -8,14 +8,14 @@
 #include "process_config.hpp"
 #include "scheduling_algorithm.hpp"
 
-namespace os_lab2 {
+namespace scheduler_simulator {
 
-class SchedulingSystem {
+class System {
  public:
-  static SchedulingSystem& GetInstance();
+  static System& GetInstance();
 
  private:
-  SchedulingSystem();
+  System();
 
  public:
   void Init(const CommandLineArgs& args);
@@ -23,7 +23,8 @@ class SchedulingSystem {
 
  private:
   std::size_t                 simulation_time_;
+  std::string                 results_filepath_;
   std::vector<ProcessConfig>  processes_;
 };
 
-} // namespace os_lab2
+} // namespace scheduler_simulator

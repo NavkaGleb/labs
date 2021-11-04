@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace os_lab2 {
+namespace scheduler_simulator {
 
 class CommandLineArgs {
  public:
@@ -34,4 +34,4 @@ inline auto end(const CommandLineArgs& args) {
   return args.End();
 }
 
-} // namespace os_lab2
+} // namespace scheduler_simulator

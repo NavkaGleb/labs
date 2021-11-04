@@ -4,11 +4,9 @@
 
 #include <tabulate/table.hpp>
 
-namespace os_lab2 {
-
-SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
-  std::size_t                 simulation_time,
-  std::vector<ProcessConfig>& processes
+scheduler_simulator::SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
+  std::size_t                                       simulation_time,
+  std::vector<scheduler_simulator::ProcessConfig>&  processes
 ) {
   tabulate::Table table;
   std::size_t     record_count = 0;
@@ -100,5 +98,3 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(
 
   return result;
 }
-
-} // namespace os_lab2

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <sstream>
 
-namespace os_lab2 {
+namespace scheduler_simulator {
 
 struct ProcessConfig {
   std::size_t cpu_time    = 0;
@@ -13,4 +13,4 @@ struct ProcessConfig {
   std::size_t block_count = 0;
 };
 
-} // namespace os_lab2
+} // namespace scheduler_simulator
