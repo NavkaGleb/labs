@@ -1,0 +1,23 @@
+{
+  "simulation_time": 5000,
+  "process_config": [
+    {
+      "average_time": 1200,
+      "deviation_time": 300,
+      "io_blocking": 100,
+      "user": 0
+    },
+    {
+      "average_time": 1200,
+      "deviation_time": 300,
+      "io_blocking": 500,
+      "user": 1
+    },
+    {
+      "average_time": 1200,
+      "deviation_time": 300,
+      "io_blocking": 30,
+      "user": 1
+    }
+  ]
+}

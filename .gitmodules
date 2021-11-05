@@ -76,3 +76,6 @@
 [submodule "term5/os/lab2/third_party/tabulate"]
 	path = term5/os/lab2/third_party/scheduler-simulator/third_party/tabulate
 	url = https://github.com/p-ranav/tabulate
+[submodule "term5/os/lab2/third_party/scheduler-simulator/third_party/json"]
+	path = term5/os/lab2/third_party/scheduler-simulator/third_party/json
+	url = https://github.com/nlohmann/json

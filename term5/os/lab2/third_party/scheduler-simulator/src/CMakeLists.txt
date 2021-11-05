@@ -12,4 +12,4 @@ add_library(${TARGET} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(${TARGET} PRIVATE ${PRIVATE_INCLUDE_DIR})
 target_include_directories(${TARGET} PUBLIC ${PUBLIC_INCLUDE_DIR})
 
-target_link_libraries(${TARGET} PUBLIC ng::random tabulate)
+target_link_libraries(${TARGET} PUBLIC ng::random tabulate nlohmann_json)

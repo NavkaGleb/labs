@@ -5,6 +5,8 @@
 
 #include <tabulate/table.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include "common.hpp"
 
 namespace scheduler_simulator {
@@ -18,57 +20,53 @@ System::System()
   : simulation_time_(0) {}
 
 void System::Init(const CommandLineArgs& args) {
-  struct Config {
-    std::size_t process_count               = 0;
-    std::size_t average_process_time        = 0;
-    std::size_t standard_process_deviation  = 0;
-  };
-
   if (args.GetCount() != 3) {
     throw std::invalid_argument("Didn't provided file with config!");
   }
 
   results_filepath_ = args[2];
 
-  Config        config;
-  std::ifstream in_file(args[1]);
-  std::string   fragment;
+  std::ifstream   in_file(args[1]);
+  nlohmann::json  json;
 
-  while (in_file >> fragment) {
-    if (fragment == "process_count") {
-      in_file >> config.process_count;
-
-      processes_.resize(config.process_count);
-    }
-
-    if (fragment == "average_process_time") {
-      in_file >> config.average_process_time;
-    }
-
-    if (fragment == "standard_process_deviation") {
-      in_file >> config.standard_process_deviation;
-    }
-
-    if (fragment == "io_blocking") {
-      for (auto& process : processes_) {
-        double x = common::R1();
-
-        while (x == -1.0) {
-          x = common::R1();
-        }
-
-        process.cpu_time = (std::size_t)(x * (double)config.standard_process_deviation) + config.average_process_time;
-
-        in_file >> process.io_blocking;
-      }
-    }
-
-    if (fragment == "simulation_time") {
-      in_file >> simulation_time_;
-    }
-  }
+  in_file >> json;
 
   in_file.close();
+
+  simulation_time_ = json["simulation_time"];
+
+  processes_.reserve(json["process_config"].size());
+
+  tabulate::Table table;
+
+  table.add_row({ "cpu_time", "io_blocking", "user" });
+
+  for (const auto& json_process_config : json["process_config"]) {
+    std::size_t   average_time = json_process_config["average_time"];
+    std::size_t   deviation_time = json_process_config["deviation_time"];
+
+    ProcessConfig process_config;
+
+    double x = common::R1();
+
+    while (x == -1.0) {
+      x = common::R1();
+    }
+
+    process_config.cpu_time     = (std::size_t) (x * (double) deviation_time) + average_time;
+    process_config.io_blocking  = json_process_config["io_blocking"];
+    process_config.user         = json_process_config["user"];
+
+    table.add_row({
+      std::to_string(process_config.cpu_time),
+      std::to_string(process_config.io_blocking),
+      std::to_string(process_config.user)
+    });
+
+    processes_.push_back(process_config);
+  }
+
+  std::cout << table << std::endl;
 
   std::cout << "Initialization was successful!" << std::endl;
 }
