@@ -3,11 +3,11 @@
 #include <iostream>
 #include <fstream>
 
+#include <ng_random/random.hpp>
+
 #include <tabulate/table.hpp>
 
 #include <nlohmann/json.hpp>
-
-#include "common.hpp"
 
 namespace scheduler_simulator {
 
@@ -39,28 +39,23 @@ void System::Init(const CommandLineArgs& args) {
 
   tabulate::Table table;
 
-  table.add_row({ "cpu_time", "io_blocking", "user" });
+  table.add_row({ "max_cpu_time", "io_blocking", "user_id" });
 
   for (const auto& json_process_config : json["process_config"]) {
+    ProcessConfig process_config;
+
     std::size_t   average_time = json_process_config["average_time"];
     std::size_t   deviation_time = json_process_config["deviation_time"];
 
-    ProcessConfig process_config;
-
-    double x = common::R1();
-
-    while (x == -1.0) {
-      x = common::R1();
-    }
-
-    process_config.cpu_time     = (std::size_t) (x * (double) deviation_time) + average_time;
+    process_config.max_cpu_time = ng::random::Next<std::size_t>(average_time - deviation_time, average_time + deviation_time);
+    process_config.name         = json_process_config["name"];
     process_config.io_blocking  = json_process_config["io_blocking"];
-    process_config.user         = json_process_config["user"];
+    process_config.user_id      = json_process_config["user_id"];
 
     table.add_row({
-      std::to_string(process_config.cpu_time),
+      std::to_string(process_config.max_cpu_time),
       std::to_string(process_config.io_blocking),
-      std::to_string(process_config.user)
+      std::to_string(process_config.user_id)
     });
 
     processes_.push_back(process_config);
@@ -89,9 +84,9 @@ void System::Run(SchedulingAlgorithm&& algorithm) {
 
   for (const auto& process : processes_) {
     table.add_row({
-      std::to_string(process.cpu_time),
+      std::to_string(process.max_cpu_time),
       std::to_string(process.io_blocking),
-      std::to_string(process.cpu_done),
+      std::to_string(process.max_cpu_time),
       std::to_string(process.block_count)
     });
   }

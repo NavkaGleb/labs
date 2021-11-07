@@ -2,22 +2,25 @@
   "simulation_time": 5000,
   "process_config": [
     {
-      "average_time": 1200,
-      "deviation_time": 300,
+      "name": "a",
+      "average_time": 400,
+      "deviation_time": 200,
       "io_blocking": 100,
-      "user": 0
+      "user_id": 0
     },
     {
-      "average_time": 1200,
-      "deviation_time": 300,
+      "name": "b",
+      "average_time": 400,
+      "deviation_time": 200,
       "io_blocking": 500,
-      "user": 1
+      "user_id": 1
     },
     {
-      "average_time": 1200,
-      "deviation_time": 300,
+      "name": "c",
+      "average_time": 400,
+      "deviation_time": 200,
       "io_blocking": 30,
-      "user": 1
+      "user_id": 1
     }
   ]
 }
