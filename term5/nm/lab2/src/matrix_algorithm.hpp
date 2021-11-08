@@ -2,7 +2,7 @@
 
 #include <concepts>
 
-#include "matrix_algorithm.hpp"
+#include "matrix.hpp"
 
 namespace nm_lab2::matrix_algorithm {
 
@@ -41,6 +41,15 @@ Vector<T, kSize> SeidelMethod(
 
 template <Arithmetic T, std::size_t kSize>
 T GetDeterminant(const Matrix<T, kSize, kSize>& matrix);
+
+template <Arithmetic T, std::size_t kRows, std::size_t kColumns>
+constexpr T GetNorm(const Matrix<T, kRows, kColumns>& matrix);
+
+template <Arithmetic T, std::size_t kSize>
+constexpr Matrix<T, kSize, kSize> GetInverse(const Matrix<T, kSize, kSize>& matrix);
+
+template <Arithmetic T, std::size_t kSize>
+constexpr T GetConditionNumber(const Matrix<T, kSize, kSize>& matrix);
 
 } // nm_lab2::matrix_algorithm
 

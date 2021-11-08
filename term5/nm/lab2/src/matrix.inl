@@ -1,6 +1,3 @@
-
-#include "matrix.hpp"
-
 namespace nm_lab2 {
 
 template <typename T, std::size_t kRows, std::size_t kColumns>
@@ -65,12 +62,12 @@ constexpr const Vector<T, kColumns>& Matrix<T, kRows, kColumns>::operator[](std:
 }
 
 template <
-    typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
-    typename RhsT, std::size_t kRhsRows, std::size_t kRhsColumns
+  typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
+  typename RhsT, std::size_t kRhsRows, std::size_t kRhsColumns
 >
 constexpr Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> operator *(
-    const Matrix<LhsT, kLhsRows, kLhsColumns>& lhs,
-    const Matrix<RhsT, kRhsRows, kRhsColumns>& rhs
+  const Matrix<LhsT, kLhsRows, kLhsColumns>& lhs,
+  const Matrix<RhsT, kRhsRows, kRhsColumns>& rhs
 ) {
   static_assert(kLhsColumns == kRhsRows);
 
@@ -83,6 +80,29 @@ constexpr Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> operator
       for (std::size_t k = 0; k < common_dimension; ++k) {
         result[i][j] += lhs[i][k] * rhs[k][j];
       }
+    }
+  }
+
+  return result;
+}
+
+template <
+  typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
+  typename RhsT, std::size_t kSize
+>
+constexpr Vector<std::common_type_t<LhsT, RhsT>, kSize> operator *(
+  const Matrix<LhsT, kLhsRows, kLhsColumns>&  lhs,
+  const Vector<RhsT, kSize>&                  rhs
+) {
+  static_assert(kLhsColumns == kSize);
+
+  const auto common_dimension = kLhsColumns;
+
+  Vector<std::common_type_t<LhsT, RhsT>, kSize> result;
+
+  for (std::size_t i = 0; i < result.GetSize(); ++i) {
+    for (std::size_t j = 0; j < common_dimension; ++j) {
+      result[i] += lhs[i][j] * rhs[j];
     }
   }
 

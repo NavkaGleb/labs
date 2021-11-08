@@ -38,6 +38,9 @@ class Matrix {
   constexpr Row& operator [](std::size_t index);
   constexpr const Row& operator [](std::size_t index) const;
 
+ public:
+  static inline const Matrix kE = Matrix(1);
+
  private:
   DataContainer data_;
 };
@@ -51,23 +54,32 @@ constexpr Matrix<std::common_type_t<LhsT, RhsT>, kLhsRows, kRhsColumns> operator
   const Matrix<RhsT, kRhsRows, kRhsColumns>& rhs
 );
 
+template <
+  typename LhsT, std::size_t kLhsRows, std::size_t kLhsColumns,
+  typename RhsT, std::size_t kSize
+>
+constexpr Vector<std::common_type_t<LhsT, RhsT>, kSize> operator *(
+    const Matrix<LhsT, kLhsRows, kLhsColumns>&  lhs,
+    const Vector<RhsT, kSize>&                  rhs
+);
+
 template <typename T, std::size_t kRows, std::size_t kColumns>
-auto begin(Matrix<T, kRows, kColumns>& matrix) {
+constexpr inline auto begin(Matrix<T, kRows, kColumns>& matrix) {
   return matrix.Begin();
 }
 
 template <typename T, std::size_t kRows, std::size_t kColumns>
-auto end(Matrix<T, kRows, kColumns>& matrix) {
+constexpr inline auto end(Matrix<T, kRows, kColumns>& matrix) {
   return matrix.End();
 }
 
 template <typename T, std::size_t kRows, std::size_t kColumns>
-auto begin(const Matrix<T, kRows, kColumns>& matrix) {
+constexpr inline auto begin(const Matrix<T, kRows, kColumns>& matrix) {
   return matrix.Begin();
 }
 
 template <typename T, std::size_t kRows, std::size_t kColumns>
-auto end(const Matrix<T, kRows, kColumns>& matrix) {
+constexpr inline auto end(const Matrix<T, kRows, kColumns>& matrix) {
   return matrix.End();
 }
 

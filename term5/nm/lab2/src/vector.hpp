@@ -17,9 +17,6 @@ class Vector {
   template <std::same_as<T>... Args>
   constexpr Vector(Args&&... args);
 
-//  constexpr Vector(const Vector& other) = default;
-//  constexpr Vector(Vector&& other) noexcept = default;
-
  public:
   [[nodiscard]] constexpr std::size_t GetSize() const noexcept;
 

@@ -2,6 +2,7 @@
 #include <cassert>
 #include <vector>
 #include <iomanip>
+#include <numeric>
 
 #include "math.hpp"
 
@@ -125,7 +126,7 @@ Vector<T, kSize> SquareRootMethod(
   for (std::size_t i = kSize - 1; i + 1 > 0; --i) {
     T sum = T();
 
-    for (std::size_t j = 0; j < i; ++j) {
+    for (std::size_t j = kSize - 1; j + 1 > i; --j) {
       sum += s[i][j] * x[j];
     }
 
@@ -229,6 +230,64 @@ T GetDeterminant(const Matrix<T, kSize, kSize>& matrix) {
   }
 
   return product;
+}
+
+template <Arithmetic T, std::size_t kRows, std::size_t kColumns>
+constexpr T GetNorm(const Matrix<T, kRows, kColumns>& matrix) {
+  T norm;
+
+  for (std::size_t i = 0; i < kRows; ++i) {
+    auto sum = std::accumulate(matrix[i].Begin(), matrix[i].End(), T(), [](T sum, T coefficient) {
+      return sum + static_cast<T>(std::abs(coefficient));
+    });
+
+    norm = i == 0 ? norm : std::max(norm, sum);
+  }
+
+  return norm;
+}
+
+template <Arithmetic T, std::size_t kSize>
+constexpr Matrix<T, kSize, kSize> GetInverse(const Matrix<T, kSize, kSize>& matrix) {
+  // Gauss method
+  auto result = matrix;
+  auto e = Matrix<T, kSize, kSize>(1);
+
+  for (std::size_t k = 0; k < kSize; ++k) {
+    auto diagonal_element = result[k][k];
+
+    for (std::size_t j = 0; j < kSize; ++j) {
+      result[k][j] /= diagonal_element;
+      e[k][j] /= diagonal_element;
+    }
+
+    for (std::size_t i = k + 1; i < kSize; ++i) {
+      auto coefficient = result[i][k];
+
+      for (std::size_t j = 0; j < kSize; ++j) {
+        result[i][j] -= result[k][j] * coefficient;
+        e[i][j] -= e[k][j] * coefficient;
+      }
+    }
+  }
+
+  for (std::size_t k = kSize - 1; k > 0; --k) {
+    for (std::size_t i = k - 1; i + 1 > 0; --i) {
+      auto coefficient = result[i][k];
+
+      for (std::size_t j = 0; j < kSize; ++j) {
+        result[i][j] -= result[k][j] * coefficient;
+        e[i][j] -= e[k][j] * coefficient;
+      }
+    }
+  }
+
+  return e;
+}
+
+template <Arithmetic T, std::size_t kSize>
+constexpr T GetConditionNumber(const Matrix<T, kSize, kSize>& matrix) {
+  return GetNorm(matrix) * GetNorm(GetInverse(matrix));
 }
 
 } // namespace nm_lab2::matrix_algorithm
