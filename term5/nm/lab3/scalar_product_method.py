@@ -33,8 +33,8 @@ def main():
     b = np.dot(np.eye(matrix.shape[0]), max_eigenvalue) - matrix
     min_eigenvalue = max_eigenvalue - find_max_eigenvalue(b, eps)
 
-    print(f"max_eigenvalue = {max_eigenvalue}")
-    print(f"min_eigenvalue = {min_eigenvalue}")
+    print(f'max_eigenvalue = {max_eigenvalue}')
+    print(f'min_eigenvalue = {min_eigenvalue}')
 
 
 if __name__ == '__main__':
