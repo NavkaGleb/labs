@@ -3,20 +3,20 @@
 #include <vector>
 #include <map>
 
-#include <scheduler_simulator/scheduling_algorithm.hpp>
+#include "../scheduling_algorithm.hpp"
 
 #include <tabulate/table.hpp>
 
 namespace os_lab2 {
 
-class FairShareAlgorithm : public scheduler_simulator::SchedulingAlgorithm {
+class FairShareAlgorithm : public SchedulingAlgorithm {
  public:
   FairShareAlgorithm();
 
  public:
   Result operator ()(
-    std::size_t                                             simulation_time,
-    const std::vector<scheduler_simulator::ProcessConfig>&  process_configs
+    std::size_t                       simulation_time,
+    const std::vector<ProcessConfig>& process_configs
   ) override;
 
  private:
@@ -38,8 +38,8 @@ class FairShareAlgorithm : public scheduler_simulator::SchedulingAlgorithm {
  private:
   [[nodiscard]] bool IsDone() const;
 
-  void InitUserConfigs(const std::vector<scheduler_simulator::ProcessConfig>& process_configs);
-  void InitProcesses(const std::vector<scheduler_simulator::ProcessConfig>& process_configs);
+  void InitUserConfigs(const std::vector<ProcessConfig>& process_configs);
+  void InitProcesses(const std::vector<ProcessConfig>& process_configs);
 
   Process& GetCurrentProcess();
 

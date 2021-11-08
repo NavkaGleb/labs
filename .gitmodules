@@ -71,11 +71,11 @@
 	path = term5/os/lab1/third_party/Random
 	url = https://github.com/navkagleb/Random
 [submodule "term5/os/lab2/third_party/ng-random"]
-	path = term5/os/lab2/third_party/scheduler-simulator/third_party/ng-random
+	path = term5/os/lab2/third_party/ng-random
 	url = https://github.com/navkagleb/ng-random
 [submodule "term5/os/lab2/third_party/tabulate"]
-	path = term5/os/lab2/third_party/scheduler-simulator/third_party/tabulate
+	path = term5/os/lab2/third_party/tabulate
 	url = https://github.com/p-ranav/tabulate
 [submodule "term5/os/lab2/third_party/scheduler-simulator/third_party/json"]
-	path = term5/os/lab2/third_party/scheduler-simulator/third_party/json
+	path = term5/os/lab2/third_party/json
 	url = https://github.com/nlohmann/json

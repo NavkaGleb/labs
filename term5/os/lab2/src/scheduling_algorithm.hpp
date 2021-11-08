@@ -5,7 +5,7 @@
 
 #include "process_config.hpp"
 
-namespace scheduler_simulator {
+namespace os_lab2 {
 
 struct SchedulingAlgorithm {
   struct Result {
@@ -17,4 +17,4 @@ struct SchedulingAlgorithm {
   virtual Result operator ()(std::size_t simulation_time, const std::vector<ProcessConfig>& process_configs) = 0;
 };
 
-} // namespace scheduler_simulator
+} // namespace os_lab2

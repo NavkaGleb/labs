@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <sstream>
 
-namespace scheduler_simulator {
+namespace os_lab2 {
 
 struct ProcessConfig {
   std::string name;
@@ -13,4 +13,4 @@ struct ProcessConfig {
   std::size_t user_id      = 0;
 };
 
-} // namespace scheduler_simulator
+} // namespace os_lab2

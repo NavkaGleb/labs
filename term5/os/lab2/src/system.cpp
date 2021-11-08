@@ -9,7 +9,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace scheduler_simulator {
+namespace os_lab2 {
 
 System& System::GetInstance() {
   static System instance;
@@ -99,4 +99,4 @@ void System::Run(SchedulingAlgorithm&& algorithm) {
   std::cout << "Finish!" << std::endl;
 }
 
-} // namespace scheduler_simulator
+} // namespace os_lab2

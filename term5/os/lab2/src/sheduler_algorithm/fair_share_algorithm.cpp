@@ -14,9 +14,9 @@ FairShareAlgorithm::FairShareAlgorithm() {
   result_.taken_time = 0;
 }
 
-scheduler_simulator::SchedulingAlgorithm::Result FairShareAlgorithm::operator ()(
-  std::size_t                                             simulation_time,
-  const std::vector<scheduler_simulator::ProcessConfig>&  process_configs
+SchedulingAlgorithm::Result FairShareAlgorithm::operator ()(
+  std::size_t                       simulation_time,
+  const std::vector<ProcessConfig>& process_configs
 ) {
   InitUserConfigs(process_configs);
   InitProcesses(process_configs);
@@ -45,13 +45,13 @@ bool FairShareAlgorithm::IsDone() const {
   return user_configs.empty();
 }
 
-void FairShareAlgorithm::InitUserConfigs(const std::vector<scheduler_simulator::ProcessConfig>& process_configs) {
+void FairShareAlgorithm::InitUserConfigs(const std::vector<ProcessConfig>& process_configs) {
   for (const auto& process_config : process_configs) {
     user_configs[process_config.user_id].process_count++;
   }
 }
 
-void FairShareAlgorithm::InitProcesses(const std::vector<scheduler_simulator::ProcessConfig>& process_configs) {
+void FairShareAlgorithm::InitProcesses(const std::vector<ProcessConfig>& process_configs) {
   for (const auto& process_config : process_configs) {
     Process process;
 
@@ -153,7 +153,7 @@ void FairShareAlgorithm::PushRecord(const Process& current_process, const std::s
     std::to_string(current_process.block_count)
   });
 
-  table_.row(row_count - 1).format()
+  table_.row(row_count).format()
     .font_color(color);
 }
 

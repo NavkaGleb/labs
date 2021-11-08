@@ -8,7 +8,7 @@
 #include "process_config.hpp"
 #include "scheduling_algorithm.hpp"
 
-namespace scheduler_simulator {
+namespace os_lab2 {
 
 class System {
  public:
@@ -27,4 +27,4 @@ class System {
   std::vector<ProcessConfig>  processes_;
 };
 
-} // namespace scheduler_simulator
+} // namespace os_lab2
