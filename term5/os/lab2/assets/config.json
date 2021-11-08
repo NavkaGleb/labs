@@ -3,24 +3,51 @@
   "process_config": [
     {
       "name": "a",
-      "average_time": 400,
-      "deviation_time": 200,
-      "io_blocking": 100,
-      "user_id": 0
+      "user_id": 0,
+      "cpu_time": {
+        "average": 400,
+        "deviation": 200
+      },
+      "io_block_time": {
+        "average": 20,
+        "deviation": 5
+      },
+      "io_block_period": {
+        "average": 400,
+        "deviation": 100
+      }
     },
     {
       "name": "b",
-      "average_time": 400,
-      "deviation_time": 200,
-      "io_blocking": 500,
-      "user_id": 1
+      "user_id": 1,
+      "cpu_time": {
+        "average": 400,
+        "deviation": 200
+      },
+      "io_block_time": {
+        "average": 20,
+        "deviation": 5
+      },
+      "io_block_period": {
+        "average": 400,
+        "deviation": 100
+      }
     },
     {
       "name": "c",
-      "average_time": 400,
-      "deviation_time": 200,
-      "io_blocking": 30,
-      "user_id": 1
+      "user_id": 0,
+      "cpu_time": {
+        "average": 400,
+        "deviation": 200
+      },
+      "io_block_time": {
+        "average": 20,
+        "deviation": 5
+      },
+      "io_block_period": {
+        "average": 400,
+        "deviation": 100
+      }
     }
   ]
 }

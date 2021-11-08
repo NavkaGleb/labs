@@ -39,23 +39,49 @@ void System::Init(const CommandLineArgs& args) {
 
   tabulate::Table table;
 
-  table.add_row({ "max_cpu_time", "io_blocking", "user_id" });
+  table.add_row({ "name", "user_id", "max_cpu_time", "io_block_time", "io_block_period",  });
 
   for (const auto& json_process_config : json["process_config"]) {
     ProcessConfig process_config;
 
-    std::size_t   average_time = json_process_config["average_time"];
-    std::size_t   deviation_time = json_process_config["deviation_time"];
+    process_config.name     = json_process_config["name"];
+    process_config.user_id  = json_process_config["user_id"];
 
-    process_config.max_cpu_time = ng::random::Next<std::size_t>(average_time - deviation_time, average_time + deviation_time);
-    process_config.name         = json_process_config["name"];
-    process_config.io_blocking  = json_process_config["io_blocking"];
-    process_config.user_id      = json_process_config["user_id"];
+    Range<std::size_t> cpu_time = {
+      json_process_config["cpu_time"]["average"],
+      json_process_config["cpu_time"]["deviation"]
+    };
+
+    process_config.io_block_time = {
+      json_process_config["io_block_time"]["average"],
+      json_process_config["io_block_time"]["deviation"]
+    };
+
+    process_config.io_block_period = {
+      json_process_config["io_block_period"]["average"],
+      json_process_config["io_block_period"]["deviation"]
+    };
+
+    process_config.max_cpu_time = ng::random::Next<std::size_t>(cpu_time.average - cpu_time.deviation, cpu_time.average + cpu_time.deviation);
+
+    tabulate::Table io_block_time_table;
+    io_block_time_table.add_row({
+      std::to_string(process_config.io_block_time.average),
+      std::to_string(process_config.io_block_time.deviation)
+    }).format().hide_border();
+
+    tabulate::Table io_block_period_table;
+    io_block_period_table.add_row({
+      std::to_string(process_config.io_block_period.average),
+      std::to_string(process_config.io_block_period.deviation)
+    }).format().hide_border();
 
     table.add_row({
+      process_config.name,
+      std::to_string(process_config.user_id),
       std::to_string(process_config.max_cpu_time),
-      std::to_string(process_config.io_blocking),
-      std::to_string(process_config.user_id)
+      io_block_time_table,
+      io_block_period_table
     });
 
     processes_.push_back(process_config);
@@ -79,15 +105,14 @@ void System::Run(SchedulingAlgorithm&& algorithm) {
 
   tabulate::Table table;
 
-  table.add_row({ "cpu_time", "io_blocking", "cpu_done", "block_count" });
+  table.add_row({ "cpu_time", "io_blocking", "cpu_done" });
   table.row(0).format().font_color(tabulate::Color::yellow);
 
   for (const auto& process : processes_) {
     table.add_row({
       std::to_string(process.max_cpu_time),
-      std::to_string(process.io_blocking),
+      std::to_string(process.io_block_time.average),
       std::to_string(process.max_cpu_time),
-      std::to_string(process.block_count)
     });
   }
 
