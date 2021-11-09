@@ -61,6 +61,8 @@ SchedulingAlgorithm::Result FairShareAlgorithm::operator ()(Config&& config) {
 
   // Main loop
   while (result_.taken_time < config.simulation_time) {
+    result_.taken_time += kContextSwitchTime;
+
     auto current_process_iterator = std::min_element(processes_.begin(), processes_.end(), [](const Process& lhs, const Process& rhs) {
       return lhs.priority < rhs.priority;
     });
@@ -76,6 +78,8 @@ SchedulingAlgorithm::Result FairShareAlgorithm::operator ()(Config&& config) {
 
     // Quantum simulation
     for (std::size_t tick = 0; tick < kQuantum; ++tick) {
+      result_.taken_time++;
+
       // Update current process
       current_process.cpu_time.current++;
       current_process.cpu_count++;
@@ -99,8 +103,6 @@ SchedulingAlgorithm::Result FairShareAlgorithm::operator ()(Config&& config) {
     if (current_process.status == Process::Status::kRunning) {
       current_process.status = Process::Status::kPaused;
     }
-
-    result_.taken_time += kQuantum;
 
     PushRecord(current_process);
 

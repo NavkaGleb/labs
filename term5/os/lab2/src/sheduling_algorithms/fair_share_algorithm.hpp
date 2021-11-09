@@ -55,8 +55,9 @@ class FairShareAlgorithm : public SchedulingAlgorithm {
   void PushRecord(const Process& current_process);
 
  private:
-  static inline const std::size_t kQuantum      = 60;
-  static inline const std::size_t kBasePriority = 60;
+  static inline const std::size_t kContextSwitchTime = 1;
+  static inline const std::size_t kQuantum           = 50;
+  static inline const std::size_t kBasePriority      = 50;
 
  private:
   tabulate::Table                   table_;
