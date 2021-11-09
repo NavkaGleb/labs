@@ -5,6 +5,10 @@ namespace os_lab2 {
 
 template <typename SchedulingAlgorithm>
 void SchedulingSystem::Run() {
+  if (processes_.empty()) {
+    throw std::runtime_error("SchedulingSystem didn't initialized. Run SchedulingSystem::Init method to initialize the system");
+  }
+
   std::cout << "Working..." << std::endl;
 
   auto result = SchedulingAlgorithm()({

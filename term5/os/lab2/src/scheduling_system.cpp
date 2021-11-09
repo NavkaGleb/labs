@@ -22,6 +22,8 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
   summary_results_filepath_ = args[2];
   process_results_filepath_ = args[3];
 
+  std::cout << args[1] << std::endl;
+
   std::ifstream   in_file(args[1]);
   nlohmann::json  json;
 
@@ -29,8 +31,16 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
 
   in_file.close();
 
+  if (!json.contains("simulation_time")) {
+    throw std::invalid_argument("Config file does not meet requirements: No 'simulation_time' field");
+  }
+
   if (!json.contains("process_config")) {
     throw std::invalid_argument("Config file does not meet requirements: No 'process_config' field");
+  }
+
+  if (json["process_config"].empty()) {
+    throw std::invalid_argument("Config file does not meet requirements: 'process_config' has to contains at least one process");
   }
 
   simulation_time_ = json["simulation_time"];

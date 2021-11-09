@@ -1,0 +1,37 @@
+{
+  "simulation_time": 5000,
+  "process_config": [
+    {
+      "name": "a",
+      "user_id": 0,
+      "cpu_time_range": {
+        "min": 300,
+        "max": 600
+      },
+      "io_block_range": {
+        "min": 80,
+        "max": 140
+      }
+    },
+    {
+      "name": "b",
+      "user_id": 1,
+      "cpu_time_range": {
+        "min": 200,
+        "max": 800
+      }
+    },
+    {
+      "name": "c",
+      "user_id": 1,
+      "cpu_time_range": {
+        "min": 300,
+        "max": 400
+      },
+      "io_block_range": {
+        "min": 30,
+        "max": 100
+      }
+    }
+  ]
+}
