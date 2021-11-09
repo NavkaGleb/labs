@@ -10,21 +10,26 @@
 
 namespace os_lab2 {
 
-class System {
+class SchedulingSystem {
  public:
-  static System& GetInstance();
+  static SchedulingSystem& GetInstance();
 
  private:
-  System();
+  SchedulingSystem();
 
  public:
   void Init(const CommandLineArgs& args);
-  void Run(SchedulingAlgorithm&& algorithm);
+
+  template <typename ShedulingAlgorithm>
+  void Run();
 
  private:
   std::size_t                 simulation_time_;
-  std::string                 results_filepath_;
+  std::string                 summary_results_filepath_;
+  std::string                 process_results_filepath_;
   std::vector<ProcessConfig>  processes_;
 };
 
 } // namespace os_lab2
+
+#include "scheduling_system.inl"

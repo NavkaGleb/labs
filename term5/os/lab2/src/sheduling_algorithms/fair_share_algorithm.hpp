@@ -3,9 +3,9 @@
 #include <vector>
 #include <map>
 
-#include "../scheduling_algorithm.hpp"
-
 #include <tabulate/table.hpp>
+
+#include "scheduling_algorithm.hpp"
 
 namespace os_lab2 {
 
@@ -14,20 +14,35 @@ class FairShareAlgorithm : public SchedulingAlgorithm {
   FairShareAlgorithm();
 
  public:
-  Result operator ()(
-    std::size_t                       simulation_time,
-    const std::vector<ProcessConfig>& process_configs
-  ) override;
+  Result operator ()(Config&& config) override;
 
  private:
   struct Process {
-    std::string name;
-    std::size_t priority          = 0;
-    std::size_t max_cpu_time      = 0;
-    std::size_t current_cpu_time  = 0;
-    std::size_t user_id           = 0;
-    std::size_t block_count       = 0;
-    std::size_t cpu_count         = 0;
+    enum class Status : uint8_t {
+      kUnknown = 0,
+      kRunning,
+      kPaused,
+      kBlocked,
+      kDone,
+    };
+
+    template <typename T>
+    struct Limit {
+      Range<T>  range;
+      T         max     = T();
+      T         current = T();
+    };
+
+    std::string                       name;
+    std::size_t                       user_id       = 0;
+    std::size_t                       priority      = 0;
+    std::size_t                       block_count   = 0;
+    std::size_t                       cpu_count     = 0;
+    Status                            status        = Status::kUnknown;
+    std::optional<Limit<std::size_t>> io_block_time;
+    Limit<std::size_t>                cpu_time;
+
+    explicit Process(const ProcessConfig& process_config, std::size_t priority);
   };
 
   struct UserConfig {
@@ -36,29 +51,18 @@ class FairShareAlgorithm : public SchedulingAlgorithm {
   };
 
  private:
-  [[nodiscard]] bool IsDone() const;
-
-  void InitUserConfigs(const std::vector<ProcessConfig>& process_configs);
-  void InitProcesses(const std::vector<ProcessConfig>& process_configs);
-
-  Process& GetCurrentProcess();
-
-  void UpdateCurrentProcess(Process& current_process);
-  void UpdateProcessesPriority();
-
-  void LogCurrentProcess(const Process& current_process);
-  void LogTable();
-  void PushRecord(const Process& current_process, const std::string& comment, tabulate::Color color);
+  void LogTable(std::ostream& ostream);
+  void PushRecord(const Process& current_process);
 
  private:
-  static const std::size_t kQuantum = 60;
-  static const std::size_t kBasePriority = 60;
+  static inline const std::size_t kQuantum      = 60;
+  static inline const std::size_t kBasePriority = 60;
 
  private:
-  tabulate::Table table_;
-  std::vector<Process> processes_;
-  std::map<std::size_t, UserConfig>  user_configs;
-  Result result_;
+  tabulate::Table                   table_;
+  std::vector<Process>              processes_;
+  std::map<std::size_t, UserConfig> user_configs;
+  Result                            result_;
 };
 
 } // namespace os_lab2

@@ -14,7 +14,13 @@ struct SchedulingAlgorithm {
     std::size_t taken_time = 0;
   };
 
-  virtual Result operator ()(std::size_t simulation_time, const std::vector<ProcessConfig>& process_configs) = 0;
+  struct Config {
+    std::size_t                       simulation_time = 0;
+    const std::vector<ProcessConfig>& process_configs;
+    const std::string&                process_results_filepath;
+  };
+
+  virtual Result operator ()(Config&& config) = 0;
 };
 
 } // namespace os_lab2

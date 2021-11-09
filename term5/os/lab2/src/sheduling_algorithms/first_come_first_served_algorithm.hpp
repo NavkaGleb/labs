@@ -5,7 +5,7 @@
 namespace os_lab2 {
 
 struct FirstComeFirstServedAlgorithm : public SchedulingAlgorithm {
-  Result operator ()(std::size_t simulation_time, const std::vector<ProcessConfig>& processes) override;
+  Result operator ()(Config&& config) override;
 };
 
 } // namespace os_lab2

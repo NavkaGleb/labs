@@ -4,49 +4,33 @@
     {
       "name": "a",
       "user_id": 0,
-      "cpu_time": {
-        "average": 400,
-        "deviation": 200
+      "cpu_time_range": {
+        "min": 300,
+        "max": 600
       },
-      "io_block_time": {
-        "average": 20,
-        "deviation": 5
-      },
-      "io_block_period": {
-        "average": 400,
-        "deviation": 100
+      "io_block_range": {
+        "min": 80,
+        "max": 140
       }
     },
     {
       "name": "b",
       "user_id": 1,
-      "cpu_time": {
-        "average": 400,
-        "deviation": 200
-      },
-      "io_block_time": {
-        "average": 20,
-        "deviation": 5
-      },
-      "io_block_period": {
-        "average": 400,
-        "deviation": 100
+      "cpu_time_range": {
+        "min": 200,
+        "max": 800
       }
     },
     {
       "name": "c",
       "user_id": 1,
-      "cpu_time": {
-        "average": 400,
-        "deviation": 200
+      "cpu_time_range": {
+        "min": 300,
+        "max": 400
       },
-      "io_block_time": {
-        "average": 20,
-        "deviation": 5
-      },
-      "io_block_period": {
-        "average": 400,
-        "deviation": 100
+      "io_block_range": {
+        "min": 30,
+        "max": 100
       }
     }
   ]
