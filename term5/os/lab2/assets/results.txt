@@ -1,12 +1,12 @@
-algorithm type: Scheduling in Interactive Systems
-algorithm name: Fair-Share Algorithm
-taken time:     1380
+algorithm type: Batch (NonPreemptive)
+algorithm name: First-Come First-Served
+taken time:     1257
 +----------+-------------+----------+
 | cpu_time | io_blocking | cpu_done |
 +----------+-------------+----------+
-| 396      | 20          | 396      |
+| 311      | 20          | 311      |
 +----------+-------------+----------+
-| 283      | 20          | 283      |
+| 485      | 20          | 485      |
 +----------+-------------+----------+
 | 461      | 20          | 461      |
 +----------+-------------+----------+

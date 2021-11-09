@@ -39,7 +39,8 @@ void System::Init(const CommandLineArgs& args) {
 
   tabulate::Table table;
 
-  table.add_row({ "name", "user_id", "max_cpu_time", "io_block_time", "io_block_period",  });
+  table.add_row({ "name", "user_id", "max_cpu_time", "io_block_time", "io_block_period",  }).row(0).format()
+    .font_color(tabulate::Color::yellow);
 
   for (const auto& json_process_config : json["process_config"]) {
     ProcessConfig process_config;
