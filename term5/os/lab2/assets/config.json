@@ -1,36 +1,60 @@
 {
-  "simulation_time": 5000,
+  "simulation_time": 1000,
   "process_config": [
     {
       "name": "a",
       "user_id": 0,
-      "cpu_time_range": {
-        "min": 300,
-        "max": 600
+      "cpu_time": {
+        "min": 1000,
+        "max": 1100
       },
-      "io_block_range": {
+      "io_block_period": {
         "min": 80,
         "max": 140
+      },
+      "io_block_time": {
+        "min": 10,
+        "max": 20
       }
     },
     {
       "name": "b",
       "user_id": 1,
-      "cpu_time_range": {
-        "min": 200,
-        "max": 800
+      "cpu_time": {
+        "min": 1000,
+        "max": 1100
       }
     },
     {
       "name": "c",
       "user_id": 1,
-      "cpu_time_range": {
-        "min": 300,
-        "max": 400
+      "cpu_time": {
+        "min": 1000,
+        "max": 1100
       },
-      "io_block_range": {
+      "io_block_period": {
         "min": 30,
         "max": 100
+      },
+      "io_block_time": {
+        "min": 10,
+        "max": 20
+      }
+    },
+    {
+      "name": "d",
+      "user_id": 1,
+      "cpu_time": {
+        "min": 1000,
+        "max": 1100
+      },
+      "io_block_period": {
+        "min": 80,
+        "max": 140
+      },
+      "io_block_time": {
+        "min": 10,
+        "max": 20
       }
     }
   ]

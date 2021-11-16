@@ -49,7 +49,7 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
 
   tabulate::Table table;
 
-  table.add_row({ "name", "user_id", "cpu_time_range", "io_block_range" }).row(0).format()
+  table.add_row({ "name", "user_id", "cpu_time_range", "io_block_period_range", "io_block_time_range" }).row(0).format()
     .font_color(tabulate::Color::yellow);
 
   for (const auto& json_process_config : json["process_config"]) {
@@ -63,7 +63,7 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
       throw std::invalid_argument("Config file does not meet requirements: No 'user_id' in 'process_config'");
     }
 
-    if (!json_process_config.contains("cpu_time_range")) {
+    if (!json_process_config.contains("cpu_time")) {
       throw std::invalid_argument("Config file does not meet requirements: No 'cpu_time_range' in 'process_config'");
     }
 
@@ -71,33 +71,52 @@ void SchedulingSystem::Init(const CommandLineArgs& args) {
     process_config.user_id  = json_process_config["user_id"];
 
     process_config.cpu_time_range = {
-      json_process_config["cpu_time_range"]["min"],
-      json_process_config["cpu_time_range"]["max"]
+      json_process_config["cpu_time"]["min"],
+      json_process_config["cpu_time"]["max"]
     };
 
-    if (json_process_config.contains("io_block_range")) {
-      process_config.io_block_range = {
-        json_process_config["io_block_range"]["min"],
-        json_process_config["io_block_range"]["max"]
+    if (json_process_config.contains("io_block_period")) {
+      process_config.io_block_period_range = {
+        json_process_config["io_block_period"]["min"],
+        json_process_config["io_block_period"]["max"]
+      };
+    }
+
+    if (json_process_config.contains("io_block_time")) {
+      process_config.io_block_time_range = {
+        json_process_config["io_block_time"]["min"],
+        json_process_config["io_block_time"]["max"]
       };
     }
 
     tabulate::Table io_block_period_table;
 
-    if (process_config.io_block_range) {
+    if (process_config.io_block_period_range) {
       io_block_period_table.add_row({
-        std::to_string(process_config.io_block_range->min) + ":" +
-        std::to_string(process_config.io_block_range->max)
+        std::to_string(process_config.io_block_period_range->min) + ":" +
+        std::to_string(process_config.io_block_period_range->max)
       }).format().hide_border();
     } else {
       io_block_period_table.add_row({ "-" }).format().hide_border();
+    }
+
+    tabulate::Table io_block_time_table;
+
+    if (process_config.io_block_time_range) {
+      io_block_time_table.add_row({
+        std::to_string(process_config.io_block_time_range->min) + ":" +
+        std::to_string(process_config.io_block_time_range->max)
+      }).format().hide_border();
+    } else {
+      io_block_time_table.add_row({ "-" }).format().hide_border();
     }
 
     table.add_row({
       process_config.name,
       std::to_string(process_config.user_id),
       std::to_string(process_config.cpu_time_range.min) + ":" + std::to_string(process_config.cpu_time_range.max),
-      io_block_period_table
+      io_block_period_table,
+      io_block_time_table
     });
 
     processes_.push_back(process_config);

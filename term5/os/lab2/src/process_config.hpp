@@ -16,7 +16,8 @@ struct ProcessConfig {
   std::string                       name;
   std::size_t                       user_id = 0;
   Range<std::size_t>                cpu_time_range;
-  std::optional<Range<std::size_t>> io_block_range;
+  std::optional<Range<std::size_t>> io_block_period_range;
+  std::optional<Range<std::size_t>> io_block_time_range;
 };
 
 } // namespace os_lab2

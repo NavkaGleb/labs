@@ -13,7 +13,7 @@ struct Process : ProcessConfig {
   std::size_t                       io_block_next     = 0;
   std::size_t                       block_count       = 0;
   std::size_t                       max_cpu_time      = 0;
-  std::optional<Range<std::size_t>> io_block_range;
+  std::optional<Range<std::size_t>> io_block_period;
 
   explicit Process(const ProcessConfig& process_config) {
     name            = process_config.name;
@@ -24,7 +24,7 @@ struct Process : ProcessConfig {
       process_config.cpu_time_range.max
     );
 
-    io_block_range = process_config.io_block_range;
+    io_block_period = process_config.io_block_period_range;
   }
 };
 
@@ -55,13 +55,13 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(Config&& 
       std::to_string(processes[current_process_index].current_cpu_time)
     }).format().hide_border();
 
-    bool is_io_block_period_exists = processes[current_process_index].io_block_range.has_value();
+    bool is_io_block_period_exists = processes[current_process_index].io_block_period.has_value();
 
     table.add_row({
         std::to_string(current_process_index),
         comment,
         cpu_time_table,
-        is_io_block_period_exists ? std::to_string(processes[current_process_index].io_block_range->max) : "-",
+        is_io_block_period_exists ? std::to_string(processes[current_process_index].io_block_period->max) : "-",
         std::to_string(processes[current_process_index].block_count)
     });
 
@@ -96,8 +96,8 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(Config&& 
       add_row("registered...");
     }
 
-    if (processes[current_process_index].io_block_range) {
-      if (processes[current_process_index].io_block_range->max == processes[current_process_index].io_block_next) {
+    if (processes[current_process_index].io_block_period) {
+      if (processes[current_process_index].io_block_period->max == processes[current_process_index].io_block_next) {
         add_row("io blocked...", tabulate::Color::red);
 
         processes[current_process_index].block_count++;
@@ -117,7 +117,7 @@ SchedulingAlgorithm::Result FirstComeFirstServedAlgorithm::operator ()(Config&& 
 
     processes[current_process_index].current_cpu_time++;
 
-    if (processes[current_process_index].io_block_range) {
+    if (processes[current_process_index].io_block_period) {
       processes[current_process_index].io_block_next++;
     }
 
