@@ -1,0 +1,2 @@
+add_subdirectory(mpi_implementation)
+add_subdirectory(thread_implementation)

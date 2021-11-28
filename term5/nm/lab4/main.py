@@ -13,7 +13,7 @@ def f(x):
 
 
 def chebyshev_polynomial_zero(k, n, a, b):
-    return (a + b) / 2 + (b - a) / 2 * math.cos(((2 * k + 1) * math.pi) / (2 * n))
+    return ((a + b) / 2) + ((b - a) / 2) * math.cos(((2 * k + 1) * math.pi) / (2 * n))
 
 
 def print_measurements(measurements):
@@ -23,7 +23,7 @@ def print_measurements(measurements):
 
 def main():
     node_count = 9
-    a = -10
+    a = 2
     b = 10
 
     nodes = []

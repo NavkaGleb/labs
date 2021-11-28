@@ -1,70 +1,74 @@
 +------+--------------------------------+---------+----------+-----------------+---------------+-------------+------------+----------+
 | name | status                         | user_id | cpu_time | io_block_period | io_block_time | block_count | taken_time | priority |
 +------+--------------------------------+---------+----------+-----------------+---------------+-------------+------------+----------+
-|    a | running -> before quantum      |       0 |   0:1095 |           0:108 |          0:14 |           0 |          1 |       50 |
-|    a | ready -> after quantum         |       0 |  50:1095 |          50:108 |          0:14 |           0 |         51 |       50 |
-|    b | running -> before quantum      |       1 |   0:1004 |               - |             - |           0 |         52 |       50 |
-|    b | ready -> after quantum         |       1 |  50:1004 |               - |             - |           0 |        102 |       50 |
-|    c | running -> before quantum      |       1 |   0:1097 |            0:63 |          0:10 |           0 |        103 |       62 |
-|    c | ready -> after quantum         |       1 |  50:1097 |           50:63 |          0:10 |           0 |        153 |       62 |
-|    d | running -> before quantum      |       1 |   0:1057 |           0:120 |          0:19 |           0 |        154 |       68 |
-|    d | ready -> after quantum         |       1 |  50:1057 |          50:120 |          0:19 |           0 |        204 |       68 |
-|    a | running -> before quantum      |       0 |  50:1095 |          50:108 |          0:14 |           0 |        205 |       76 |
-|    a | ready -> after quantum         |       0 | 100:1095 |         100:108 |          0:14 |           0 |        255 |       76 |
-|    b | running -> before quantum      |       1 |  50:1004 |               - |             - |           0 |        256 |       85 |
-|    b | ready -> after quantum         |       1 | 100:1004 |               - |             - |           0 |        306 |       85 |
-|    c | running -> before quantum      |       1 |  50:1097 |           50:63 |          0:10 |           0 |        307 |       92 |
-|    c | blocked -> blocked             |       1 |  63:1097 |           63:63 |          0:10 |           0 |        320 |       92 |
-|    d | ready -> in quantum            |       1 |  50:1057 |          50:120 |          0:19 |           0 |        321 |       92 |
-|    d | running -> in quantum          |       1 |  50:1057 |          50:120 |          0:19 |           0 |        321 |       92 |
-|    c | ready -> from blocked to ready |       1 |  63:1097 |            0:49 |         15:15 |           1 |        335 |       92 |
-|    d | ready -> after quantum         |       1 |  87:1057 |          87:120 |          0:19 |           0 |        358 |       92 |
-|    c | running -> before quantum      |       1 |  63:1097 |            0:49 |         15:15 |           1 |        359 |      102 |
-|    c | blocked -> blocked             |       1 | 112:1097 |           49:49 |         15:15 |           1 |        408 |      102 |
-|    c | blocked -> after quantum       |       1 | 113:1097 |            1:30 |          2:19 |           2 |        409 |      102 |
-|    a | running -> before quantum      |       0 | 100:1095 |         100:108 |          0:14 |           0 |        410 |      101 |
-|    a | blocked -> blocked             |       0 | 108:1095 |         108:108 |          0:14 |           0 |        418 |      101 |
-|    b | ready -> in quantum            |       1 | 100:1004 |               - |             - |           0 |        419 |      123 |
-|    b | running -> in quantum          |       1 | 100:1004 |               - |             - |           0 |        419 |      123 |
-|    c | ready -> from blocked to ready |       1 | 113:1097 |            1:30 |         19:19 |           2 |        428 |      102 |
-|    a | ready -> from blocked to ready |       0 | 108:1095 |           0:138 |         18:18 |           1 |        436 |      101 |
-|    b | ready -> after quantum         |       1 | 142:1004 |               - |             - |           0 |        461 |      123 |
-|    a | running -> before quantum      |       0 | 108:1095 |           0:138 |         18:18 |           1 |        462 |      106 |
-|    a | ready -> after quantum         |       0 | 158:1095 |          50:138 |         18:18 |           1 |        512 |      106 |
-|    d | running -> before quantum      |       1 |  87:1057 |          87:120 |          0:19 |           0 |        513 |      104 |
-|    d | blocked -> blocked             |       1 | 120:1057 |         120:120 |          0:19 |           0 |        546 |      104 |
-|    c | ready -> in quantum            |       1 | 113:1097 |            1:30 |         19:19 |           2 |        547 |      117 |
-|    c | running -> in quantum          |       1 | 113:1097 |            1:30 |         19:19 |           2 |        547 |      117 |
-|    d | ready -> from blocked to ready |       1 | 120:1057 |           0:138 |         17:17 |           1 |        563 |      104 |
-|    c | ready -> after quantum         |       1 | 130:1097 |           18:30 |         19:19 |           2 |        564 |      117 |
-|    d | running -> before quantum      |       1 | 120:1057 |           0:138 |         17:17 |           1 |        565 |      128 |
-|    d | ready -> after quantum         |       1 | 170:1057 |          50:138 |         17:17 |           1 |        615 |      128 |
-|    a | running -> before quantum      |       0 | 158:1095 |          50:138 |         18:18 |           1 |        616 |      132 |
-|    a | ready -> after quantum         |       0 | 208:1095 |         100:138 |         18:18 |           1 |        666 |      132 |
-|    c | running -> before quantum      |       1 | 130:1097 |           18:30 |         19:19 |           2 |        667 |      125 |
-|    c | blocked -> blocked             |       1 | 142:1097 |           30:30 |         19:19 |           2 |        679 |      125 |
-|    b | ready -> in quantum            |       1 | 142:1004 |               - |             - |           0 |        680 |      131 |
-|    b | running -> in quantum          |       1 | 142:1004 |               - |             - |           0 |        680 |      131 |
-|    c | ready -> from blocked to ready |       1 | 142:1097 |            0:36 |         15:15 |           3 |        694 |      125 |
-|    b | ready -> after quantum         |       1 | 180:1004 |               - |             - |           0 |        718 |      131 |
-|    c | running -> before quantum      |       1 | 142:1097 |            0:36 |         15:15 |           3 |        719 |      138 |
-|    c | blocked -> blocked             |       1 | 178:1097 |           36:36 |         15:15 |           3 |        755 |      138 |
-|    d | ready -> in quantum            |       1 | 170:1057 |          50:138 |         17:17 |           1 |        756 |      152 |
-|    d | running -> in quantum          |       1 | 170:1057 |          50:138 |         17:17 |           1 |        756 |      152 |
-|    d | ready -> after quantum         |       1 | 184:1057 |          64:138 |         17:17 |           1 |        770 |      152 |
-|    a | running -> before quantum      |       0 | 208:1095 |         100:138 |         18:18 |           1 |        771 |      157 |
-|    c | ready -> from blocked to ready |       1 | 178:1097 |            0:79 |         20:20 |           4 |        776 |      138 |
-|    a | blocked -> blocked             |       0 | 246:1095 |         138:138 |         18:18 |           1 |        809 |      157 |
-|    b | ready -> in quantum            |       1 | 180:1004 |               - |             - |           0 |        810 |      161 |
-|    b | running -> in quantum          |       1 | 180:1004 |               - |             - |           0 |        810 |      161 |
-|    b | ready -> after quantum         |       1 | 192:1004 |               - |             - |           0 |        822 |      161 |
-|    c | running -> before quantum      |       1 | 178:1097 |            0:79 |         20:20 |           4 |        823 |      152 |
-|    a | ready -> from blocked to ready |       0 | 246:1095 |           0:140 |         19:19 |           2 |        829 |      157 |
-|    c | ready -> after quantum         |       1 | 228:1097 |           50:79 |         20:20 |           4 |        873 |      152 |
-|    d | running -> before quantum      |       1 | 184:1057 |          64:138 |         17:17 |           1 |        874 |      161 |
-|    d | ready -> after quantum         |       1 | 234:1057 |         114:138 |         17:17 |           1 |        924 |      161 |
-|    b | running -> before quantum      |       1 | 192:1004 |               - |             - |           0 |        925 |      168 |
-|    b | ready -> after quantum         |       1 | 242:1004 |               - |             - |           0 |        975 |      168 |
-|    a | running -> before quantum      |       0 | 246:1095 |           0:140 |         19:19 |           2 |        976 |      174 |
-|    a | ready -> after quantum         |       0 | 296:1095 |          50:140 |         19:19 |           2 |       1026 |      174 |
+|    a | running -> before quantum      |       0 |   0:1100 |            0:85 |          0:12 |           0 |          1 |       50 |
+|    a | ready -> after quantum         |       0 |  50:1100 |           50:85 |          0:12 |           0 |         51 |       50 |
+|    b | running -> before quantum      |       1 |   0:1057 |               - |             - |           0 |         52 |       50 |
+|    b | ready -> after quantum         |       1 |  50:1057 |               - |             - |           0 |        102 |       50 |
+|    c | running -> before quantum      |       1 |   0:1059 |            0:34 |          0:14 |           0 |        103 |       62 |
+|    c | blocked -> blocked             |       1 |  34:1059 |           34:34 |          0:14 |           0 |        137 |       62 |
+|    d | ready -> in quantum            |       1 |   0:1061 |            0:84 |          0:15 |           0 |        138 |       62 |
+|    d | running -> in quantum          |       1 |   0:1061 |            0:84 |          0:15 |           0 |        138 |       62 |
+|    c | ready -> from blocked to ready |       1 |  34:1059 |            0:54 |         15:15 |           1 |        152 |       62 |
+|    d | ready -> after quantum         |       1 |  16:1061 |           16:84 |          0:15 |           0 |        154 |       62 |
+|    d | running -> before quantum      |       1 |  16:1061 |           16:84 |          0:15 |           0 |        155 |       76 |
+|    d | ready -> after quantum         |       1 |  66:1061 |           66:84 |          0:15 |           0 |        205 |       76 |
+|    a | running -> before quantum      |       0 |  50:1100 |           50:85 |          0:12 |           0 |        206 |       76 |
+|    a | blocked -> blocked             |       0 |  85:1100 |           85:85 |          0:12 |           0 |        241 |       76 |
+|    b | ready -> in quantum            |       1 |  50:1057 |               - |             - |           0 |        242 |       96 |
+|    b | running -> in quantum          |       1 |  50:1057 |               - |             - |           0 |        242 |       96 |
+|    b | ready -> after quantum         |       1 |  65:1057 |               - |             - |           0 |        257 |       96 |
+|    c | running -> before quantum      |       1 |  34:1059 |            0:54 |         15:15 |           1 |        258 |       81 |
+|    a | ready -> from blocked to ready |       0 |  85:1100 |            0:96 |         18:18 |           1 |        260 |       76 |
+|    c | ready -> after quantum         |       1 |  84:1059 |           50:54 |         15:15 |           1 |        308 |       81 |
+|    a | running -> before quantum      |       0 |  85:1100 |            0:96 |         18:18 |           1 |        309 |       96 |
+|    a | ready -> after quantum         |       0 | 135:1100 |           50:96 |         18:18 |           1 |        359 |       96 |
+|    b | running -> before quantum      |       1 |  65:1057 |               - |             - |           0 |        360 |       91 |
+|    b | ready -> after quantum         |       1 | 115:1057 |               - |             - |           0 |        410 |       91 |
+|    d | running -> before quantum      |       1 |  66:1061 |           66:84 |          0:15 |           0 |        411 |      100 |
+|    d | blocked -> blocked             |       1 |  84:1061 |           84:84 |          0:15 |           0 |        429 |      100 |
+|    c | ready -> in quantum            |       1 |  84:1059 |           50:54 |         15:15 |           1 |        430 |      109 |
+|    c | running -> in quantum          |       1 |  84:1059 |           50:54 |         15:15 |           1 |        430 |      109 |
+|    c | blocked -> blocked             |       1 |  88:1059 |           54:54 |         15:15 |           1 |        434 |      109 |
+|    b | ready -> in quantum            |       1 | 115:1057 |               - |             - |           0 |        435 |      124 |
+|    b | running -> in quantum          |       1 | 115:1057 |               - |             - |           0 |        435 |      124 |
+|    c | ready -> from blocked to ready |       1 |  88:1059 |            0:99 |         10:10 |           2 |        444 |      109 |
+|    d | ready -> from blocked to ready |       1 |  84:1061 |           0:101 |         18:18 |           1 |        448 |      100 |
+|    b | ready -> after quantum         |       1 | 143:1057 |               - |             - |           0 |        463 |      124 |
+|    d | running -> before quantum      |       1 |  84:1061 |           0:101 |         18:18 |           1 |        464 |      113 |
+|    d | ready -> after quantum         |       1 | 134:1061 |          50:101 |         18:18 |           1 |        514 |      113 |
+|    c | running -> before quantum      |       1 |  88:1059 |            0:99 |         10:10 |           2 |        515 |      117 |
+|    c | ready -> after quantum         |       1 | 138:1059 |           50:99 |         10:10 |           2 |        565 |      117 |
+|    a | running -> before quantum      |       0 | 135:1100 |           50:96 |         18:18 |           1 |        566 |      117 |
+|    a | blocked -> blocked             |       0 | 181:1100 |           96:96 |         18:18 |           1 |        612 |      117 |
+|    b | ready -> in quantum            |       1 | 143:1057 |               - |             - |           0 |        613 |      145 |
+|    b | running -> in quantum          |       1 | 143:1057 |               - |             - |           0 |        613 |      145 |
+|    b | ready -> after quantum         |       1 | 147:1057 |               - |             - |           0 |        617 |      145 |
+|    d | running -> before quantum      |       1 | 134:1061 |          50:101 |         18:18 |           1 |        618 |      130 |
+|    a | ready -> from blocked to ready |       0 | 181:1100 |            0:83 |         14:14 |           2 |        627 |      117 |
+|    d | ready -> after quantum         |       1 | 184:1061 |         100:101 |         18:18 |           1 |        668 |      130 |
+|    c | running -> before quantum      |       1 | 138:1059 |           50:99 |         10:10 |           2 |        669 |      138 |
+|    c | blocked -> blocked             |       1 | 187:1059 |           99:99 |         10:10 |           2 |        718 |      138 |
+|    c | blocked -> after quantum       |       1 | 188:1059 |            1:58 |          2:13 |           3 |        719 |      138 |
+|    a | running -> before quantum      |       0 | 181:1100 |            0:83 |         14:14 |           2 |        720 |      142 |
+|    c | ready -> from blocked to ready |       1 | 188:1059 |            1:58 |         13:13 |           3 |        731 |      138 |
+|    a | ready -> after quantum         |       0 | 231:1100 |           50:83 |         14:14 |           2 |        770 |      142 |
+|    b | running -> before quantum      |       1 | 147:1057 |               - |             - |           0 |        771 |      134 |
+|    b | ready -> after quantum         |       1 | 197:1057 |               - |             - |           0 |        821 |      134 |
+|    d | running -> before quantum      |       1 | 184:1061 |         100:101 |         18:18 |           1 |        822 |      160 |
+|    d | blocked -> blocked             |       1 | 185:1061 |         101:101 |         18:18 |           1 |        823 |      160 |
+|    c | ready -> in quantum            |       1 | 188:1059 |            1:58 |         13:13 |           3 |        824 |      162 |
+|    c | running -> in quantum          |       1 | 188:1059 |            1:58 |         13:13 |           3 |        824 |      162 |
+|    d | ready -> from blocked to ready |       1 | 185:1061 |           0:132 |         15:15 |           2 |        838 |      160 |
+|    c | ready -> after quantum         |       1 | 237:1059 |           50:58 |         13:13 |           3 |        873 |      162 |
+|    d | running -> before quantum      |       1 | 185:1061 |           0:132 |         15:15 |           2 |        874 |      163 |
+|    d | ready -> after quantum         |       1 | 235:1061 |          50:132 |         15:15 |           2 |        924 |      163 |
+|    a | running -> before quantum      |       0 | 231:1100 |           50:83 |         14:14 |           2 |        925 |      166 |
+|    a | blocked -> blocked             |       0 | 264:1100 |           83:83 |         14:14 |           2 |        958 |      166 |
+|    b | ready -> in quantum            |       1 | 197:1057 |               - |             - |           0 |        959 |      171 |
+|    b | running -> in quantum          |       1 | 197:1057 |               - |             - |           0 |        959 |      171 |
+|    a | ready -> from blocked to ready |       0 | 264:1100 |            0:87 |         17:17 |           3 |        975 |      166 |
+|    b | ready -> after quantum         |       1 | 214:1057 |               - |             - |           0 |        976 |      171 |
+|    b | running -> before quantum      |       1 | 214:1057 |               - |             - |           0 |        977 |      172 |
+|    b | ready -> after quantum         |       1 | 264:1057 |               - |             - |           0 |       1027 |      172 |
 +------+--------------------------------+---------+----------+-----------------+---------------+-------------+------------+----------+
