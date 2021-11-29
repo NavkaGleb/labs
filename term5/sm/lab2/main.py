@@ -9,13 +9,14 @@ def moore_penrose_method(matrix, sigma0, eps=1e-5):
 
     matrix = np.array(matrix, dtype=float)
     e = np.eye(matrix.shape[0])
+    sigma_k = sigma0
 
     # Step 2
     plus_matrix = matrix.T @ np.linalg.inv(matrix @ matrix.T + sigma0 * e)
 
     while True:
         # Step 3
-        sigma_k = sigma0 / 2
+        sigma_k = sigma_k / 2
 
         previous = plus_matrix
 

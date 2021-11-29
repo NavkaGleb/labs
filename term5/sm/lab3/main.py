@@ -137,7 +137,7 @@ def calc_beta(b, m1, m3, c2, c3, measurements):
         if np.abs(delta).max() < EPS:
             break
 
-    return np.array([c1, c2, m2])
+    return np.array([c1, c4, m2])
 
 
 def main():
