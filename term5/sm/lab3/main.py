@@ -27,14 +27,14 @@ def calc_c1_derivative(m1, m2, m3, c1, c2, c3, c4):
     ])
 
 
-def calc_c2_derivative(m1, m2, m3, c1, c2, c3, c4):
+def calc_c4_derivative(m1, m2, m3, c1, c2, c3, c4):
     return np.array([
-        [0,       0, 0,       0, 0,       0],
-        [-1 / m1, 0, 1 / m1,  0, 0,       0],
-        [0,       0, 0,       0, 0,       0],
-        [1 / m2,  0, -1 / m2, 0, c3 / m2, 0],
-        [0,       0, 0,       0, 0,       0],
-        [0,       0, 0,       0, 0,       0]
+        [0, 0, 0, 0, 0,       0],
+        [0, 0, 0, 0, 0,       0],
+        [0, 0, 0, 0, 0,       0],
+        [0, 0, 0, 0, 0,       0],
+        [0, 0, 0, 0, 0,       0],
+        [0, 0, 0, 0, -1 / m3, 0]
     ])
 
 
@@ -51,10 +51,10 @@ def calc_m2_derivative(m1, m2, m3, c1, c2, c3, c4):
 
 def calc_model_derivatives(m1, m2, m3, c1, c2, c3, c4, y):
     c1_derivative = calc_c1_derivative(m1, m2, m3, c1, c2, c3, c4) @ y
-    c2_derivative = calc_c2_derivative(m1, m2, m3, c1, c2, c3, c4) @ y
+    c4_derivative = calc_c4_derivative(m1, m2, m3, c1, c2, c3, c4) @ y
     m2_derivative = calc_m2_derivative(m1, m2, m3, c1, c2, c3, c4) @ y
 
-    return np.array([c1_derivative, c2_derivative, m2_derivative]).T
+    return np.array([c1_derivative, c4_derivative, m2_derivative]).T
 
 
 def f(m1, m2, m3, c1, c2, c3, c4, y):
@@ -107,11 +107,11 @@ def calc_delta(y, u, measurements):
     return lhs @ rhs
 
 
-def calc_beta(b, m1, m3, c3, c4, measurements):
+def calc_beta(b, m1, m3, c2, c3, measurements):
     measurement_count = len(measurements)
 
     c1 = b[0]
-    c2 = b[1]
+    c4 = b[1]
     m2 = b[2]
 
     while True:
@@ -124,10 +124,16 @@ def calc_beta(b, m1, m3, c3, c4, measurements):
         # Step 3 (Finding delta of beta)
         delta = calc_delta(y, u, measurements)
 
+        # Step 4
         c1 += delta[0]
-        c2 += delta[1]
+        c4 += delta[1]
         m2 += delta[2]
 
+        max_delta = np.abs(delta).max()
+
+        print(f'max_delta: {max_delta}')
+
+        # Step 5
         if np.abs(delta).max() < EPS:
             break
 
@@ -135,12 +141,12 @@ def calc_beta(b, m1, m3, c3, c4, measurements):
 
 
 def main():
+    c2 = 0.3
     c3 = 0.2
-    c4 = 0.12
     m1 = 12
     m3 = 18
-    # c1, c2, m2 are unknown
 
+    # b[0] = c1, b[1] = c4, b[2] = m2
     b0 = np.array([0.1, 0.08, 21])
 
     measurements = []
@@ -151,9 +157,9 @@ def main():
 
     measurements = np.array(measurements, float).T
 
-    result = calc_beta(b0, m1, m3, c3, c4, measurements)
+    b = calc_beta(b0, m1, m3, c2, c3, measurements)
 
-    print(result)
+    print(f'c1: {b[0]}\nc4: {b[1]}\nm2: {b[2]}')
 
 
 if __name__ == "__main__":
