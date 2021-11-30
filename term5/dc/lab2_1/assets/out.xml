@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<FootballCompetition>
+    <Team name="first-team">
+        <Player age="0" firstName="firstP" lastName="last"/>
+        <Player age="1" firstName="secondP" lastName="second"/>
+        <Player age="2" firstName="thirdP" lastName="third"/>
+    </Team>
+    <Team name="second-team">
+        <Player age="3" firstName="4thP" lastName="string"/>
+    </Team>
+    <Team name="third-team">
+        <Player age="4" firstName="5th" lastName="GG"/>
+        <Player age="100" firstName="6" lastName="f"/>
+    </Team>
+</FootballCompetition>
