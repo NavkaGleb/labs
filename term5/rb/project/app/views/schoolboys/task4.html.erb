@@ -1,0 +1,17 @@
+<div class="container">
+  <table class="table table-bordered mt-5">
+    <tr>
+      <th scope="col">Count</th>
+    </tr>
+
+    <% @schoolboys.each do |schoolboy| %>
+      <tr class="align-middle">
+        <td>
+          <%= schoolboy %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+
+  <%= link_to "To main page", root_path, class: "btn btn-sm btn-primary w-100 mt-3 mb-5" %>
+</div>

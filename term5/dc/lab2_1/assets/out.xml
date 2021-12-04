@@ -10,6 +10,6 @@
     </Team>
     <Team name="third-team">
         <Player age="4" firstName="5th" lastName="GG"/>
-        <Player age="100" firstName="6" lastName="f"/>
+        <Player age="100" firstName="6" lastName=""/>
     </Team>
 </FootballCompetition>

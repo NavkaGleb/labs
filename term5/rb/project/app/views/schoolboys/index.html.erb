@@ -1,0 +1,55 @@
+<div class="container mt-5">
+  <ul class="nav nav-pills nav-fill mb-1">
+    <li class="nav-item">
+      <%= link_to "Task 1", "/task1", class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= link_to "Task 2", "/task2", class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= link_to "Task 3", "/task3", class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= link_to "Task 4", "/task4", class: "nav-link" %>
+    </li>
+  </ul>
+
+  <ul class="nav nav-pills nav-fill mb-5">
+    <li class="nav-item">
+      <%= link_to "Add Schoolboy", new_schoolboy_path, class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= link_to "Add new random schoolboys", "/random_schoolboys", class: "nav-link" %>
+    </li>
+  </ul>
+
+  <table class="table table-bordered">
+    <tr>
+      <th scope="col">Surname</th>
+      <th scope="col">Where want to enter</th>
+      <th scope="col">Where entered</th>
+      <th scope="col">Edit</th>
+      <th scope="col">Delete</th>
+    </tr>
+
+    <% @schoolboys.each do |schoolboy| %>
+      <tr class="align-middle">
+        <th scope="row">
+          <%= link_to schoolboy.surname, schoolboy %>
+        </th>
+        <td>
+          <%= schoolboy.where_want_to_enter %>
+        </td>
+        <td>
+          <%= schoolboy.where_entered %>
+        </td>
+        <td>
+          <%= link_to "✏", edit_schoolboy_path(schoolboy), class: "btn btn-sm btn-light w-100" %>
+        </td>
+        <td>
+          <%= link_to "☠", schoolboy_path(schoolboy), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-sm btn-light w-100" %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

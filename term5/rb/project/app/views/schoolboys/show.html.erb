@@ -1,0 +1,11 @@
+<h1><%= @schoolboy.surname %></h1>
+
+<p><%= @schoolboy.where_want_to_enter %></p>
+<p><%= @schoolboy.where_entered %></p>
+
+<ul>
+  <li><%= link_to "Edit", edit_schoolboy_path(@schoolboy) %></li>
+  <li><%= link_to "Destroy", schoolboy_path(@schoolboy),
+                  method: :delete,
+                  data: { confirm: "Are you sure?" } %></li>
+</ul>
