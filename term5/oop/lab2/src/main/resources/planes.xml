@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<planes>
+    <plane>
+        <model>model</model>
+        <origin>origin</origin>
+        <specifications>
+            <type>ESCORT</type>
+            <seatCount>2</seatCount>
+            <missileCount>0</missileCount>
+        </specifications>
+        <hasRadar>false</hasRadar>
+    </plane>
+
+    <plane>
+        <model>new model</model>
+        <origin>new origin</origin>
+        <specifications>
+            <type>FIGHTER</type>
+            <seatCount>1</seatCount>
+            <missileCount>10</missileCount>
+        </specifications>
+        <hasRadar>true</hasRadar>
+    </plane>
+</planes>

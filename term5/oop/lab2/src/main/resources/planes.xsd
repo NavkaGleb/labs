@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="planes" type="Planes"/>
+
+    <xsd:complexType name="Planes">
+        <xsd:sequence>
+            <xsd:element name="plane" type="Plane" minOccurs="0" maxOccurs="3"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="Type">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ESCORT"/>
+            <xsd:enumeration value="SUPPORT"/>
+            <xsd:enumeration value="FIGHTER"/>
+            <xsd:enumeration value="INTERCEPTOR"/>
+            <xsd:enumeration value="SCOUT"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="Specifications">
+        <xsd:sequence>
+            <xsd:element name="type" type="Type"/>
+            <xsd:element name="seatCount">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:integer">
+                        <xsd:minInclusive value="1"/>
+                        <xsd:maxInclusive value="2"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="missileCount">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:int">
+                        <xsd:minInclusive value="0"/>
+                        <xsd:maxInclusive value="10"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Plane">
+        <xsd:all>
+            <xsd:element name="model" type="xsd:string"/>
+            <xsd:element name="origin" type="xsd:string"/>
+            <xsd:element name="specifications" type="Specifications"/>
+            <xsd:element name="hasRadar" type="xsd:boolean"/>
+        </xsd:all>
+    </xsd:complexType>
+</xsd:schema>
