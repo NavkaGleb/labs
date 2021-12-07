@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import util.Plane;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,13 +34,13 @@ class ParserTest {
             true
         ));
 
-    void invalidTest(PlaneParser parser) {
-        assertThrows(RuntimeException.class, () -> parser.parse(XML_INVALID_PATH, XSD_PATH));
+    void invalidTest(XMLParser<Plane> parser) {
+        assertThrows(RuntimeException.class, () -> parser.parse(XML_INVALID_PATH, XSD_PATH, new PlaneBuilder()));
     }
 
-    void validTest(PlaneParser parser) {
+    void validTest(XMLParser<Plane> parser) {
         try {
-            List<Plane> planes = parser.parse(XML_VALID_PATH, XSD_PATH);
+            List<Plane> planes = parser.parse(XML_VALID_PATH, XSD_PATH, new PlaneBuilder());
 
             assertEquals(PLANES.size(), planes.size());
 
@@ -63,19 +62,13 @@ class ParserTest {
 
     @Test
     void domParserTest() {
-        invalidTest(new DOMPlaneParser());
-        validTest(new DOMPlaneParser());
+        invalidTest(new DOMParser<>());
+        validTest(new DOMParser<>());
     }
 
     @Test
     void saxParserTest() {
-        invalidTest(new SAXPlaneParser());
-        validTest(new SAXPlaneParser());
-    }
-
-    @Test
-    void staxParserTest() {
-        validTest(new StAXPlaneParser());
-        validTest(new StAXPlaneParser());
+        invalidTest(new SAXParser<>());
+        validTest(new SAXParser<>());
     }
 }

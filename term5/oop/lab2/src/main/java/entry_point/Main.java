@@ -1,13 +1,12 @@
 package entry_point;
 
 import org.xml.sax.SAXException;
-import parsers.DOMPlaneParser;
-import parsers.SAXPlaneParser;
-import parsers.StAXPlaneParser;
+import parsers.DOMParser;
+import parsers.PlaneBuilder;
+import parsers.SAXParser;
 import util.Plane;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,17 +26,16 @@ public class Main {
         System.out.println("-------------------------------");
     }
 
-    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException, XMLStreamException {
-        var domParser = new DOMPlaneParser();
-        var saxParser = new SAXPlaneParser();
-        var staxParser = new StAXPlaneParser();
+    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+        var planeBuilder = new PlaneBuilder();
 
-        var domPlanes = domParser.parse(XML_PATH, XSD_PATH);
-        var saxPlanes = saxParser.parse(XML_PATH, XSD_PATH);
-        var staxPlanes = staxParser.parse(XML_PATH, XSD_PATH);
+        var domParser = new DOMParser<Plane>();
+        var saxParser = new SAXParser<Plane>();
+
+        var domPlanes = domParser.parse(XML_PATH, XSD_PATH, planeBuilder);
+        var saxPlanes = saxParser.parse(XML_PATH, XSD_PATH, planeBuilder);
 
         logPlanes("DOM Parser", domPlanes);
         logPlanes("SAX Parser", saxPlanes);
-        logPlanes("StAX Parser", staxPlanes);
     }
 }

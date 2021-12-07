@@ -3,15 +3,14 @@ package parsers;
 import java.io.IOException;
 import java.util.List;
 
-import util.Plane;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
-interface PlaneParser {
+interface XMLParser<T> {
 
-    List<Plane> parse(String dataFilepath, String schemaFilepath) throws
+    List<T> parse(String dataFilepath, String schemaFilepath, XMLBuilder<T> builder) throws
         ParserConfigurationException,
         IOException,
         SAXException,
