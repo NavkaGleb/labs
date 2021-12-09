@@ -55,7 +55,8 @@ public class PageFault
     {
       var page = memory.get(position);
 
-      if (page.physical != -1) {
+      if (page.physical != -1)
+      {
         if (page.R == 1)
         {
           page.R = 0;
