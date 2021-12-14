@@ -104,7 +104,6 @@ public class Main {
         logResult(80, runCount);
         logResult(160, runCount);
         logResult(240, runCount);
-        logResult(160, runCount);
         logResult(320, runCount);
         logResult(400, runCount);
     }
