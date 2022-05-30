@@ -1,0 +1,13 @@
+.idea
+
+assignments/*
+!assignments/PA2
+assignments/PA2/*
+!assignments/PA2/cool.flex
+
+bin
+etc
+examples
+include
+lib
+src
