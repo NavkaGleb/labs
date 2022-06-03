@@ -10,7 +10,7 @@ namespace crypto_lab1
     namespace _detail
     {
 
-        static constexpr std::array<std::int32_t, 690> g_BoxS
+        static constexpr std::array<std::int32_t, 512> g_BoxS
         {
             0x09d0c479, 0x28c8ffe0, 0x84aa6c39, 0x9dad7287, 0x7dff9be3, 0xd4268361, 0xc96da1d4, 0x7974cc93, 0x85d0582e, 0x2a4b5705,
             0x1ca16a62, 0xc3bd279d, 0x0f1f25e5, 0x5160372f, 0xc695c1fb, 0x4d7ff1e4, 0xae5f6bf4, 0x0d72ee46, 0xff23de8a, 0xb1cf8e83,
@@ -63,24 +63,7 @@ namespace crypto_lab1
             0xafc8d52d, 0x06316131, 0xd838e7ce, 0x1bc41d00, 0x3a2e8c0f, 0xea83837e, 0xb984737d, 0x13ba4891, 0xc4f8b949, 0xa6d6acb3,
             0xa215cdce, 0x8359838b, 0x6bd1aa31, 0xf579dd52, 0x21b93f93, 0xf5176781, 0x187dfdde, 0xe94aeb76, 0x2b38fd54, 0x431de1da,
             0xab394825, 0x9ad3048f, 0xdfea32aa, 0x659473e3, 0x623f7863, 0xf3346c59, 0xab3ab685, 0x3346a90b, 0x6b56443e, 0xc6de01f8,
-            0x8d421fc0, 0x9b0ed10c, 0x88f1a1e9, 0x54c1f029, 0x7dead57b, 0x8d7ba426, 0x4cf5178a, 0x551a7cca, 0x1a9a5f08, 0xfcd651b9,
-            0x25605182, 0xe11fc6c3, 0xb6fd9676, 0x337b3027, 0xb7c8eb14, 0x9e5fd030, 0x6b57e354, 0xad913cf7, 0x7e16688d, 0x58872a69,
-            0x2c2fc7df, 0xe389ccc6, 0x30738df1, 0x0824a734, 0xe1797a8b, 0xa4a8d57b, 0x5b5d193b, 0xc8a8309b, 0x73f9a978, 0x73398d32,
-            0x0f59573e, 0xe9df2b03, 0xe8a5b6c8, 0x848d0704, 0x98df93c2, 0x720a1dc3, 0x684f259a, 0x943ba848, 0xa6370152, 0x863b5ea3,
-            0xd17b978b, 0x6d9b58ef, 0x0a700dd4, 0xa73d36bf, 0x8e6a0829, 0x8695bc14, 0xe35b3447, 0x933ac568, 0x8894b022, 0x2f511c27,
-            0xddfbcc3c, 0x006662b6, 0x117c83fe, 0x4e12b414, 0xc2bca766, 0x3a2fec10, 0xf4562420, 0x55792e2a, 0x46f5d857, 0xceda25ce,
-            0xc3601d3b, 0x6c00ab46, 0xefac9c28, 0xb3c35047, 0x611dfee3, 0x257c3207, 0xfdd58482, 0x3b14d84f, 0x23becb64, 0xa075f3a3,
-            0x088f8ead, 0x07adf158, 0x7796943c, 0xfacabf3d, 0xc09730cd, 0xf7679969, 0xda44e9ed, 0x2c854c12, 0x35935fa3, 0x2f057d9f,
-            0x690624f8, 0x1cb0bafd, 0x7b0dbdc6, 0x810f23bb, 0xfa929a1a, 0x6d969a17, 0x6742979b, 0x74ac7d05, 0x010e65c4, 0x86a3d963,
-            0xf907b5a0, 0xd0042bd3, 0x158d7d03, 0x287a8255, 0xbba8366f, 0x096edc33, 0x21916a7b, 0x77b56b86, 0x951622f9, 0xa6c5e650,
-            0x8cea17d1, 0xcd8c62bc, 0xa3d63433, 0x358a68fd, 0x0f9b9d3c, 0xd6aa295b, 0xfe33384a, 0xc000738e, 0xcd67eb2f, 0xe2eb6dc2,
-            0x97338b02, 0x06c9f246, 0x419cf1ad, 0x2b83c045, 0x3723f18a, 0xcb5b3089, 0x160bead7, 0x5d494656, 0x35f8a74b, 0x1e4e6c9e,
-            0x000399bd, 0x67466880, 0xb4174831, 0xacf423b2, 0xca815ab3, 0x5a6395e7, 0x302a67c5, 0x8bdb446b, 0x108f8fa4, 0x10223eda,
-            0x92b8b48b, 0x7f38d0ee, 0xab2701d4, 0x0262d415, 0xaf224a30, 0xb3d88aba, 0xf8b2c3af, 0xdaf7ef70, 0xcc97d3b7, 0xe9614b6c,
-            0x2baebff4, 0x70f687cf, 0x386c9156, 0xce092ee5, 0x01e87da6, 0x6ce91e6a, 0xbb7bcc84, 0xc7922c20, 0x9d3b71fd, 0x060e41c6,
-            0xd7590f15, 0x4e03bb47, 0x183c198e, 0x63eeb240, 0x2ddbf49a, 0x6d5cba54, 0x923750af, 0xf9e14236, 0x7838162b, 0x59726c72,
-            0x81b66760, 0xbb2926c1, 0x48a0ce0d, 0xa6c0496d, 0xad43507b, 0x718d496a, 0x9df057af, 0x44b1bde6, 0x054356dc, 0xde7ced35,
-            0xd51a138b, 0x62088cc9, 0x35830311, 0xc96efca2, 0x686f86ec, 0x8e77cb68, 0x63e1d6b8, 0xc80f9778, 0x79c491fd, 0x1b4c67f2,
+            0x8d421fc0, 0x9b0ed10c
         };
 
         static constexpr std::int32_t LogicalRightShift(std::int32_t x, std::int32_t n)
@@ -218,25 +201,24 @@ namespace crypto_lab1
 
         // Cryptographic core
         {
-            std::array<std::int32_t, 3> eout;
+            std::array<std::int32_t, 3> e;
 
             for (std::size_t i = 0; i < 16; ++i)
             {
-
-                eout = _detail::E(a, key[2 * i + 4], key[2 * i + 5]);
+                e = _detail::E(a, key[2 * i + 4], key[2 * i + 5]);
 
                 a = _detail::RotateLeft(a, 13);
-                c = c + eout[1];
+                c = c + e[1];
 
                 if (i < 8)
                 {
-                    b = b + eout[0];
-                    d = d ^ eout[2];
+                    b = b + e[0];
+                    d = d ^ e[2];
                 }
                 else
                 {
-                    d = d + eout[0];
-                    b = b ^ eout[2];
+                    d = d + e[0];
+                    b = b ^ e[2];
                 }
 
                 cyclicShiftLeft(a, b, c, d);
@@ -247,7 +229,6 @@ namespace crypto_lab1
         {
             for (std::size_t i = 0; i < 8; ++i)
             {
-
                 if (i == 3 || i == 7)
                 {
                     a = a - b;
@@ -326,26 +307,26 @@ namespace crypto_lab1
 
         // Cryptographic core
         {
-            std::array<std::int32_t, 3> eout;
+            std::array<std::int32_t, 3> e;
 
             for (std::size_t i = 16; i--;)
             {
                 cyclicShiftLeft(d, c, b, a);
 
                 a = _detail::RotateRight(a, 13);
-                eout = _detail::E(a, key[2 * i + 4], key    [2 * i + 5]);
+                e = _detail::E(a, key[2 * i + 4], key    [2 * i + 5]);
 
-                c = c - eout[1];
+                c = c - e[1];
 
                 if (i < 8)
                 {
-                    b = b - eout[0];
-                    d = d ^ eout[2];
+                    b = b - e[0];
+                    d = d ^ e[2];
                 }
                 else
                 {
-                    d = d - eout[0];
-                    b = b ^ eout[2];
+                    d = d - e[0];
+                    b = b ^ e[2];
                 }
             }
         }
@@ -393,7 +374,7 @@ namespace crypto_lab1
 
         std::vector<std::int8_t> result(in.size() + paddingSize);
         std::vector<std::int8_t> padding(paddingSize, 0);
-        padding[0] = 0x80;
+        padding[0] = static_cast<std::int8_t>(0x80);
 
         Block16 block;
 
@@ -477,7 +458,7 @@ namespace crypto_lab1
             }
             else if (i == data.size())
             {
-                t[i] = data.size();
+                t[i] = static_cast<std::int32_t>(data.size());
             }
             else
             {
@@ -500,7 +481,7 @@ namespace crypto_lab1
                 }
             }
 
-            for (std::int32_t i = 0; i <= 9; ++i)
+            for (std::size_t i = 0; i < 10; ++i)
             {
                 keyTable[10 * j + i] = t[4 * i % 15];
             }
@@ -515,7 +496,7 @@ namespace crypto_lab1
             std::int32_t r{ 0 };
             std::int32_t p{ 0 };
 
-            for (std::int32_t i = 5; i <= 35; ++i)
+            for (std::size_t i = 5; i < 36; ++i)
             {
                 j = keyTable[i] & 0x00000003;
                 w = keyTable[i] | 0x00000003;

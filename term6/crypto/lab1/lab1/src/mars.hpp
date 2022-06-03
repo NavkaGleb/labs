@@ -7,9 +7,11 @@
 
 namespace crypto_lab1
 {
-
+    
+    // 1280 bit key
     using KeyTable = std::array<std::int32_t, 40>;
 
+    // 128 bit block
     class Block16
     {
     public:

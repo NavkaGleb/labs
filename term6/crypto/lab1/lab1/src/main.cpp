@@ -11,7 +11,7 @@ namespace
 
         for (const auto& e : data)
         {
-            std::cout << +static_cast<std::int8_t>(e) << " ";
+            std::cout << +e << " ";
         }
 
         std::cout << std::endl;
@@ -21,6 +21,9 @@ namespace
 
 int main()
 {
+    // http://reto.orgfree.com/us/projectlinks/MARSReport.html#Top
+    // 128 - 1248 bits
+
     const std::array<std::int8_t, 4> in{ 12, 85, 32, 42 };
     const std::array<std::int8_t, 4> key{ 12, 85, 32, 42 };
 
