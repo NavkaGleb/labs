@@ -1,0 +1,76 @@
+<div class="container align-content-center">
+    <br>
+    <h3 class="text-center">Administrator form</h3>
+    <hr>
+
+    <div class="card text-white bg-dark mx-auto" style="max-width: 600px;">
+        <article class="card-body mx-auto" style="max-width: 400px;">
+            <h4 class="card-title mt-3 text-center">Add new product</h4>
+            <br>
+            <form id="product-addition-form" method="POST" action="http://localhost:8080/servlets/products/add">
+                <div class="form-group">
+                    <label for="product-name">Name</label>
+                    <input
+                            type="text"
+                            name="product-name"
+                            id="product-name"
+                            placeholder="Name"
+                            required
+                            class="form-control col">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input
+                            type="number"
+                            name="price"
+                            id="price"
+                            placeholder="Price"
+                            required
+                            class="form-control col"
+                            min="1" max="500">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input
+                            type="text"
+                            name="description"
+                            id="description"
+                            placeholder="Description"
+                            class="form-control col">
+                </div>
+
+                <div class="form-group">
+                    <label for="type">
+                        Please select the restaurant:
+                    </label>
+                    <select name="type" id="type" class="form-control w-auto">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" onclick="checkFormInputs().then()" id="product-submit"
+                            class="btn btn-warning col">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </article>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="failureModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Product addition failure</h5>
+            </div>
+            <div class="modal-body">
+                <p id="failureModalText"></p>
+            </div>
+            <div class="modal-footer" id="failureModalFooter">
+            </div>
+        </div>
+    </div>
+</div>
