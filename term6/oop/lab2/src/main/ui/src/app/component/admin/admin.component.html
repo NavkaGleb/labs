@@ -1,0 +1,24 @@
+<div *ngIf="users.length; else noUsers" class="users-list">
+  <h2>Users:</h2>
+  <table class="table table-dark table-image">
+    <thead class="thead-dark">
+    <tr>
+      <th scope="col">№</th>
+      <th scope="col">Name</th>
+      <th scope="col">Balance</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users; let i = index">
+      <td class="index-number">{{i + 1}}</td>
+      <td>{{user.username}}</td>
+      <td>{{user.balance}}$</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<ng-template #noUsers>
+  <h2>There are no any users for now in the system</h2>
+</ng-template>

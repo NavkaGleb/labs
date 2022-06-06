@@ -1,0 +1,86 @@
+form {
+  margin:5% auto;
+  width:800px;
+  background:white;
+  padding:2.5% 5% 2.5%;
+  border-radius:2.5%;
+}
+
+div {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+button {
+  align-content: center;
+  width: 600px;
+  margin-left: 50px;
+}
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+  width: 80%;
+}
+
+h2 {
+  font-size:4em;
+  padding:100px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align:center;
+}
+
+input {
+  margin:5% 0;
+  border:none;
+  width:100%;
+  font-size:1.5em;
+  padding:0 0 2%;
+  background:none;
+}
+
+textarea:focus, input:focus{
+  outline: 0;
+}
+
+#name {
+  border-bottom:2px solid #FBD75C;
+}
+
+#email {
+  border-bottom:2px solid #F2B07E;
+}
+
+label {
+  color:#BDC3C7;
+  text-transform:uppercase;
+  font-size:0.8em;
+  letter-spacing:4px;
+}
+
+#button {
+  background:none;
+  border:none;
+  width:100%;
+  min-height:50px;
+  margin:10px 0 10px;
+  border-radius:2.5%;
+  color:white;
+  padding:0.5% 0 0;
+  font-size:1.75em;
+  cursor: pointer;
+  -webkit-transition: background 1s ease-out;
+  -moz-transition: background 1s ease-out;
+  -o-transition: background 1s ease-out;
+  transition: background 1s ease-out;
+}
+
+
+#button:hover {
+  background-position:-400px;
+}

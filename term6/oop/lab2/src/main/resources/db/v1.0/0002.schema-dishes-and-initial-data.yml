@@ -1,0 +1,228 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: Alex Totsky
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                  name: dish_id
+                  type: SERIAL
+              - column:
+                  constraints:
+                    nullable: false
+                    unique: true
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: float8
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: ordered
+                  type: integer
+            remarks: Contains all dishes in a menu
+            tableName: dishes
+  - changeSet:
+      id: 4
+      author: Alex Totsky
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: BigMac
+              - column:
+                  name: price
+                  value: 10
+              - column:
+                  name: description
+                  value: tastyyyyy
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Naggets
+              - column:
+                  name: price
+                  value: 8
+              - column:
+                  name: description
+                  value: tasty even mooore
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Diablo
+              - column:
+                  name: price
+                  value: 30
+              - column:
+                  name: description
+                  value: Very hot!
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Chicken
+              - column:
+                  name: price
+                  value: 18
+              - column:
+                  name: description
+                  value: So spicy!
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Margarita
+              - column:
+                  name: price
+                  value: 15
+              - column:
+                  name: description
+                  value: Wooooooow
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Stripces
+              - column:
+                  name: price
+                  value: 6
+              - column:
+                  name: description
+                  value: Better than McDonalds! (dunno)
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Neapolitana
+              - column:
+                  name: price
+                  value: 25
+              - column:
+                  name: description
+                  value: Rich life...
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Big Tasty
+              - column:
+                  name: price
+                  value: 20
+              - column:
+                  name: description
+                  value: Better than anything imho
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Four cheeses
+              - column:
+                  name: price
+                  value: 30
+              - column:
+                  name: description
+                  value: Perfect for vegan (no?)
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Milkshake
+              - column:
+                  name: price
+                  value: 10
+              - column:
+                  name: description
+                  value: Sweet
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Chicken roll
+              - column:
+                  name: price
+                  value: 20
+              - column:
+                  name: description
+                  value: My favorite
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: Coca-cola
+              - column:
+                  name: price
+                  value: 5
+              - column:
+                  name: description
+                  value: Classic
+              - column:
+                  name: ordered
+                  value: 0
+            schemaName: public
+            tableName: dishes

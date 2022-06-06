@@ -1,0 +1,9 @@
+<div *ngIf="orders.length; else noOrders" class="orders-list">
+  <h2>Orders:</h2>
+  <app-order *ngFor="let order of orders" [order]="order" [user]="user">
+  </app-order>
+</div>
+
+<ng-template #noOrders>
+  <h2>There are no any orders for now in the system</h2>
+</ng-template>

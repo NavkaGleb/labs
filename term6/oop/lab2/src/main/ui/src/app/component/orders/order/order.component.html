@@ -1,0 +1,52 @@
+<div class="order-item">
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+    <div>
+      <span class="dishes-title">Dishes:</span> <br>
+      <div *ngIf="order.dishes.length; else noDishes" class="dishes-list">
+        <div class="dish-item" *ngFor="let dish of order.dishes">
+          <p><span class="field-name">Dish name: </span> {{dish.dishName}}
+            <span class="field-name"> Quantity: </span> {{dish.quantity}}
+            <span class="field-name"> Price: </span> {{ this.prices[dish.dishName] * dish.quantity}} </p>
+        </div>
+      </div>
+      <ng-template #noDishes>
+        <h2>There are no any dishes for this order</h2>
+      </ng-template>
+    </div>
+    <p>
+      <span class="order-field">Total sum: {{order.totalSum}}$ </span>
+    </p>
+
+    <div class="form-group" *ngIf="user.isAdmin; else noAdmin">
+      <label for="status" class="order-title">Order status:</label>
+      <select formControlName="status" class="custom-select">
+        <option value="PENDING">PENDING</option>
+        <option value="ACCEPTED">ACCEPTED</option>
+        <option value="DECLINED">DECLINED</option>
+      </select>
+
+      <div *ngIf="submitted && f.status.errors" class="invalid-feedback">
+        <div *ngIf="f.status.errors.required">Specify order status</div>
+      </div>
+    </div>
+
+    <ng-template #noAdmin>
+      <label for="status" class="order-field">Order status:</label> {{order.status}}
+    </ng-template>
+
+    <div class="form-group" *ngIf="user.isAdmin">
+      <button class="btn btn-success" style="margin-bottom: 10px; margin-left: 400px">
+        Submit
+      </button>
+
+      <div *ngIf="successfulMessage" class="alert alert-success">
+        {{successfulMessage}}
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{errorMessage}}
+      </div>
+    </div>
+  </form>
+</div>
+<hr>

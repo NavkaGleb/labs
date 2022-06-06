@@ -1,0 +1,21 @@
+<!-- nav -->
+<nav class="navbar navbar-expand navbar-dark bg-primary" *ngIf="(isAuthenticated | async)">
+  <div class="navbar-nav">
+    <a class="nav-item nav-link" routerLink="/" *ngIf="(isAuthenticated | async)">Welcome page</a>
+    <a class="nav-item nav-link" routerLink="/menu" *ngIf="(isAuthenticated | async)">List of products</a>
+    <a class="nav-item nav-link" routerLink="/orders" *ngIf="(isAuthenticated | async)">Your orders</a>
+    <a class="nav-item nav-link" routerLink="/admin" *ngIf="(isAdminAuthenticated | async)">Show users</a>
+    <a class="nav-item nav-link" (click)="logout()" *ngIf="(isAuthenticated | async)">Logout</a>
+  </div>
+</nav>
+
+<!-- main app container -->
+<!--<div class="jumbotron">-->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+<!--</div>-->
