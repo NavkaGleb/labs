@@ -106,7 +106,7 @@ function drawGrid(canvas) {
     context.strokeStyle = window.getComputedStyle(canvas).getPropertyValue('--grid-color');
     context.lineWidth = 0.5;
 
-    for (let i = 10; i < canvas.width; i += 10) {
+    for (let i = 10; i < canvas.width; i += 40) {
         context.beginPath();
         {
             context.moveTo(i, 10);
@@ -115,7 +115,7 @@ function drawGrid(canvas) {
         context.stroke();
     }
 
-    for (let i = 10; i < canvas.height; i += 10) {
+    for (let i = 10; i < canvas.height; i += 40) {
         context.beginPath();
         {
             context.moveTo(10, i);
