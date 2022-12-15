@@ -1,34 +1,41 @@
 name:                lab2
 version:             0.1.0.0
-github:              "SymphonyOfTranquility/Functional-programming"
+github:              "Github username here/lab2"
 license:             BSD3
-author:              "SymphonyOfTranquility"
-maintainer:          "example@example.com"
-copyright:           "2021 SymphonyOfTranquility"
-
-extra-source-files:
-- README.md
-- ChangeLog.md
+author:              "Author name here"
+maintainer:          "Author email here"
+copyright:           "2019 Author name here"
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
-# category:            Web
+# category:            App category here
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/SymphonyOfTranquility/Functional-programming>
+description:         Please see the README on GitHub at <https://github.com/Github username here/lab2#readme>
 
 dependencies:
 - base >= 4.7 && < 5
-- containers == 0.6.2.1
-- random > 1.0
-- time == 1.9.3
+- containers
+- random
+- time
 - test-framework
 - test-framework-hunit
 - HUnit
 - containers
 - QuickCheck
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
 
 library:
   source-dirs: src
@@ -40,17 +47,17 @@ executables:
     ghc-options:
     - -threaded
     - -rtsopts
-    - -with-rtsopts=-N4
+    - -with-rtsopts=-N
     dependencies:
     - lab2
 
 tests:
   lab2-test:
-    main:                Tests.hs
+    main:                Spec.hs
     source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts
-    - -with-rtsopts=-N2
+    - -with-rtsopts=-N
     dependencies:
     - lab2
