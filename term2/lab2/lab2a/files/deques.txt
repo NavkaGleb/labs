@@ -1,5 +1,0 @@
-0 - deque on const array
-1 - deque on std::vector
-2 - deque on ng::Array
-3 - deque on ng::DList
-4 - std::deque

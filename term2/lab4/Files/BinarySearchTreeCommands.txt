@@ -1,7 +1,0 @@
-0 - add new node                                           (requires: int value)
-1 - add 'n' random nodes                                   (requires: int amount)
-2 - build ThreadBinaryTree based on current BinaryTree     (no params)
-3 - remove all thread (transition to simple BinaryTree)    (no params)
-4 - print tree using tabs                                  (no params)
-5 - print values in symmetric order                        (requires: char separator)
-6 - exit

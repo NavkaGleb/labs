@@ -1,1 +1,0 @@
-# Numerical Methods Lab2

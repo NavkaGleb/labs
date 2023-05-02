@@ -1,4 +1,0 @@
-select the mode
-0 - interactive dialog mode
-1 - demo mode
-2 - benchmark

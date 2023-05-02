@@ -1,8 +1,0 @@
-build
-.idea
-.qmake.stash
-*.o
-lab2.pro.user.*
-moc_*
-ui_*
-Makefile

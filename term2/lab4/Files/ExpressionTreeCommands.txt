@@ -1,9 +1,0 @@
-0 - input new math expression and build the tree           (requires: std::string expression)
-1 - get full parentheses expression                        (no params)
-2 - calculate result using new values of variables         (requires: double values...)
-3 - get result based on prev values of variables           (no params)
-4 - simplify tree                                          (no params)
-5 - differentiate and rebuild the tree                     (no params)
-6 - differentiate and get new tree                         (no params)
-7 - print structure of tree using tabs                     (no params)
-8 - exit

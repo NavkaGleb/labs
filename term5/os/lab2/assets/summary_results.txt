@@ -1,3 +1,0 @@
-Algorithm type: Scheduling in Interactive Systems
-Algorithm name: Fair-Share Algorithm
-Taken time:     1027
